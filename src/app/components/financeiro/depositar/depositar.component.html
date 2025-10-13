@@ -1,0 +1,83 @@
+<div class="flex flex-col h-full bg-cover bg-center text-gray-900 rounded-lg shadow-lg p-4 sm:p-6"
+  style="background-image: url('assets/images/fundobolao.png');">
+
+  <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-400">
+    <h1 class="font-bold text-slate-800 min-w-0 flex-shrink-0 text-lg sm:text-xl"
+      style="font-size: clamp(0.9rem, 3.5vw, 1.25rem);">
+      <span class="text-slate-900">Novo Depósito</span>
+    </h1>
+    <button mat-raised-button color="primary" (click)="goBackToDashboard()"
+      class="px-3 py-1 text-sm sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-md transition duration-300 ease-in-out transform hover:scale-105 ml-2">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-8">
+    <mat-spinner color="accent"></mat-spinner>
+    <p class="mt-4 text-lg text-gray-600">Processando depósito...</p>
+  </div>
+
+  <!-- Tela principal do formulário de depósito -->
+  <div *ngIf="!isLoading && !showPixScreen" class="flex-grow flex flex-col items-center justify-center">
+    <mat-card class="w-full max-w-sm rounded-lg shadow-lg p-6 bg-white">
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Realizar Depósito</h2>
+      <form [formGroup]="depositoForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Valor (R$)</mat-label>
+          <span matPrefix>R$&nbsp;</span>
+          <input matInput type="number" formControlName="valor" placeholder="Ex: 10.00">
+          <mat-icon matSuffix>attach_money</mat-icon>
+          <mat-error *ngIf="depositoForm.get('valor')?.invalid && depositoForm.get('valor')?.touched">
+            Por favor, insira um valor válido.
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="depositoForm.invalid"
+          class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+          <mat-icon>credit_card</mat-icon> Gerar PIX
+        </button>
+      </form>
+    </mat-card>
+  </div>
+
+  <!-- Tela de pagamento PIX -->
+  <div *ngIf="showPixScreen" class="flex-grow flex flex-col items-center justify-center">
+    <mat-card class="w-full max-w-md rounded-lg shadow-lg p-6 bg-white text-center">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Pagar com PIX</h2>
+      <p class="text-gray-600 mb-6">Escaneie o QR Code ou use o código para pagar.</p>
+
+      <!-- QR Code dinâmico -->
+      <div class="flex flex-col items-center justify-center mb-6">
+        <img [src]="pixResponse?.qrCodeBase64" alt="QR Code PIX" class="w-48 h-48 border border-gray-300 rounded-lg p-2">
+        <p class="text-sm text-gray-500 mt-1">Simulação. Não use para pagamento real.</p>
+      </div>
+
+      <!-- Código Copia e Cola -->
+      <div class="mb-6">
+        <p class="font-semibold text-gray-700">Ou use o código:</p>
+        <div class="flex items-center mt-2">
+          <input type="text" [value]="pixResponse?.pixCopiaECola" readonly
+            class="flex-grow p-2 border rounded-lg bg-gray-100 text-sm truncate">
+          <button mat-icon-button (click)="copiarPix()" class="ml-2 text-indigo-600 hover:text-indigo-800">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mt-4">
+        <!-- Botão de Simulação -->
+        <button mat-raised-button color="accent" (click)="simularPagamento()"
+          class="py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+          <mat-icon>check_circle</mat-icon> Simular Pagamento
+        </button>
+        
+        <button mat-raised-button (click)="goBackToDashboard()"
+          class="py-2 bg-gray-400 hover:bg-gray-500 text-gray-800 font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+          Voltar
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div>
+

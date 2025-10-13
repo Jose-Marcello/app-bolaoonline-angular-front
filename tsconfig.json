@@ -1,0 +1,63 @@
+// Localização: tsconfig.json
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./src", // Base para resolver caminhos relativos
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false, // Mantido como false para maior compatibilidade inicial
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2022", // Ou "es2020" dependendo da sua configuração Angular CLI
+    "module": "es2022", // Ou "es2020"
+    "useDefineForClassFields": false,
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
+    "paths": {
+      // Aliases gerais
+      "@environments/*": ["environments/*"],
+      "@services/*": ["app/services/*"],
+      "@core/*": ["app/core/*"], // Para interceptors, guards, etc.
+
+      // Aliases para o domínio de AUTENTICAÇÃO (agora com login/register diretamente sob auth)
+      "@auth/*": ["app/auth/*"], // Aponta para a pasta auth (para auth.service.ts, etc.)
+      "@auth/login/*": ["app/auth/component/login/*"], // Para o componente de login
+      "@auth/register/*": ["app/auth/component/register/*"], // Para o componente de registro
+      "@auth/models/*": ["app/auth/models/*"], // Para os modelos dentro de auth/models
+      "@auth/guards/*": ["app/auth/guards/*"], // Para os guards dentro de auth/guards (se criarmos)
+
+      // Aliases para os COMPONENTES (agora todos sob app/components)
+      "@components/*": ["app/components/*"], // Alias geral para a pasta components
+      "@components/dashboard/*": ["app/components/dashboard/*"],
+      "@components/aposta-rodada/*": ["app/components/aposta-rodada/*"], // Para a pasta aposta-rodada
+
+      // Aliases para os MODELOS (agora genéricos sob app/models/common)
+      "@models/*": ["app/models/*"], // Para modelos genéricos (ex: common)
+      "@models/common/*": ["app/models/common/*"], // Para modelos comuns
+      // Adicione outros aliases de modelos específicos se necessário (ex: @models/campeonato/*)
+      "@models/apostador/*": ["app/models/apostador/*"],
+      "@models/campeonato/*": ["app/models/campeonato/*"],
+      "@models/rodada/*": ["app/models/rodada/*"],
+      "@models/equipe/*": ["app/models/equipe/*"],
+      "@models/partida/*": ["app/models/partida/*"],
+      "@models/palpite/*": ["app/models/palpite/*"]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

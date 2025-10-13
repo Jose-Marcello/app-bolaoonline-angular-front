@@ -1,0 +1,112 @@
+// Localização: src/app/components/dashboard/dashboard.component.scss
+
+// Estilos para o painel de expansão, garantindo que o rótulo posicione corretamente
+::ng-deep .mat-expansion-panel {
+  position: relative; // Essencial para o 'position: absolute' do rótulo
+  overflow: visible; // Garante que o rótulo não seja cortado
+}
+
+// 1. AFASTAR NOME E ESCUDO DO TOPO DO CARD
+// Usamos ::ng-deep para atingir o elemento interno do mat-expansion-panel
+// Aumentamos o min-height para criar mais espaço vertical no cabeçalho
+// Adicionamos padding para empurrar o conteúdo para baixo
+::ng-deep .mat-expansion-panel-header {
+  min-height: 120px !important;
+  padding: 15px !important;
+}
+
+// 2. FONTE MENOR EM AZUL ESCURO NEGRITO
+// O seletor .mat-panel-title é o contêiner direto do nome e escudo
+// A classe .campeonato-nome no seu HTML já é mais específica, então podemos usá-la
+::ng-deep .campeonato-nome {
+  font-size: 1rem !important; /* Fonte menor, 16px */
+  font-weight: bold !important; /* Negrito */
+  color: #1e3a8a !important; /* Cor azul escuro */
+}
+
+// 3. MOVENDO O RÓTULO PARA O CENTRO (À DIREITA)
+// A classe `campeonato-status-label` é o seletor do seu rótulo
+// Usamos position: absolute em relação ao painel e ajustamos top e transform
+::ng-deep .campeonato-status-label {
+  position: absolute !important;
+  top: 50% !important;
+  right: 15px !important;
+  transform: translateY(-50%) rotate(6deg) !important;
+  white-space: nowrap !important;
+  z-index: 10 !important;
+}
+
+// Estilos para a barra de rolagem horizontal
+.horizontal-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.botao_aposta_rodada{
+  background-color: #699168;
+  color:  #0a0101;
+  font-size: 0.7rem !important; /* Fonte menor, 16px */
+  font-weight: bold !important;
+}
+
+.botao_resultado_rodada{
+  background-color: #4e9fb8;
+  color:  #0a0101;
+  font-size: 0.7rem !important; /* Fonte menor, 16px */
+  font-weight: bold !important;
+}
+
+.botao_rodadas_finalizadas{
+  background-color: #646262;
+  color:  #070606;
+  font-size: 0.7rem !important; /* Fonte menor, 16px */
+  font-weight: bold !important;
+}
+
+
+.horizontal-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #4a5568;
+  border-radius: 4px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar-track {
+  background-color: #2d3748;
+}
+
+.button-padrao-dashboard {
+    @apply w-full px-4 py-2 text-sm font-semibold rounded-lg shadow-md transition duration-300 ease-in-out;
+}
+
+
+/* Localização: src/app/components/dashboard/dashboard.component.scss */
+
+/* Sobrescreve as regras de estilo do Angular Material */
+::ng-deep .mat-expansion-panel-header {
+  padding: 0 16px !important; // Reduz o padding horizontal
+  min-height: 48px !important; // Define uma altura mínima menor
+
+  .mat-expansion-panel-header-title,
+  .mat-expansion-panel-header-description {
+    margin: 0 !important; // Remove a margem interna
+    padding: 0 !important; // Remove o padding interno
+  }
+}
+
+/* Ajusta o painel quando expandido */
+::ng-deep .mat-expansion-panel-header.mat-expanded {
+  min-height: 48px !important;
+}
+
+/* Ajusta o corpo do painel quando expandido */
+::ng-deep .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+/* Ajusta o conteúdo do card interno para espaçamento */
+.card-content-compact {
+  padding: 8px 16px; // Adiciona um padding controlado
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch; /* Para iOS */
+  touch-action: pan-x; /* Para Android e outros */
+}

@@ -1,0 +1,228 @@
+<style>
+  /* Solução definitiva para remover a sombra do Material Design */
+  .mat-card, .mat-expansion-panel, .mat-expansion-panel-header {
+    box-shadow: none !important;
+  }
+
+  .placar-final-box {
+    background-color: #f1f5f9; /* gray-100 */
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 0.75rem; /* p-3 */
+    margin-top: 0.75rem; /* mt-3 */
+    border: 1px solid #e2e8f0; /* gray-200 */
+  }
+
+  .pontos-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: #10b981; /* green-500 */
+    color: #ffffff;
+    border-radius: 9999px; /* rounded-full */
+    font-weight: 800; /* font-extrabold */
+    font-size: 1rem; /* text-lg */
+  }
+</style>
+
+<div class="flex flex-col h-full bg-cover bg-center text-gray-900 rounded-lg shadow-lg p-4 sm:p-6"
+  style="background-image: url('assets/images/fundobolao.png');">
+
+  <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-400">
+    <h1 class="font-bold text-slate-800 min-w-0 flex-shrink-0 text-lg sm:text-xl"
+      style="font-size: clamp(0.9rem, 3.5vw, 1.25rem);">
+      <span class="text-slate-900">{{ rodadaSelecionada?.campeonato?.nome || 'Carregando...' }}</span>
+    </h1>
+    <button mat-raised-button color="primary" (click)="goBackToDashboard()"
+      class="px-3 py-1 text-sm sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-md transition duration-300 ease-in-out transform hover:scale-105 ml-2">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-8">
+    <mat-spinner color="accent"></mat-spinner>
+    <p class="mt-4 text-lg text-gray-600">Carregando resultados...</p>
+  </div>
+
+  <div *ngIf="errorMessage && !isLoading" class="bg-red-500 text-white p-3 sm:p-4 rounded-lg shadow-md mb-4 text-center">
+    <p class="font-semibold text-md sm:text-lg">{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="hasNotifications && notifications.length > 0" class="mb-4">
+    <div *ngFor="let notif of notifications" [ngClass]="{
+          'bg-red-400': notif.tipo === 'Erro',
+          'bg-yellow-400': notif.tipo === 'Alerta',
+          'bg-green-400': notif.tipo === 'Sucesso',
+          'bg-blue-400': notif.tipo === 'Info'
+        }" class="text-white p-3 rounded-lg shadow-md mb-2">
+      <p class="font-semibold">{{ notif.mensagem }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="flex-grow flex flex-col">
+
+    <h2 class="text-xl font-bold text-slate-800 mb-3 fonte-subtit">Rodadas Correntes</h2>
+    <div *ngIf="rodadasCorrentes.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+      <div class="grid grid-cols-4 gap-2 p-3 border-b border-gray-300 text-gray-600 font-semibold text-xs sm:text-sm">
+        <span class="text-center"></span>
+        <span class="text-center">Rodada</span>
+        <span class="text-center">Início</span>
+        <span class="text-center">Fim</span>
+      </div>
+      <div class="flex flex-col">
+        <mat-card *ngFor="let rodada of rodadasCorrentes" (click)="onRodadaSelected(rodada.id!)" [ngClass]="{
+            'bg-gray-100 hover:bg-gray-200': rodadaSelecionada?.id !== rodada.id,
+            'bg-indigo-100 border-l-4 border-indigo-400 shadow-lg': rodadaSelecionada?.id === rodada.id
+          }" class="rounded-none shadow-none p-3 cursor-pointer transition duration-200 ease-in-out relative">
+          <div class="grid grid-cols-4 gap-2 items-center text-xs sm:text-sm">
+            <div class="flex justify-center">
+              <svg *ngIf="rodadaSelecionada?.id === rodada.id" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-circle text-indigo-600 transition-transform duration-200 hover:scale-110">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 12h8" />
+                <path d="m12 16 4-4-4-4" />
+              </svg>
+              <div *ngIf="rodadaSelecionada?.id !== rodada.id" class="w-6 h-6"></div>
+            </div>
+            <span class="font-bold text-center text-gray-900">{{ rodada.numeroRodada }}</span>
+            <span class="text-center text-gray-700">{{ rodada.dataInic | date:'dd/MM/yy' }}</span>
+            <span class="text-center text-gray-700">{{ rodada.dataFim | date:'dd/MM/yy' }}</span>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+    <div *ngIf="rodadasCorrentes.length === 0" class="bg-yellow-100 text-yellow-800 p-3 rounded-lg shadow-md mb-4">
+      <p>Nenhuma rodada corrente para visualizar neste campeonato.</p>
+    </div>
+
+    <div *ngIf="rodadaSelecionada?.id" class="flex justify-center mt-6 mb-6">
+      <button mat-raised-button color="accent" (click)="onDownloadPlanilhaConferencia()"
+        class="px-4 py-2 text-sm bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+        <mat-icon>download</mat-icon>
+        Planilha de Conferência
+      </button>
+    </div>
+
+    <h2 class="text-xl font-bold text-slate-800 mb-3 fonte-subtit">Minhas Apostas para esta Rodada:</h2>
+    <div *ngIf="apostadorCampeonatoId && apostasUsuarioRodada.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+      <div class="grid grid-cols-5 gap-2 p-3 border-b border-gray-300 text-gray-600 font-semibold text-xs sm:text-sm">
+        <span class="text-center"></span>
+        <span class="text-center">Ident</span>
+        <span class="text-center">Dt Envio</span>
+        <span class="text-center">Pontuação</span>
+        <span class="text-center">TIPO</span>
+      </div>
+      <div class="flex flex-col">
+        <mat-card *ngFor="let aposta of apostasUsuarioRodada" (click)="onApostaSelected(aposta.id!)" [ngClass]="{
+            'bg-gray-100 hover:bg-gray-200': apostaAtual?.id !== aposta.id,
+            'bg-teal-100 border-l-4 border-teal-400 shadow-lg': apostaAtual?.id === aposta.id
+          }" class="rounded-none shadow-none p-3 cursor-pointer transition duration-200 ease-in-out relative">
+          <div class="grid grid-cols-5 gap-2 items-center text-xs sm:text-sm">
+            <div class="flex justify-center">
+              <svg *ngIf="apostaAtual?.id === aposta.id" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-circle text-teal-600 transition-transform duration-200 hover:scale-110">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 12h8" />
+                <path d="m12 16 4-4-4-4" />
+              </svg>
+              <div *ngIf="apostaAtual?.id !== aposta.id" class="w-6 h-6"></div>
+            </div>
+            <span class="font-bold text-center text-gray-900">{{ aposta.identificadorAposta || 'N/A' }}</span>
+            <span class="text-center text-gray-700">{{ aposta.dataHoraSubmissao ? (aposta.dataHoraSubmissao | date:'dd/MM/yy') : 'N/A' }}</span>
+            <span class="text-center font-semibold text-green-600">{{ aposta.pontuacaoTotalRodada }}</span>
+            <span class="text-center text-gray-700">{{ aposta.ehApostaCampeonato ? 'Campeonato' : 'Avulsa' }}</span>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+    <div *ngIf="!apostadorCampeonatoId" class="bg-blue-100 text-blue-800 p-3 rounded-lg shadow-md mb-4">
+      <p>Você ainda não aderiu a este campeonato.</p>
+    </div>
+    <div *ngIf="apostadorCampeonatoId && apostasUsuarioRodada.length === 0" class="bg-yellow-100 text-yellow-800 p-3 rounded-lg shadow-md mb-4">
+      <p>Você ainda não tem apostas para esta rodada.</p>
+    </div>
+
+    <div *ngIf="apostaAtual" class="flex flex-col sm:flex-row justify-between items-center mt-6 p-4 bg-gray-200 rounded-lg shadow-md">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 sm:mb-0">
+        Pontuação na Rodada: <span class="font-extrabold text-green-600">{{ apostaAtual.pontuacaoTotalRodada }}</span>
+      </h3>
+      <div class="flex space-x-3">
+        <button mat-raised-button color="primary" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md" (click)="navegarParaRankingRodada()">
+          <mat-icon>leaderboard</mat-icon> Ranking da Rodada
+        </button>
+      <button mat-raised-button color="primary" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md" (click)="navegarParaRankingCampeonato()">
+          <mat-icon>bar_chart</mat-icon> Ranking do Campeonato
+      </button>
+      </div> 
+    </div>
+
+    <h2 class="text-xl font-bold text-slate-800 mb-3 fonte-subtit mt-8">Palpites e Resultados:</h2>
+    <div class="w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <mat-card *ngFor="let jogo of jogosDaApostaAtual"
+            class="bg-white rounded-xl shadow-md p-3 flex flex-col justify-between">
+          <div class="text-center text-slate-800 text-sm mb-3 font-semibold">
+            <p *ngIf="jogo.estadioNome">{{ jogo.estadioNome }}</p>
+            <p>{{ jogo.dataJogo | date:'dd/MM/yy - EEEE':'pt-BR' }} às {{ jogo.horaJogo }}</p>
+          </div>
+
+          <div class="flex items-center justify-center w-full mb-3">
+            <div class="flex items-center flex-col text-center w-1/4">
+              <img [src]="baseUrlImagens + jogo.escudoMandante" alt="Escudo Mandante" class="w-10 h-10 mb-1 rounded-full"
+                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/FF0000/FFFFFF?text=X';">
+              <span class="font-bold text-sm text-gray-900">{{ jogo.equipeMandante }}</span>
+            </div>
+
+            <div class="flex flex-col text-center mx-1">
+              <div class="flex flex-row items-center justify-center space-x-1">
+                <span class="text-xl font-bold text-gray-700">{{ jogo.placarApostaCasa }}</span>
+                <span class="text-2xl font-extrabold text-gray-900">X</span>
+                <span class="text-xl font-bold text-gray-700">{{ jogo.placarApostaVisita }}</span>
+              </div>
+              <span class="text-xs text-gray-500 font-semibold mt-1">Seu Palpite</span>
+            </div>
+
+            <div class="flex items-center flex-col text-center w-1/4">
+              <img [src]="baseUrlImagens + jogo.escudoVisitante" alt="Escudo Visitante" class="w-10 h-10 mb-1 rounded-full"
+                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/0000FF/FFFFFF?text=Y';">
+              <span class="font-bold text-sm text-gray-900">{{ jogo.equipeVisitante }}</span>
+            </div>
+          </div>
+          
+          <div class="flex flex-col items-center mt-2">
+              <span class="text-xs font-semibold"
+                    [ngClass]="{
+                      'text-green-500': jogo.statusJogo === 'Finalizado',
+                      'text-blue-500': jogo.statusJogo === 'EmAndamento',
+                      'text-red-500': jogo.statusJogo === 'NaoIniciado'
+                    }">
+                  {{ jogo.statusJogo }}
+              </span>
+          </div>
+
+          <div class="placar-final-box flex flex-col items-center mt-3" *ngIf="jogo.statusJogo === 'Finalizado' || jogo.statusJogo === 'EmAndamento'">
+            <span class="text-sm font-semibold text-gray-700">Resultado Atual</span>
+          <div class="flex flex-row items-center justify-center space-x-1 mt-1">
+            <span class="text-2xl font-bold text-red-600">{{ jogo.placarRealCasa }}</span>
+            <span class="text-2xl font-extrabold text-gray-900">X</span>
+            <span class="text-2xl font-bold text-red-600">{{ jogo.placarRealVisita }}</span>
+          </div>      
+          </div>
+
+          <div class="flex flex-col justify-center items-center mt-3" *ngIf="jogo.statusJogo === 'Finalizado' || jogo.statusJogo === 'EmAndamento'">
+              <span class="text-sm font-semibold text-gray-700">{{ jogo.statusJogo === 'Finalizado' ? 'Pontuação Final' : 'Pontuação Corrente' }}</span>
+              <div class="mt-1">
+                <span class="pontos-circle">{{ jogo.pontuacao }}</span>
+              </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+    <div *ngIf="!apostadorCampeonatoId" class="bg-blue-100 text-blue-800 p-3 rounded-lg shadow-md mb-4">
+      <p>Você ainda não aderiu a este campeonato.</p>
+    </div>
+    <div *ngIf="apostadorCampeonatoId && apostasUsuarioRodada.length === 0" class="bg-yellow-100 text-yellow-800 p-3 rounded-lg shadow-md mb-4">
+      <p>Você ainda não tem apostas para esta rodada.</p>
+    </div>
+  </div>
+</div>

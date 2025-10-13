@@ -1,0 +1,225 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+//$caminho-da-imagem: 'assets/images/fundo_bolao.png';
+
+/* Importação do Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globais para o body e html para garantir que o fundo cubra tudo */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  /* Fundo da imagem principal aplicado ao body para cobrir tudo */
+  //background-image: url('assets/images/fundo_bolao.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  overflow-x: hidden; /* Evita rolagem horizontal indesejada */
+}
+
+/* Cores personalizadas do Bolão para uso com Tailwind */
+:root {
+  --bolao-blue-dark: #3F51B5; /* Azul escuro (primário) */
+  --bolao-blue-medium: #5C6BC0; /* Azul médio */
+  --bolao-blue-light: #C5CAE9; /* Azul claro */
+  --bolao-green-dark: #4CAF50; /* Verde escuro (sucesso) */
+  --bolao-green-light: #81C784; /* Verde claro */
+  --bolao-accent: #FFC107; /* Amarelo (accent) */
+  --bolao-warn: #F44336; /* Vermelho (aviso/erro) */
+  --bolao-text-black: #212121; /* Texto preto */
+  --bolao-text-gray: #757575; /* Texto cinza */
+}
+
+/* Classes utilitárias Tailwind personalizadas para as cores */
+.bg-bolao-blue-dark { background-color: var(--bolao-blue-dark); }
+.hover\:bg-bolao-blue-dark\/90:hover { background-color: rgba(var(--bolao-blue-dark), 0.9); }
+.bg-bolao-green-dark { background-color: var(--bolao-green-dark); }
+.hover\:bg-bolao-green-dark\/90:hover { background-color: rgba(var(--bolao-green-dark), 0.9); }
+.bg-bolao-accent { background-color: var(--bolao-accent); }
+.hover\:bg-bolao-accent\/90:hover { background-color: rgba(var(--bolao-accent), 0.9); }
+.bg-bolao-warn { background-color: var(--bolao-warn); }
+.hover\:bg-bolao-warn\/90:hover { background-color: rgba(var(--bolao-warn), 0.9); }
+.text-bolao-text-black { color: var(--bolao-text-black); }
+.text-bolao-text-gray { color: var(--bolao-text-gray); }
+.bg-bolao-green-light { background-color: var(--bolao-green-light); }
+.border-bolao-green-dark { border-color: var(--bolao-green-dark); }
+.text-bolao-green-dark { color: var(--bolao-green-dark); }
+.border-bolao-warn { border-color: var(--bolao-warn); }
+.text-bolao-warn { color: var(--bolao-warn); }
+.bg-bolao-accent { background-color: var(--bolao-accent); }
+.border-bolao-accent { border-color: var(--bolao-accent); }
+.text-bolao-accent { color: var(--bolao-accent); }
+
+
+/* Classes para snackbar */
+.snackbar-success {
+  background-color: var(--bolao-green-dark) !important;
+  color: white !important;
+}
+
+.snackbar-error {
+  background-color: var(--bolao-warn) !important;
+  color: white !important;
+}
+
+.snackbar-warning {
+  background-color: #FFEB3B !important; /* Amarelo mais vibrante para aviso */
+  color: #333 !important;
+}
+
+.snackbar-info {
+  background-color: var(--bolao-blue-dark) !important;
+  color: white !important;
+}
+
+/* <<-- FORÇANDO CORES DE FUNDO DOS CARDS E WRAPPER AQUI COM MAIS ESPECIFICIDADE -->> */
+/* Usando seletores de elementos do Material Design */
+.cards-container-wrapper {
+  background-color: rgba(245, 245, 245, 0.068) !important; /* Cinza claro com leve transparência, forçado */
+}
+
+mat-card.mat-mdc-card { /* Seletor mais específico para o card do Material Design */
+  background-color: #e0e0e0f3 !important; /* Um cinza um pouco mais escuro para os cards, forçado */
+  border: 1px solid #04188d !important; /* Borda forçada */
+}
+
+
+
+
+/*
+ * Localização: src/app/aposta-rodada/aposta-rodada-form/aposta-rodada-form.component.scss
+ *
+ * Este código foi reestruturado para ser mais específico e resolver os problemas de
+ * aplicação de estilos. As classes mat-table e mat-header-cell são seletores
+ * específicos do Angular Material, que garantem que as mudanças sejam aplicadas.
+ */
+
+// Estilos existentes
+.cards-container-wrapper {
+  background-color: rgba(245, 245, 245, 0.068) !important;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(179, 177, 177, 0.925);
+  width: 100%;
+  max-width: 96rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+mat-card.mat-mdc-card {
+  background-color: #e0e0e0f3 !important;
+  border: 1px solid #04188d !important;
+}
+
+.dashboard-button {
+  width: 100%;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  padding: 0.75rem 1rem;
+  height: auto;
+  line-height: normal;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.jogo-card {
+  background-color: #f5f5f5 !important;
+  border: 1px solid #ccc !important;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flex.items-center.justify-between {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .mat-form-field {
+    width: 100px;
+  }
+}
+
+mat-form-field {
+  .mat-mdc-form-field-wrapper {
+    padding-bottom: 0 !important;
+  }
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   NOVOS ESTILOS - MELHORIAS NA INTERFACE (Seletores mais específicos)
+   ========================================================================== */
+
+/* Padronização da cor da fonte para todos os dados das tabelas mat-table */
+mat-table .mat-row .mat-cell {
+  color: #333333;
+}
+
+/* Padronização do cabeçalho do grid de apostas */
+/* Garante que o texto do cabeçalho seja capitalizado e com cor padronizada */
+mat-header-cell {
+  text-transform: capitalize;
+  font-weight: 500;
+  color: #1a202c;
+}
+
+/* Sugestão para o ícone de seleção:
+ * Esta abordagem usa o seletor ::ng-deep para forçar a aplicação do estilo
+ * em componentes aninhados, o que é útil para componentes do Angular Material.
+ * Você precisará adicionar este bloco de código no seu arquivo styles.scss global.
+ */
+/*
+::ng-deep .select-icon .mat-icon {
+    display: none;
+}
+
+::ng-deep .select-icon {
+    position: relative;
+
+    &::before {
+        content: '→';
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #04188d;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+*/
+
+/* Alternativa mais moderna sem ::ng-deep, para o styles.scss global */
+.select-icon .mat-icon {
+    display: none;
+}
+
+.select-icon::before {
+    content: '→';
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #04188d;
+    display: block;
+}

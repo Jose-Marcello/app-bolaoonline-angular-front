@@ -1,0 +1,122 @@
+/* Localização: src/app/aposta-rodada/aposta-rodada-form/aposta-rodada-form.component.scss */
+
+/* Estilos existentes */
+.cards-container-wrapper {
+  background-color: rgba(245, 245, 245, 0.068) !important;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(179, 177, 177, 0.925);
+  width: 100%;
+  max-width: 96rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cor_fundo_placar_final {
+  background-color: rgba(58, 7, 243, 0.068) !important;
+}
+
+mat-card.mat-mdc-card {
+  background-color: #e0e0e0f3 !important;
+  border: 1px solid #04188d !important;
+}
+
+.fonte-subtit {
+  color: #92bbeb !important;
+}
+
+.cor-statusjogo {
+  color: #130270 !important;
+}
+
+.dashboard-button {
+  width: 100%;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  padding: 0.75rem 1rem;
+  height: auto;
+  line-height: normal;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.jogo-card {
+  background-color: #f5f5f5 !important;
+  border: 1px solid #ccc !important;
+  transition: transform 0.2s ease-in-out;
+ 
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flex.items-center.justify-between {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .mat-form-field {
+    width: 100px;
+  }
+}
+
+mat-form-field {
+  .mat-mdc-form-field-wrapper {
+    padding-bottom: 0 !important;
+  }
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   NOVOS ESTILOS - Melhorias com seletores mais específicos e ng-deep
+   ========================================================================== */
+
+/* Usamos ::ng-deep para garantir que o estilo se aplique a componentes filhos */
+/* Padronização da cor da fonte para todos os dados das tabelas */
+::ng-deep .mat-row .mat-cell {
+  color: #333333 !important;
+}
+
+/* Padronização do cabeçalho do grid de apostas */
+/* Garante que o texto do cabeçalho seja capitalizado e com cor padronizada */
+::ng-deep .mat-header-cell {
+  text-transform: capitalize !important;
+  font-weight: 500 !important;
+  color: #1a202c !important;
+}
+
+/* Sugestão para o ícone de seleção:
+ * Esta abordagem usa o seletor ::ng-deep para forçar a aplicação do estilo
+ * em componentes aninhados, que é útil para componentes do Angular Material.
+ * O seletor .select-icon será uma classe que você vai adicionar manualmente no HTML.
+ */
+::ng-deep .select-icon {
+  // Esconde o ícone atual, que geralmente é um material icon 'done'
+  .mat-icon {
+    display: none;
+  }
+
+  // Adiciona a seta como um pseudo-elemento
+  &::before {
+    content: '→'; /* Ícone de seta */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #04188d; /* Cor da seta, combinando com a borda do card */
+    display: block;
+  }
+}

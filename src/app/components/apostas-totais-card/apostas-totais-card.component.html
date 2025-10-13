@@ -1,0 +1,24 @@
+
+<mat-card class="p-4 rounded-lg shadow-md mb-4 bg-gray-50 border-2 border-gray-200">
+  <div class="flex items-center mb-2">
+    <mat-icon class="text-xl text-blue-500 mr-2">info</mat-icon>
+    <mat-card-title class="text-lg font-bold text-gray-800">{{ titulo }}</mat-card-title>
+  </div>
+  
+  <div class="flex flex-col space-y-2 text-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600">Apostas Avulsas:</span>
+      <span class="font-semibold text-gray-900">{{ totais.numeroDeApostas }}</span>
+    </div>
+    
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600">Valor Arrecadado:</span>
+      <span class="font-bold text-blue-600">{{ totais.valorTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
+    </div>
+    
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600">Prêmio Estimado:</span>
+      <span class="font-bold text-yellow-800">{{ totais.valorTotal * (1 - taxaAdministrativa) | currency:'BRL':'symbol':'1.2-2' }}</span>
+    </div>
+  </div>
+</mat-card>

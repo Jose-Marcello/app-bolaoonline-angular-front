@@ -1,0 +1,93 @@
+<div class="h-screen w-screen flex items-center justify-center relative" 
+     style="background-image: url('/assets/images/fundobolao.png'); background-size: cover; background-position: center; background-attachment: fixed;">
+  <div class="max-w-md w-full max-h-screen overflow-y-auto bg-bolao-card-bg p-8 rounded-lg shadow-xl space-y-6 text-bolao-text-light mx-auto">
+    <div class="text-center">
+      <img src="/assets/images/logobolao.png" alt="Logo Bolão Online" class="w-24 h-24 mx-auto mb-4 rounded-full border-2 border-bolao-green-light">
+      <h2 class="text-3xl font-extrabold text-bolao-green-light">
+        Bolão Online
+      </h2>
+      <p class="mt-2 text-center text-xl font-extrabold text-bolao-green-light">
+        Faça login na sua conta
+      </p>
+    </div>
+
+    <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div>
+          <input id="email-address" name="email" type="email" autocomplete="email" required
+                 formControlName="email"
+                 class="appearance-none relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 text-bolao-text-light bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm rounded-t-md"
+                 placeholder="Endereço de Email">
+          <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)"
+               class="text-red-500 text-sm mt-1">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">Email é obrigatório.</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Email inválido.</span>
+          </div>
+        </div>
+
+        <div class="relative flex items-center w-full">
+          <input id="password" name="password" [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password" required
+                 formControlName="password"
+                 class="appearance-none block w-full px-3 py-2 pr-10 border border-gray-600 placeholder-gray-400 text-bolao-text-light bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm rounded-b-md"
+                 placeholder="Senha">
+          <button type="button" (click)="togglePasswordVisibility()" 
+                  class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-bolao-green-light">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <button type="submit"
+          [disabled]="loginForm.invalid || isLoading"
+          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-bolao-green-dark hover:bg-bolao-green-dark/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolao-green-dark">
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <svg class="h-5 w-5 text-bolao-green-light group-hover:text-bolao-green-light/80" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+            </svg>
+          </span> 
+          Entrar
+        </button>
+      </div>
+    </form>
+    
+    <div class="mt-4 text-center text-sm">
+      <a (click)="openResendEmailModal()" class="font-medium text-bolao-green-light hover:text-bolao-green-light/80 cursor-pointer">
+        Não recebeu o e-mail de confirmação? <span class="font-bold underline">Reenviar.</span>
+      </a>
+    </div>
+
+    <div *ngIf="showResendEmailModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-xl text-gray-900 w-full max-w-sm" [formGroup]="resendForm">
+      <h3 class="text-xl font-bold mb-4">Reenviar e-mail de confirmação</h3>
+      <p class="mb-4">Digite o e-mail da sua conta para receber o link de confirmação novamente.</p>
+      
+      <input type="email" placeholder="Endereço de e-mail" formControlName="emailToResend"
+             class="appearance-none block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md mb-4">
+      
+      <div *ngIf="resendForm.get('emailToResend')?.invalid && (resendForm.get('emailToResend')?.dirty || resendForm.get('emailToResend')?.touched)" class="text-red-500 text-sm mb-4">
+        <span *ngIf="resendForm.get('emailToResend')?.errors?.['required']">Email é obrigatório.</span>
+        <span *ngIf="resendForm.get('emailToResend')?.errors?.['email']">Email inválido.</span>
+      </div>
+      
+      <div class="flex justify-end space-x-2">
+          <button (click)="closeResendEmailModal()" class="px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300">
+              Cancelar
+          </button>
+          <button (click)="resendEmail()" [disabled]="resendForm.invalid || isLoading"
+                  class="px-4 py-2 text-sm font-medium rounded-md text-white bg-bolao-green-dark hover:bg-bolao-green-dark/80 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i *ngIf="isLoading" class="fa fa-spinner fa-spin mr-2"></i>
+              Enviar
+          </button>
+      </div>
+  </div>
+</div>
+    
+    <div class="text-center text-sm mt-4">
+      Não tem conta?
+      <a routerLink="/register" class="font-medium text-bolao-green-light hover:text-bolao-green-light/80 ">
+        Registre-se aqui
+      </a>
+    </div>
+  </div>
+</div>

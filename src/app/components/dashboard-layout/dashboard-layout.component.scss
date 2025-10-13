@@ -1,0 +1,5 @@
+/* src/app/components/dashboard-layout/dashboard-layout.component.scss */
+.mat-sidenav {
+    background-color: #F5F5DC !important; /* Use !important para garantir a sobreposição */
+    opacity: 1 !important; /* Garante que não há opacidade definida */
+}

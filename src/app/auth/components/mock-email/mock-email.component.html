@@ -1,0 +1,23 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100 p-4"> <div class="card bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl"> <div class="card-header border-b pb-4 mb-4 text-center"> <h4 class="text-2xl font-bold text-gray-800">E-mail Simulado</h4>
+    </div>
+    <div class="card-body" *ngIf="!isLoading">
+      <p class="mb-2"><strong>Para:</strong> {{ emailData?.to }}</p>
+      <p class="mb-4"><strong>Assunto:</strong> {{ emailData?.subject }}</p>
+      <hr class="my-4">
+      <div [innerHTML]="emailData?.body" class="prose max-w-none text-gray-700 leading-relaxed"></div> 
+      <hr class="my-4">
+      
+      <div class="text-center mt-6"> <button 
+          *ngIf="emailData?.confirmationLink"
+          class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
+          (click)="onConfirm()">
+          Confirmar E-mail
+        </button>
+      </div>
+
+    </div>
+    <div class="card-body text-center py-8" *ngIf="isLoading">
+      <p class="text-gray-600">Carregando e-mail...</p>
+    </div>
+  </div>
+</div>

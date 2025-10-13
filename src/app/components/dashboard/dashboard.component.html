@@ -1,0 +1,110 @@
+<div class="dashboard-container p-6 md:p-10">
+<div *ngIf="isLoading" class="flex justify-center items-center h-full">
+<mat-spinner diameter="50"></mat-spinner>
+</div>
+
+<div *ngIf="!isLoading && !errorMessage" class="container mx-auto">
+<div class="my-2">
+<mat-card class="rounded-lg shadow-md bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<mat-icon class="text-xl">account_balance_wallet</mat-icon>
+<span class="text-lg font-bold">Saldo Atual</span>
+</div>
+<span class="text-2xl font-bold">{{ apostadorSaldo | currency:'BRL':'symbol':'1.2-2' }}</span>
+</div>
+<div class="mt-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto md:justify-center">
+<button mat-flat-button color="primary" class="w-full text-sm" (click)="navigateToDepositar()">
+<mat-icon>add</mat-icon> Depositar
+</button>
+<button mat-flat-button color="accent" class="w-full text-sm" (click)="navigateToSacar()">
+<mat-icon>remove</mat-icon> Sacar
+</button>
+</div>
+</mat-card>
+</div>
+
+<div class="text-center mb-6 mt-4">
+  <h2 class="text-2xl font-bold text-gray-800">Campeonatos Disponíveis</h2>
+</div>
+
+<div class="flex flex-row overflow-x-auto gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+  <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="campeonato-card p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 min-w-[300px]">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <img [src]="getCampeonatoLogo(campeonato.nome)" alt="Logo do Campeonato" class="w-12 h-12 rounded-full mr-4 object-cover">
+        <div class="flex-1">
+          <mat-card-title class="text-lg font-bold text-gray-800">{{ campeonato.nome }}</mat-card-title>
+          <mat-card-subtitle class="text-sm text-gray-600">{{ campeonato.dataInicio | date:'shortDate' }} - {{ campeonato.dataFim | date:'shortDate' }}</mat-card-subtitle>
+        </div>
+      </div>
+      <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-full">
+        JOGANDO!
+      </div>
+      <div *ngIf="!campeonato.aderidoPeloUsuario" class="bg-orange-700 text-white text-xs font-bold py-1 px-2 rounded-full">
+        VAMOS JOGAR!
+      </div>
+    </div>
+
+    <div *ngIf="campeonatoTotais[campeonato.id]" class="bg-gray-500 p-3 rounded-lg border-2 border-gray-300 mb-4">
+      <div class="flex flex-col space-y-2 text-gray-700">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-black">Apostadores:</span>
+          <span class="text-sm font-bold text-black">{{ campeonatoTotais[campeonato.id].numeroDeApostadores }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-black">Valor Arrecadado:</span>
+          <span class="text-sm font-bold text-blue-800">{{ campeonatoTotais[campeonato.id].valorTotalArrecadado | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-black">Prêmio Total:</span>
+          <span class="text-sm font-bold text-yellow-800">{{ campeonatoTotais[campeonato.id].valorTotalArrecadado * (1 - taxaAdministrativa) | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex flex-col space-y-4">
+      <div *ngIf="campeonato.rodadasEmAposta?.length > 0">
+        <app-apostas-totais-card
+          titulo="Rodada em Aposta"
+          [campeonato]="campeonato"
+          [rodada]="campeonato.rodadasEmAposta[0]">
+        </app-apostas-totais-card>
+        <button mat-flat-button color="accent" class="w-full mt-2" (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0].id)">
+          <mat-icon>sports_soccer</mat-icon> Apostar (Próxima Rodada) ({{ campeonato.rodadasEmAposta.length }})
+        </button>
+      </div>
+      
+      <div *ngIf="campeonato.rodadasCorrentes?.length > 0">
+        <app-apostas-totais-card
+          titulo="Rodada Corrente"
+          [campeonato]="campeonato"
+          [rodada]="campeonato.rodadasCorrentes[0]">
+        </app-apostas-totais-card>
+      </div>
+      
+      <div *ngIf="campeonato.rodadasCorrentes?.length > 0">
+        <button mat-flat-button color="primary" class="w-full botao_resultado_rodada" (click)="verRodadasCorrentes(campeonato.id)">
+          <mat-icon>trending_up</mat-icon> Resultados (Rodada Corrente) ({{ campeonato.rodadasCorrentes.length }})
+        </button>
+      </div>
+      
+      <div *ngIf="campeonato.rodadasFinalizadas">
+        <button mat-flat-button class="w-full botao_rodadas_finalizadas" (click)="verRodadasFinalizadas(campeonato.id)">
+          <mat-icon>history</mat-icon> Histórico (Rodadas Finalizadas) ({{ campeonato.rodadasFinalizadas.length }})
+        </button>
+      </div>
+    </div>
+    
+    <div class="card-actions flex flex-col space-y-2 mt-4" *ngIf="!campeonato.aderidoPeloUsuario">
+      <button mat-flat-button color="primary" class="w-full" (click)="entrarEmCampeonato(campeonato.id)">
+        <mat-icon>add_circle_outline</mat-icon> Aderir ao Campeonato
+      </button>
+    </div>
+  </mat-card>
+</div>
+
+</div>
+
+<div *ngIf="errorMessage" class="text-red-500 text-center mt-8">{{ errorMessage }}</div>
+</div>
