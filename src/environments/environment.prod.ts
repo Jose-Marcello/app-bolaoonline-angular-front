@@ -2,7 +2,8 @@ export const environment = {
 
   production: true,
 
-  // This is the correct URL for your backend API
+  // This is the correct URL for your backend API  cls
+  
   apiUrl: 'https://bolaoonline-docker.azurewebsites.net/api',
   imagesUrl: 'https://bolaoonline-docker.azurewebsites.net',
 
