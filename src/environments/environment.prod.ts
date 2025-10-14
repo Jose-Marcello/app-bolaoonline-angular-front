@@ -1,10 +1,12 @@
 export const environment = {
+
   production: true,
 
-  apiUrl: 'https://app.palpitesbolao.com.br/api',
-  imagesUrl: '/assets/images/'
+  // This is the correct URL for your backend API
+  apiUrl: 'https://bolaoonline-docker.azurewebsites.net/api',
+  imagesUrl: 'https://bolaoonline-docker.azurewebsites.net',
 
-  //apiUrl: 'https://bolaoonline-testes4.azurewebsites.net',
-  //imagesUrl: 'https://bolaoonline-testes4.azurewebsites.net'  // <-- A URL CORRETA DO BACKEND
-
+  // The commented-out code below is what you had before
+  // apiUrl: 'https://bolaoonline-testes4.azurewebsites.net',
+  // imagesUrl: 'https://bolaoonline-testes4.azurewebsites.net' 
 };
