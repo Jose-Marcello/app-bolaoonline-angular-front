@@ -9,5 +9,10 @@
       "allowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
       "rewrite": "https://bolaoonline-docker.azurewebsites.net/api/*"
     }
-  ]
+  ],
+ "globalHeaders": {
+    "Access-Control-Allow-Origin": "*"
+  }
+
+
 } 
