@@ -1,13 +1,15 @@
+
+
 export const environment = {
-
   production: true,
+  // Use seu domínio personalizado para todas as chamadas de API
+  apiUrl: 'https://app.palpitesbolao.com.br',
+  imagesUrl: 'https://app.palpitesbolao.com.br'
+};
 
-  // This is the correct URL for your backend API  cls
   
-  apiUrl: 'https://bolaoonline-docker.azurewebsites.net',
-  imagesUrl: 'https://bolaoonline-docker.azurewebsites.net',
+  //apiUrl: 'https://bolaoonline-docker.azurewebsites.net',
+  //imagesUrl: 'https://bolaoonline-docker.azurewebsites.net',
 
-  // The commented-out code below is what you had before
   // apiUrl: 'https://bolaoonline-testes4.azurewebsites.net',
   // imagesUrl: 'https://bolaoonline-testes4.azurewebsites.net' 
-};
