@@ -7,12 +7,10 @@
     {
       "route": "/api/*",
       "allowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-      "rewrite": "https://bolaoonline-docker.azurewebsites.net/api/*"
+      "rewrite": "https://app.palpitesbolao.com.br/api/*"
     }
   ],
- "globalHeaders": {
+  "globalHeaders": {
     "Access-Control-Allow-Origin": "*"
   }
-
-
-} 
+}
