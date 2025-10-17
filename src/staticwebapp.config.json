@@ -1,1 +1,22 @@
-{"navigationFallback":{"rewrite":"/index.html","exclude":["/assets/*.{js,css,png,jpg,jpeg,gif,svg}","/api/*"]},"routes":[{"route":"/api/*","allowedMethods":["GET","POST","PUT","PATCH","DELETE"],"rewrite":"https://app.palpitesbolao.com.br/api/*"}],"globalHeaders":{"Access-Control-Allow-Origin":"*"},"auth":{"rolesSource":"/api/FakeRoleAssigner","identityProviders":{"github":{"registration":{"clientIdSettingName":"GITHUB_CLIENT_ID","clientSecretSettingName":"GITHUB_CLIENT_SECRET_APP_SETTING_NAME"}}}}}
+{
+    "navigationFallback": {
+        "rewrite": "/index.html",
+        "exclude": ["/assets/*.{js,css,png,jpg,jpeg,gif,svg}", "/api/*"]
+    },
+    
+    "globalHeaders": {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Security-Policy": "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+    },
+    "auth": {
+        "rolesSource": "/api/FakeRoleAssigner",
+        "identityProviders": {
+            "github": {
+                "registration": {
+                    "clientIdSettingName": "GITHUB_CLIENT_ID",
+                    "clientSecretSettingName": "GITHUB_CLIENT_SECRET_APP_SETTING_NAME"
+                } 
+            }
+        }
+    }
+}
