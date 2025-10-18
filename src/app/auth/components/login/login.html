@@ -37,6 +37,10 @@
         </div>
       </div>
       
+      <div class="forgot-password-link">
+            <a routerLink="/forgot-password" class="link-recuperacao font-medium text-bolao-green-light hover:text-bolao-green-light/80 ">Esqueceu sua senha?</a>
+      </div>
+
       <div class="mt-4">
         <button type="submit"
           [disabled]="loginForm.invalid || isLoading"
@@ -83,7 +87,7 @@
   </div>
 </div>
     
-    <div class="text-center text-sm mt-4">
+    <div class="text-center font-medium text-bolao-green-light hover:text-bolao-green-light/80">
       Não tem conta?
       <a routerLink="/register" class="font-medium text-bolao-green-light hover:text-bolao-green-light/80 ">
         Registre-se aqui
