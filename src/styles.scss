@@ -14,26 +14,14 @@ html, body {
   height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  /* Fundo da imagem principal aplicado ao body para cobrir tudo */
-  //background-image: url('assets/images/fundo_bolao.png') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-attachment: fixed !important;
-  overflow-x: hidden; /* Evita rolagem horizontal indesejada */
+  
+  /* Mantemos o tamanho e desativamos o background-size que estava solto */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
-/* Cores personalizadas do Bolão para uso com Tailwind */
-:root {
-  --bolao-blue-dark: #3F51B5; /* Azul escuro (primário) */
-  --bolao-blue-medium: #5C6BC0; /* Azul médio */
-  --bolao-blue-light: #C5CAE9; /* Azul claro */
-  --bolao-green-dark: #4CAF50; /* Verde escuro (sucesso) */
-  --bolao-green-light: #81C784; /* Verde claro */
-  --bolao-accent: #FFC107; /* Amarelo (accent) */
-  --bolao-warn: #F44336; /* Vermelho (aviso/erro) */
-  --bolao-text-black: #212121; /* Texto preto */
-  --bolao-text-gray: #757575; /* Texto cinza */
-}
 
 /* Classes utilitárias Tailwind personalizadas para as cores */
 .bg-bolao-blue-dark { background-color: var(--bolao-blue-dark); }
@@ -87,8 +75,6 @@ mat-card.mat-mdc-card { /* Seletor mais específico para o card do Material Desi
   background-color: #e0e0e0f3 !important; /* Um cinza um pouco mais escuro para os cards, forçado */
   border: 1px solid #04188d !important; /* Borda forçada */
 }
-
-
 
 
 /*
@@ -169,8 +155,8 @@ mat-form-field {
 }
 
 /* ==========================================================================
-   NOVOS ESTILOS - MELHORIAS NA INTERFACE (Seletores mais específicos)
-   ========================================================================== */
+  NOVOS ESTILOS - MELHORIAS NA INTERFACE (Seletores mais específicos)
+  ========================================================================== */
 
 /* Padronização da cor da fonte para todos os dados das tabelas mat-table */
 mat-table .mat-row .mat-cell {
