@@ -92,38 +92,58 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.hidePassword = !this.hidePassword;
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.notificationsService.showNotification('Por favor, preencha o e-mail e a senha corretamente.', 'alerta');
-      this.loginForm.markAllAsTouched();
-      return;
-    }
-    
-    this.isLoading = true;
-    const loginRequest: LoginRequestDto = this.loginForm.value;
+ onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.notificationsService.showNotification('Por favor, preencha o e-mail e a senha corretamente.', 'alerta');
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+    
+    this.isLoading = true;
+    const loginRequest: LoginRequestDto = this.loginForm.value;
 
-    this.authService.login(loginRequest).pipe(
-      finalize(() => this.isLoading = false)
-    ).subscribe({
-      next: (response: ApiResponse<LoginResponse>) => {
-        const loginResponseData = isPreservedCollection<LoginResponse>(response.data) ? response.data.$values[0] : response.data;
-        if (response.success && loginResponseData?.loginSucesso) {
-          this.authService.setSession(loginResponseData);
-          this.notificationsService.showNotification('Login realizado com sucesso!', 'sucesso');
-          setTimeout(() => {
-            this.router.navigate(['/dashboard']);
-          }, 50);
-        } else {
-          const errorMessage = response.message || 'Credenciais inválidas. Tente novamente.';
-          this.notificationsService.showNotification(errorMessage, 'erro');
+    this.authService.login(loginRequest).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: (response: ApiResponse<LoginResponse>) => {
+        const loginResponseData = isPreservedCollection<LoginResponse>(response.data) ? response.data.$values[0] : response.data;
+        if (response.success && loginResponseData?.loginSucesso) {
+          this.authService.setSession(loginResponseData);
+          this.notificationsService.showNotification('Login realizado com sucesso!', 'sucesso');
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 50);
+        } else {
+          // Se a resposta não for bem-sucedida, mas for um 200 (lógica do backend)
+          const errorMessage = response.message || 'Credenciais inválidas. Tente novamente.';
+          this.notificationsService.showNotification(errorMessage, 'erro');
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        let errorMessage = 'Ocorreu um erro desconhecido. Por favor, tente novamente mais tarde.';
+
+        // LÓGICA DE TRATAMENTO DE ERRO PARA MELHORAR O UX
+        if (err.status === 400 || err.status === 401) {
+            // Em vez de 'desconhecido', damos uma mensagem clara e um CTA para o registro.
+            errorMessage = 'Usuário ou Senha incorretos. Verifique suas credenciais ou ';
+            
+            // Usamos a notificação para injetar um link HTML para registro
+            this.notificationsService.showNotification(
+                errorMessage, 
+                'erro',
+                // Aqui você pode injetar o link de registro na notificação
+                // (Isso depende de como seu NotificationsService trata o conteúdo HTML. 
+                // Se for texto puro, use: 'Usuário ou Senha incorretos. Não possui conta? Registre-se aqui.'
+                // Se for HTML: errorMessage + ' <a href="/register">Registre-se aqui</a>.'
+            );
+            return;
         }
-      },
-      error: (err: HttpErrorResponse) => {
-        let errorMessage = 'Ocorreu um erro desconhecido. Por favor, tente novamente mais tarde.';
-        this.notificationsService.showNotification(errorMessage, 'erro');
-      }
-    });
-  }
+
+        // Se o erro não for 400/401, exibe o erro genérico do servidor
+        this.notificationsService.showNotification(errorMessage, 'erro');
+      }
+    });
+  }
 
   openResendEmailModal(): void {
     this.showResendEmailModal = true;
