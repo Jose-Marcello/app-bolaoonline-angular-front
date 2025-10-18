@@ -20,6 +20,11 @@ import { ApiResponse, isPreservedCollection } from '@models/common/api-response.
 export class ForgotPasswordComponent implements OnInit {
   forgotPasswordForm: FormGroup;
   isLoading = false;
+
+  // APLICAÇÃO DA LÓGICA DE 3 AMBIENTES
+  isMockEnvironment = 
+    window.location.host.includes('localhost') || 
+    window.location.host === 'app.palpitesbolao.com.br';
   isProduction = environment.production;
 
   constructor(
@@ -34,9 +39,15 @@ export class ForgotPasswordComponent implements OnInit {
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
+   
   }
 
  // forgotten-password.component.ts
+
+// forgotten-password.component.ts (Supondo que você adicionou a variável na classe)
+/* Exemplo: 
+  isMockEnvironment = window.location.host.includes('localhost') || window.location.host === 'app.palpitesbolao.com.br';
+*/
 
 onSubmit(): void {
   if (this.forgotPasswordForm.invalid) {
@@ -48,33 +59,32 @@ onSubmit(): void {
   const email = this.forgotPasswordForm.get('email')?.value;
   
   this.authService.forgotPassword(email).subscribe({
-    next: (response: ApiResponse<string>) => { // Assegure-se que o tipo é ApiResponse<string>
+    next: (response: ApiResponse<string>) => {
       this.isLoading = false;
       
-      const resetLink = response.data; // O link/string do backend
+      const resetLink = response.data;
 
       // **********************************************
       // 1. CHECAGEM PARA AMBIENTE DE SIMULAÇÃO (MOCK)
       // **********************************************
-      // Se for sucesso E não for produção E o link de reset (Data) não for vazio/nulo
-      if (response.success && !this.isProduction && resetLink) { 
+      // NOVO TESTE: Usamos isMockEnvironment para ativar o MOCK no Localhost e Staging
+      if (response.success && this.isMockEnvironment && resetLink) { 
         
         this.notificationsService.showNotification('Simulação ATIVA: Redirecionando para a tela de teste de e-mail.', 'sucesso');
         
-        // REDIRECIONA O TESTADOR PARA O MOCK DE E-MAIL
+        // REDIRECIONA PARA O MOCK DE E-MAIL
         this.router.navigate(['/testes/email'], { 
-          // Passamos o link de reset para que o testador possa usá-lo na próxima tela
           queryParams: { link: resetLink, email: email, type: 'reset' } 
         });
-        return; // Sai da função após o mock
+        return; // Sai da função
       } 
       
       // **********************************************
-      // 2. CENÁRIO DE PRODUÇÃO / SEGURANÇA (Link nulo ou Produção)
+      // 2. CENÁRIO DE PRODUÇÃO / SEGURANÇA / ERRO DE VALIDAÇÃO
       // **********************************************
       
       if (response.success) {
-        // Usa a mensagem de segurança do backend (mesmo que o link tenha sido nulo no backend)
+        // Usa a mensagem de segurança do backend: "Se o e-mail estiver cadastrado, as instruções foram enviadas."
         this.notificationsService.showNotification(
           response.message || 'Se o e-mail estiver cadastrado, as instruções foram enviadas para redefinição.', 
           'sucesso'
@@ -82,31 +92,27 @@ onSubmit(): void {
         // Opcional: Redirecionar para o login após sucesso de segurança
         // this.router.navigate(['/login']); 
       } else {
-        // Erros de validação ou outros erros não-HTTP retornados pelo backend (Status 200, mas success: false)
-
+        // Erros de validação (Status 200, mas success: false)
         const notifications = response.notifications;
         let notificationArray: any[] = [];
 
-        // 1. Converte a coleção preservada para um array antes de usar o .map
+        // LÓGICA DE CONVERSÃO DE ARRAY (MANTIDA)
         if (notifications && isPreservedCollection(notifications)) {
-            // Se for uma PreservedCollection, pegamos o array real em $values
             notificationArray = notifications.$values; 
         } else if (Array.isArray(notifications)) {
-            // Se já for um array normal, use-o
             notificationArray = notifications;
         }
 
-        // 2. Mapear o array (agora seguro)
         const errorMessage = notificationArray.map(n => n.mensagem).join(', ') || 'Erro ao enviar e-mail. Tente novamente.';
 
         this.notificationsService.showNotification(errorMessage, 'erro');
-       }
-      
+      }
     },
     error: (err: HttpErrorResponse) => {
       this.isLoading = false;
       let errorMessage = 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.';
       
+      // Lógica de tratamento de erro HTTP (mantida)
       if (err.status === 404) {
         errorMessage = 'O serviço de recuperação de senha não está disponível. Por favor, tente mais tarde.';
       } else if (err.status >= 500) {

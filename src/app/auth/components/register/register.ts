@@ -44,9 +44,17 @@ export class RegisterComponent implements OnInit {
   selectedFile: File | null = null;
   private readonly fotoPerfilMaxFileSize = 5242880;
   isRegistered = false;
-  registrationSuccess = false;  
-  isProduction = environment.production;  
+  registrationSuccess = false;    
   registeredUserEmail: string;
+
+  // APLICAÇÃO DA LÓGICA DE 3 AMBIENTES
+  isMockEnvironment = 
+    window.location.host.includes('localhost') || 
+    window.location.host === 'app.palpitesbolao.com.br';
+  isProduction = environment.production;
+
+
+
 
   constructor(
     private fb: FormBuilder,
@@ -108,12 +116,14 @@ onSubmit(): void {
           
           // <<-- AQUI ESTÁ A CORREÇÃO PRINCIPAL -->>
           // A navegação de teste ágil só ocorre em ambiente de desenvolvimento
-          if (!this.isProduction) {
+          // <<-- LÓGICA DE 3 AMBIENTES APLICADA AQUI -->>
+          // Se for ambiente de Mock (Localhost OU Staging/Testes), redireciona para a simulação.
+          if (this.isMockEnvironment) { 
             const userId = response.data?.userId;
             const email = this.registeredUserEmail;
             this.router.navigate(['/testes/email'], { queryParams: { userId, email } });
           } else {
-            // Se estiver em produção, segue o fluxo normal
+            // Se for Produção (ambiente que não é mock), segue o fluxo normal de produção.
             this.isRegistered = true;
             if (this.selectedFile && response.data?.userId) {
               this.uploadProfilePhoto(response.data.userId);
