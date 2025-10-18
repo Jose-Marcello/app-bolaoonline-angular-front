@@ -83,9 +83,25 @@ onSubmit(): void {
         // this.router.navigate(['/login']); 
       } else {
         // Erros de validação ou outros erros não-HTTP retornados pelo backend (Status 200, mas success: false)
-        const errorMessage = response.notifications?.map(n => n.mensagem).join(', ') || 'Erro ao enviar e-mail. Tente novamente.';
+
+        const notifications = response.notifications;
+        let notificationArray: any[] = [];
+
+        // 1. Converte a coleção preservada para um array antes de usar o .map
+        if (notifications && isPreservedCollection(notifications)) {
+            // Se for uma PreservedCollection, pegamos o array real em $values
+            notificationArray = notifications.$values; 
+        } else if (Array.isArray(notifications)) {
+            // Se já for um array normal, use-o
+            notificationArray = notifications;
+        }
+
+        // 2. Mapear o array (agora seguro)
+        const errorMessage = notificationArray.map(n => n.mensagem).join(', ') || 'Erro ao enviar e-mail. Tente novamente.';
+
         this.notificationsService.showNotification(errorMessage, 'erro');
-      }
+       }
+      
     },
     error: (err: HttpErrorResponse) => {
       this.isLoading = false;
