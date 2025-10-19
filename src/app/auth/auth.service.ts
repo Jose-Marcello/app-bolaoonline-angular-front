@@ -114,7 +114,7 @@ export class AuthService {
 
   register(request: RegisterRequestDto): Observable<ApiResponse<RegisterResponse>> {
     console.log('[AuthService] register: Tentando registro para:', request.email);
-    return this.http.post<ApiResponse<RegisterResponse>>(`${this.apiUrlAuth}/register`, request).pipe(
+    return this.http.post<ApiResponse<RegisterResponse>>(`${this.apiUrlAuth}/Account/register`, request).pipe(
       tap((response: ApiResponse<RegisterResponse>) => {
         if (response.success) {
           const mensagem = response.message || 'Registro realizado com sucesso! Um e-mail de confirmação foi enviado.';
@@ -143,7 +143,7 @@ export class AuthService {
     const requestBody = { userId, refreshToken };
     console.log('[AuthService] refreshToken: Tentando refresh de token para userId:', userId);
 
-    return this.http.post<ApiResponse<TokenRefreshResponseDto>>(`${this.apiUrlAuth}/refresh-token`, requestBody).pipe(
+    return this.http.post<ApiResponse<TokenRefreshResponseDto>>(`${this.apiUrlAuth}/Account/refresh-token`, requestBody).pipe(
       tap((response: ApiResponse<TokenRefreshResponseDto>) => {
         if (response.success && response.data) {
           console.log('[AuthService] refreshToken: Refresh de token bem-sucedido.');
@@ -280,7 +280,7 @@ export class AuthService {
   // Ele agora espera um objeto com a propriedade 'email' e faz a chamada POST.
   resendConfirmationEmail(email: string): Observable<ApiResponse<boolean>> {
     const requestBody = { email: email };
-    return this.http.post<ApiResponse<boolean>>(`${this.apiUrlAuth}/resend-email-confirmation`, requestBody);
+    return this.http.post<ApiResponse<boolean>>(`${this.apiUrlAuth}/Account/resend-email-confirmation`, requestBody);
   }
 
  public getUserEmail(): string | null {
@@ -303,7 +303,7 @@ export class AuthService {
   }
 
   confirmEmail(userId: string, code: string): Observable<ApiResponse<boolean>> {
-    return this.http.get<ApiResponse<boolean>>(`${this.apiUrlAuth}/confirm-email?userId=${userId}&code=${code}`);
+    return this.http.get<ApiResponse<boolean>>(`${this.apiUrlAuth}/Account/confirm-email?userId=${userId}&code=${code}`);
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
