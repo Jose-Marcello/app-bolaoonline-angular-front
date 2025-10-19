@@ -34,7 +34,7 @@ export class AuthService {
 
   private refreshTokenTimer: any;
 
-  private apiUrlAuth = `${environment.apiUrl}/api/Account`;
+  private apiUrlAuth = `${environment.apiUrl}/api`;
   //private apiUrlAuth = `${environment.apiUrl}/Account`;
   
   constructor(private http: HttpClient, private router: Router, private notificationsService: NotificationsService) {
