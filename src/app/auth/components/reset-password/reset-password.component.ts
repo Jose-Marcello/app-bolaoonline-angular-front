@@ -37,10 +37,11 @@ export class ResetPasswordComponent implements OnInit {
     private notificationsService: NotificationsService // <-- Injete o serviço
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void {     
     this.route.queryParamMap.subscribe(params => {
       this.userId = params.get('userId');
       this.code = params.get('code');
+      this.token = this.code; // << ESTA LINHA É CRÍTICA!
       if (!this.userId || !this.code) {
         this.notificationsService.showNotification('Token de redefinição de senha não encontrado. Por favor, tente novamente.', 'erro');
       }
