@@ -17,7 +17,6 @@ import { LoginResponse } from '@auth/models/login-response.model';
 import { RegisterResponse } from '@auth/models/register-response.model'; // Adicionei o import do RegisterResponse
 import { ApiResponse, isPreservedCollection } from '@models/common/api-response.model';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -167,12 +166,25 @@ export class AuthService {
     );
   }
 
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    const url = `${this.apiUrlAuth}/account/reset-password`;
-    const body = { token: token, newPassword: newPassword };
+  resetPassword(userId: string, code: string, newPassword: string, confirmNewPassword: string): Observable<any> {
+    
+    // Assumindo que this.apiUrlAuth está limpo (ex: .../api)
+    const url = `${this.apiUrlAuth}/Account/reset-password`; 
+    
+    // Cria o payload com as chaves EXATAS (PascalCase) exigidas pelo backend
+    const body = { 
+        UserId: userId,
+        Code: code,
+        NewPassword: newPassword, 
+        ConfirmNewPassword: confirmNewPassword
+    }; 
+    
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    
+    // Você precisa ter certeza que o HttpClient (this.http) está injetado no constructor do AuthService
+    // Se o HttpClient não estiver na classe, você não conseguirá fazer essa chamada.
     return this.http.post(url, body, { headers: headers });
-  }
+}
 
   logout(): void {
     console.log('[AuthService] logout: Limpando sessão e redirecionando.');

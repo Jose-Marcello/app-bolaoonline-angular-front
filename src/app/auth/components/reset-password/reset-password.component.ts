@@ -78,10 +78,23 @@ passwordMatchValidator(g: FormGroup) {
 }
 
   onSubmit(): void {
-    if (this.resetPasswordForm.invalid || !this.token) {
-      this.notificationsService.showNotification('Por favor, preencha o formulário corretamente.', 'alerta');
-      return;
-    }
+    // 1. O formulário não deve permitir submeter se o token não for carregado
+    if (this.resetPasswordForm.invalid || !this.token || !this.userId) { 
+      this.notificationsService.showNotification('Por favor, preencha o formulário e recarregue a página se o token não for válido.', 'alerta');
+      return;
+    }
+
+    this.isLoading = true;
+    
+    // Extrai os quatro dados necessários
+    const newPassword = this.resetPasswordForm.get('newPassword')?.value;
+    const confirmPassword = this.resetPasswordForm.get('confirmPassword')?.value;
+
+    // A chamada agora envia os 4 parâmetros exigidos pelo backend
+    this.authService.resetPassword(this.userId, this.token, newPassword, confirmPassword)
+  .subscribe({
+    next: (response) => {
+      this.isLoading = false;
 
     this.isLoading = true;
     const newPassword = this.resetPasswordForm.get('newPassword')?.value;
