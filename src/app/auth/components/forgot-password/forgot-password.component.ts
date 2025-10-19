@@ -20,6 +20,10 @@ import { ApiResponse, isPreservedCollection } from '@models/common/api-response.
 export class ForgotPasswordComponent implements OnInit {
   forgotPasswordForm: FormGroup;
   isLoading = false;
+  
+  // ADICIONAR ESTAS DUAS VARIÁVEIS DE CONTROLE DE VISIBILIDADE
+  hideNewPassword = true; 
+  hideConfirmPassword = true;
 
   // APLICAÇÃO DA LÓGICA DE 3 AMBIENTES
   isMockEnvironment = 
@@ -124,4 +128,15 @@ onSubmit(): void {
     }
   });
 }
+
+// reset-password.component.ts (Dentro da classe)
+
+toggleNewPasswordVisibility(): void {
+  this.hideNewPassword = !this.hideNewPassword;
+}
+
+toggleConfirmPasswordVisibility(): void {
+  this.hideConfirmPassword = !this.hideConfirmPassword;
+}
+
 }
