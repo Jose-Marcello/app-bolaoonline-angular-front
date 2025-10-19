@@ -53,3 +53,27 @@
     border: 2px solid #3F51B5;
     border-radius: 50%;
 }
+
+/* ===================================== */
+/* CORREÇÃO UX: BOTÃO DE LOGIN DESABILITADO */
+/* ===================================== */
+
+/* Seleciona o botão que usa a cor verde do bolão quando está desabilitado */
+.bg-bolao-green-dark[disabled] {
+    /* Usa a cor clara do bolão (bolao-green-light) para o estado inativo */
+    background-color: #81C784 !important; 
+    opacity: 0.85; /* Sutil opacidade */
+    cursor: not-allowed;
+    /* Remove o efeito de hover que poderia deixá-lo verde escuro */
+    pointer-events: none; 
+}
+
+/* Garante que o texto permaneça branco e visível no botão desabilitado */
+.bg-bolao-green-dark[disabled] span {
+    color: white !important; 
+}
+
+/* Sobrescreve o hover para não reagir */
+.bg-bolao-green-dark[disabled]:hover {
+    background-color: #81C784 !important;
+}
