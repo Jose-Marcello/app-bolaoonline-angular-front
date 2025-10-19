@@ -46,10 +46,13 @@ export class ResetPasswordComponent implements OnInit {
       }
     });
 
-    this.resetPasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
-    }, { validator: this.passwordMatchValidator });
+  this.resetPasswordForm = this.fb.group({
+    newPassword: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', Validators.required],
+}, { 
+    // << AQUI ESTÁ A CORREÇÃO >> O validador de coincidência vai no FormGroup
+    validators: this.passwordMatchValidator 
+});
   }
 
   togglePasswordVisibility(): void {
@@ -66,10 +69,11 @@ export class ResetPasswordComponent implements OnInit {
   }
 
 
-  passwordMatchValidator(form: FormGroup) {
-    return form.get('newPassword')?.value === form.get('confirmPassword')?.value
-      ? null : { 'mismatch': true };
-  }
+ // As chaves precisam bater com o formGroup
+passwordMatchValidator(g: FormGroup) {
+    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
+        ? null : { 'mismatch': true }; 
+}
 
   onSubmit(): void {
     if (this.resetPasswordForm.invalid || !this.token) {
