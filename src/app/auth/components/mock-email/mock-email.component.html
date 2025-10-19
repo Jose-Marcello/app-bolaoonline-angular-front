@@ -1,19 +1,29 @@
 <div class="card-body" *ngIf="!isLoading">
+
+  <p class="mb-2"><strong>*** SIMULAÇÃO DE EMAIL *** </strong> </p>
   <p class="mb-2"><strong>Para:</strong> {{ emailData?.to }}</p>
   <p class="mb-4"><strong>Assunto:</strong> {{ emailData?.subject }}</p>
   <hr class="my-4">
   
   <div [innerHTML]="emailData?.body" class="prose max-w-none text-gray-700 leading-relaxed"></div> 
   <hr class="my-4">
-  
+ 
+  <!--
   <div class="text-center mt-6"> 
     <button 
       *ngIf="emailData?.resetLink" 
-      [attr.href]="emailData?.resetLink" 
+      [attr.href]="emailData?.resetLink"      
+
       class="px-8 py-3 bg-red-600 text-white font-bold text-lg rounded-md shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-      Redefinir Minha Senha
+       
     </button>
+    -->
     
+    <a [href]="resetLink" class="text-blue-600 font-bold hover:underline block my-2">
+         Redefinir Senha
+    </a>
+     
+
    <button
         (click)="onCancel()" 
         class="px-8 py-3 bg-gray-300 text-gray-700 font-semibold text-lg rounded-md shadow-md hover:bg-gray-400 transition duration-150">

@@ -22,6 +22,7 @@ import { NotificationsService } from '@services/notifications.service';
 export class MockEmailComponent implements OnInit {
   emailData: any;
   isLoading = true;
+ resetLink: string;
 
   constructor(
     private route: ActivatedRoute,
