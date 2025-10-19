@@ -5,6 +5,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs/operators';
+import { NotificationsService } from '@services/notifications.service'; 
+
 
 @Component({
   selector: 'app-mock-email',
@@ -12,6 +14,7 @@ import { finalize } from 'rxjs/operators';
   imports: [
     CommonModule,
     HttpClientModule,
+
   ],
   templateUrl: './mock-email.component.html',
   styleUrls: ['./mock-email.component.scss']
@@ -23,7 +26,9 @@ export class MockEmailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private notificationsService: NotificationsService 
+
   ) { }
 
   ngOnInit(): void {
@@ -36,6 +41,13 @@ export class MockEmailComponent implements OnInit {
       }
     });
   }
+
+ onCancel(): void {
+    // Simplesmente redireciona o usuário para a tela de login
+    this.router.navigate(['/login']);
+    this.notificationsService.showNotification('Simulação de e-mail cancelada. Retornando ao login.', 'alerta');
+  }
+ 
 
   fetchMockEmail(email: string) {
     const url = `${environment.apiUrl}/api/testes/emails?email=${email}`;
@@ -92,8 +104,12 @@ export class MockEmailComponent implements OnInit {
         });
       }
     });
+ 
+ 
   }
-}
+ 
+ }
+
 }
 
 
