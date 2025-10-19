@@ -21,8 +21,10 @@ import { NotificationsService } from '@services/notifications.service';
 })
 export class MockEmailComponent implements OnInit {
   emailData: any;
-  isLoading = true;
- resetLink: string;
+  isLoading = true;  
+  isResetFlow = false; // Novo: Determina se o fluxo é de Redefinição de Senha
+  resetLink: string | null = null; // Novo: Armazena o token/link para o botão Redefinir
+  confirmationLink: string | null = null; // Novo: Armazena o link para o botão Confirmar
 
   constructor(
     private route: ActivatedRoute,
@@ -33,15 +35,30 @@ export class MockEmailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const email = params['email'];
-      if (email) {
-        this.fetchMockEmail(email);
-      } else {
-        this.isLoading = false;
-      }
-    });
-  }
+  // O componente precisa garantir que ActivatedRoute (this.route) esteja no construtor
+  this.route.queryParams.subscribe(params => {
+    
+    const email = params['email'];
+    const type = params['type']; // 'reset' ou 'confirmation'
+    const link = params['link'];  // O token/link de reset, se existir
+
+    // 1. Lógica de Diferenciação de Fluxo
+    // Esta variável DEVE estar declarada na classe: isResetFlow: boolean = false;
+    this.isResetFlow = type === 'reset'; 
+
+    // 2. Captura dos Dados Críticos para os Botões
+    // Esta variável DEVE estar declarada na classe: resetLink: string | null = null;
+    this.resetLink = link || null; 
+
+    // 3. Execução do Mock
+    if (email) {
+      this.fetchMockEmail(email); // Sua função para buscar o corpo do email
+    } else {
+      this.isLoading = false;
+      // Opcional: Notificar que o e-mail não foi fornecido
+    }
+  });
+}
 
  onCancel(): void {
     // Simplesmente redireciona o usuário para a tela de login
