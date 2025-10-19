@@ -168,7 +168,7 @@ export class AuthService {
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {
-    const url = `${this.apiUrlAuth}/account/reset-password`;
+    const url = `${this.apiUrlAuth}/Account/reset-password`;
     const body = { token: token, newPassword: newPassword };
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(url, body, { headers: headers });
@@ -185,7 +185,7 @@ export class AuthService {
   }
 
   forgotPassword(email: string): Observable<any> {
-    const url = `${this.apiUrlAuth}/forgot-password`;
+    const url = `${this.apiUrlAuth}/Account/forgot-password`;
     const body = { email: email };
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(url, body, { headers: headers });
