@@ -28,6 +28,7 @@ export class ResetPasswordComponent implements OnInit {
   hidePassword = true;
   hideNewPassword = true; 
   hideConfirmPassword = true;
+  resetLink: string;
 
   constructor(
     private fb: FormBuilder,
