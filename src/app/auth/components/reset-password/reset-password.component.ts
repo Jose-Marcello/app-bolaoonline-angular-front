@@ -26,7 +26,8 @@ export class ResetPasswordComponent implements OnInit {
   isLoading = false;
   token: string | null = null;
   hidePassword = true;
-  hideConfirmPassword: string | null = null;
+  hideNewPassword = true; 
+  hideConfirmPassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +55,16 @@ export class ResetPasswordComponent implements OnInit {
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
   }
+
+// Funções de Toggle
+  toggleNewPasswordVisibility(): void {
+    this.hideNewPassword = !this.hideNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.hideConfirmPassword = !this.hideConfirmPassword;
+  }
+
 
   passwordMatchValidator(form: FormGroup) {
     return form.get('newPassword')?.value === form.get('confirmPassword')?.value
