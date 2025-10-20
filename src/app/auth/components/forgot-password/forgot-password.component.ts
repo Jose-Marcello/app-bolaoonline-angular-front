@@ -55,6 +55,8 @@ export class ForgotPasswordComponent implements OnInit {
 
 // forgotten-password.component.ts
 
+// forgotten-password.component.ts
+
 onSubmit(): void {
   if (this.forgotPasswordForm.invalid) {
     this.notificationsService.showNotification('Por favor, insira um e-mail válido.', 'alerta');
@@ -68,10 +70,7 @@ onSubmit(): void {
   // LÓGICA DE CORREÇÃO: MOCK FORÇADO BASEADO APENAS NO AMBIENTE
   // ******************************************************************
   if (this.isMockEnvironment) {
-    // Se estamos em MOCK (localhost ou staging), NUNCA FAZEMOS A CHAMADA À API.
-    // Simulamos a resposta que o backend deveria dar (incluindo um link falso).
-    
-    // Simula um link de reset genérico para que o testador possa avançar
+    // [CÓDIGO DO MOCK AQUI]
     const mockResetLink = `/reset-password?userId=MOCKUSERID&code=MOCKTOKEN&email=${email}`;
     
     this.notificationsService.showNotification('Simulação ATIVA: Redirecionando para a tela de teste de e-mail.', 'sucesso');
@@ -81,8 +80,9 @@ onSubmit(): void {
     });
     
     this.isLoading = false;
-    return; // SAI DA FUNÇÃO, NÃO CHAMA O this.authService.forgotPassword
-  }
+    // NÃO É NECESSÁRIO RESETAR O FORM AQUI, POIS ELE SAI PARA OUTRA ROTA
+    return;
+  } 
   
   // ******************************************************************
   // FLUXO NORMAL (CHAMA A API E TRATA A RESPOSTA)
@@ -92,27 +92,28 @@ onSubmit(): void {
       this.isLoading = false;
       
       // Lógica de Segurança/Produção: Se sucesso, exibe mensagem clara.
-    if (response.success) {
+      if (response.success) {
         // --- Lógica de extração segura da primeira mensagem ---
         const notifications = response.notifications;
         let firstMessage = '';
-
-        // Se for a Coleção Preservada (.NET), pegamos o array real em $values
+        
         if (notifications && isPreservedCollection(notifications) && notifications.$values?.length > 0) {
             firstMessage = notifications.$values[0].mensagem;
         } else if (response.message) {
-            // Fallback para a mensagem simples (header) se a coleção não for acessível
             firstMessage = response.message;
         }
         
-        // Exibe a mensagem mais útil, com fallback
+        // Exibe a mensagem de sucesso (notificação genérica de segurança)
         const notificationMessage = firstMessage || 'As instruções para redefinição foram enviadas. Verifique seu e-mail.';
 
         this.notificationsService.showNotification(notificationMessage, 'sucesso');
-        // ... (Opcional: Redirecionar para o login após sucesso de segurança)
-    
+        
+        // << CORREÇÃO UX: LIMPAR FORM APÓS SUCESSO (FINALIZA A TAREFA) >>
+        this.forgotPasswordForm.reset(); 
+        // O formulário volta ao estado "pristine" e o botão fica inativo.
+        
       } else {
-        // ... (Se response.success for false - tratamento de array de notificação)
+        // ... (Tratamento de erro de validação do backend) ...
         const notifications = response.notifications;
         let notificationArray: any[] = [];
         
@@ -127,8 +128,8 @@ onSubmit(): void {
       }
     },
     error: (err: HttpErrorResponse) => {
-      this.isLoading = false;
       // ... (Lógica de tratamento de erro HTTP) ...
+      this.isLoading = false;
       let errorMessage = 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.';
       
       if (err.status === 404) {
