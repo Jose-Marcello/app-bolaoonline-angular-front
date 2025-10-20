@@ -20,6 +20,7 @@ import { FileUploadService } from '@services/file-upload.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { AuthService } from '@auth/auth.service';
+import { NotificationsService } from '@services/notifications.service'; 
 
 @Component({
   selector: 'app-perfil',
@@ -45,6 +46,8 @@ export class PerfilComponent implements OnInit, OnDestroy {
   apostadorAtual: ApostadorDto | null = null;
   fotoPerfilPreviewUrl: string | null = null;
   private readonly fotoPerfilMaxFileSize = 5242880; // 5 MB
+  emailForm!: FormGroup;
+  isEmailLoading = false; // Variável de loading para este formulário
 
   constructor(
     private fb: FormBuilder,
@@ -53,14 +56,36 @@ export class PerfilComponent implements OnInit, OnDestroy {
     private router: Router,
     private fileUploadService: FileUploadService,
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationsService: NotificationsService
   ) { }
 
   ngOnInit(): void {
     this.iniciarFormulario();
     this.carregarDadosDoApostador();
+
+    // Inicialização do Formulário de Troca de E-mail
+    this.emailForm = this.fb.group({
+        newEmail: ['', [Validators.required, Validators.email]],
+        currentPassword: ['', Validators.required]
+    });
+
   }
 
+  // Crie a função de submit:
+onChangeEmail(): void {
+    if (this.emailForm.invalid) return;
+
+    this.isEmailLoading = true;
+    
+    // 1. Extrair os valores: this.emailForm.value.newEmail e this.emailForm.value.currentPassword
+    // 2. Chamar a API de troca de e-mail (que exigirá um endpoint no backend)
+    // 3. Tratar a resposta: Se sucesso, mostrar notificação e talvez deslogar o usuário por segurança.
+
+    // Exemplo de notificação de sucesso:
+    this.notificationsService.showNotification('Link de confirmação enviado para o novo e-mail.', 'sucesso');
+    this.isEmailLoading = false;
+}
   ngOnDestroy(): void {
     // ...
   }

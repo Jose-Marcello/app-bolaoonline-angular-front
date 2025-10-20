@@ -62,5 +62,47 @@
         </button>
       </div>
     </form>
+
+<hr class="my-6 border-gray-700">
+    
+    <h3 class="text-2xl font-extrabold text-bolao-green-dark mb-4">
+        Trocar Endereço de E-mail
+    </h3>
+    
+    <form [formGroup]="emailForm" (ngSubmit)="onChangeEmail()" class="space-y-6">
+        
+        <div class="mb-4">
+            <label for="newEmail" class="sr-only">Novo E-mail</label>
+            <input id="newEmail" name="newEmail" type="email"
+              formControlName="newEmail"
+              placeholder="Novo endereço de e-mail"
+              class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 text-bolao-text-light bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm">
+            
+            <div *ngIf="emailForm.get('newEmail')?.invalid && (emailForm.get('newEmail')?.dirty || emailForm.get('newEmail')?.touched)"
+                 class="text-red-500 text-sm mt-1">
+                <span *ngIf="emailForm.get('newEmail')?.errors?.['email']">E-mail inválido.</span>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <label for="currentPassword" class="sr-only">Senha Atual</label>
+            <input id="currentPassword" name="currentPassword" type="password"
+              formControlName="currentPassword"
+              placeholder="Sua senha atual para confirmar a troca"
+              class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 text-bolao-text-light bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm">
+            
+            <div *ngIf="emailForm.get('currentPassword')?.invalid && (emailForm.get('currentPassword')?.dirty || emailForm.get('currentPassword')?.touched)"
+                 class="text-red-500 text-sm mt-1">
+                <span *ngIf="emailForm.get('currentPassword')?.errors?.['required']">A senha é obrigatória para confirmar.</span>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" [disabled]="emailForm.invalid || isEmailLoading"
+              class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              Solicitar Troca de E-mail
+            </button>
+        </div>
+    </form>
   </div>
 </div>

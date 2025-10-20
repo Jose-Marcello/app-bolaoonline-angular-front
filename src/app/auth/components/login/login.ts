@@ -45,6 +45,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   hidePassword = true; 
   
   showResendEmailModal = false;
+  
+  // APLICAÇÃO DA LÓGICA DE 3 AMBIENTES
+  isMockEnvironment = 
+    window.location.host.includes('localhost') || 
+    window.location.host === 'app.palpitesbolao.com.br';
+  
   isProduction = environment.production; // Adicione esta linha
   
   constructor(
@@ -154,25 +160,43 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.resendForm.reset();
   }
 
-  resendEmail(): void {
+// login.component.ts
+
+resendEmail(): void {
     if (this.resendForm.valid) {
       this.isLoading = true;
       const email = this.resendForm.get('emailToResend')?.value;
 
-      this.authService.resendConfirmationEmail(email).subscribe({
-        next: (response) => {
-          // Se não estiver em produção, redireciona para a tela de mock
-          if (!this.isProduction) {
-            this.router.navigate(['/testes/email'], {
-              queryParams: { email: email }
-            });
-            this.notificationsService.showNotification('Redirecionando para a tela de testes...', 'sucesso');
-          } else {
-            // Em produção, exibe a notificação normal
-            this.notificationsService.showNotification(response.message || 'Seu pedido de reenvio foi processado.', 'sucesso');
-          }
+      // << LÓGICA CORRIGIDA: VERIFICA AMBIENTE MOCK ANTES DE CHAMAR A API >>
+      if (this.isMockEnvironment) {
+          // 1. Simula o sucesso do backend
+          this.notificationsService.showNotification('Simulação ATIVA: Redirecionando para a tela de teste de e-mail.', 'sucesso');
+          
+          // 2. Redireciona para o MOCK DE E-MAIL com os parâmetros necessários (userId/code são simulados)
+          this.router.navigate(['/testes/email'], { 
+              queryParams: { 
+                  email: email, 
+                  type: 'confirmation', // Indicador de fluxo de confirmação
+                  userId: 'MOCK_USER_ID', // Simula um userId
+                  code: 'MOCK_CODE_CONFIRM' // Simula o token
+              } 
+          });
+
           this.closeResendEmailModal();
           this.isLoading = false;
+          return; // Sai da função, NÃO CHAMA A API REAL
+      } 
+      // << FIM DA LÓGICA DE MOCK >>
+
+
+      // ----------------------------------------------------
+      // LÓGICA DE PRODUÇÃO REAL (Executa se isMockEnvironment for false)
+      // ----------------------------------------------------
+      this.authService.resendConfirmationEmail(email).subscribe({
+        next: (response) => {
+            this.notificationsService.showNotification(response.message || 'Seu pedido de reenvio foi processado.', 'sucesso');
+            this.closeResendEmailModal();
+            this.isLoading = false;
         },
         error: (err) => {
           console.error('Erro ao reenviar e-mail:', err);
@@ -180,11 +204,12 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }
       });
+
     } else {
       this.notificationsService.showNotification('Por favor, digite um e-mail válido.', 'alerta');
       this.resendForm.get('emailToResend')?.markAsTouched();
     }
-  }
+}
 
   isAuthRoute(): boolean {
     const currentUrl = this.router.url;
