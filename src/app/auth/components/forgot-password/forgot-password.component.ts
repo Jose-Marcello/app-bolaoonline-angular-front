@@ -92,12 +92,25 @@ onSubmit(): void {
       this.isLoading = false;
       
       // Lógica de Segurança/Produção: Se sucesso, exibe mensagem clara.
-      if (response.success) {
-        // Exibe a mensagem de segurança do backend (que deve ser a do array)
-        const notificationMessage = response.notifications?.$values[0].mensagem 
-                                     || 'As instruções para redefinição foram enviadas. Verifique seu e-mail.';
+    if (response.success) {
+        // --- Lógica de extração segura da primeira mensagem ---
+        const notifications = response.notifications;
+        let firstMessage = '';
+
+        // Se for a Coleção Preservada (.NET), pegamos o array real em $values
+        if (notifications && isPreservedCollection(notifications) && notifications.$values?.length > 0) {
+            firstMessage = notifications.$values[0].mensagem;
+        } else if (response.message) {
+            // Fallback para a mensagem simples (header) se a coleção não for acessível
+            firstMessage = response.message;
+        }
+        
+        // Exibe a mensagem mais útil, com fallback
+        const notificationMessage = firstMessage || 'As instruções para redefinição foram enviadas. Verifique seu e-mail.';
 
         this.notificationsService.showNotification(notificationMessage, 'sucesso');
+        // ... (Opcional: Redirecionar para o login após sucesso de segurança)
+    
       } else {
         // ... (Se response.success for false - tratamento de array de notificação)
         const notifications = response.notifications;
