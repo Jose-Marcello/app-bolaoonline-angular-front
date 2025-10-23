@@ -24,4 +24,6 @@ export const environment = {
   //imagesUrl: 'https://bolaoonline-docker.azurewebsites.net',
 
   // apiUrl: 'https://bolaoonline-testes4.azurewebsites.net',
-  // imagesUrl: 'https://bolaoonline-testes4.azurewebsites.net' 
+  // imagesUrl: 'https://bolaoonline-testes4.azurewebsites.net'
+  
+  */
