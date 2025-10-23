@@ -1,6 +1,5 @@
 
-
-export const environment = {
+export const environment = { 
   production: true,
   // NOVO: Aponta para o Backend hospedado no Heroku (com SSL gratuito)
   apiUrl: 'https://bolao-online-final-65cf977b9a18.herokuapp.com', 
