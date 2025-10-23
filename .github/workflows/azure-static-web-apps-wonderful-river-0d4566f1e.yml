@@ -8,7 +8,11 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
-
+# --- ADICIONE ESTE BLOCO AQUI ---
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+# --- FIM DO BLOCO ---
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -44,3 +48,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
           action: "close"
+
