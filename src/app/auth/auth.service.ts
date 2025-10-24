@@ -33,6 +33,8 @@ export class AuthService {
 
   private refreshTokenTimer: any;
 
+  // 🛑 CORRIGIDO: Removido /api para que as rotas possam ser mais flexíveis
+  private apiUrlBase = `${environment.apiUrl}`; 
   private apiUrlAuth = `${environment.apiUrl}/api`;
   //private apiUrlAuth = `${environment.apiUrl}/account`;
   
@@ -86,7 +88,8 @@ export class AuthService {
 
   login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
     console.log('[AuthService] login: Tentando login para:', credentials.email);
-    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login`, credentials).pipe(
+    // 🛑 ROTA CORRIGIDA: Adicionando '/account/login' que corresponde ao AccountController
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlBase}/api/Account/login`, credentials).pipe(
       tap((response: ApiResponse<LoginResponse>) => {
         if (response.success && response.data?.loginSucesso) {
           const loginData = isPreservedCollection<LoginResponse>(response.data)
@@ -255,13 +258,13 @@ export class AuthService {
   }
 
   private clearSession(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('tokenExpiration');
-    console.log('[AuthService] Sessão limpa.');
+    console.log('[AuthService] logout: Limpando sessão e redirecionando.');
+    this.clearSession();
+    this.stopRefreshTokenTimer();
+    this._isAuthenticated.next(false);
+    this._currentUser.next(null);
+    this.router.navigate(['/login']);
+    this.notificationsService.showNotification('Você foi desconectado.', 'info');
   }
 
   private startRefreshTokenTimer(delay: number): void {
@@ -293,17 +296,10 @@ export class AuthService {
     return this.http.post<ApiResponse<boolean>>(`${this.apiUrlAuth}/account/resend-email-confirmation`, requestBody);
   }
 
- public getUserEmail(): string | null {
+  public getUserEmail(): string | null {
     return this._currentUser.getValue()?.email || null;
   }
 
-  /*
-  resendConfirmationEmail(email: string, scheme: string, host: string): Observable<ApiResponse<boolean>> {
-    const request = { email, scheme, host };
-    return this.http.post<ApiResponse<boolean>>(`${this.apiUrlAuth}/resend-email-confirmation`, request);
-  }
-    */
-  
   getCurrentUserIdFromSnapshot(): string | null {
     return this._currentUser.getValue()?.uid || null;
   }
