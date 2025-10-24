@@ -20,7 +20,7 @@ import { ApiResponse, isPreservedCollection } from '@models/common/api-response.
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService  {
   
   private _isAuthenticated = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this._isAuthenticated.asObservable();
