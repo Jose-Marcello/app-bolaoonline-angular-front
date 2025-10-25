@@ -1,13 +1,11 @@
-// Localização: src/app/auth/components/mock-email/mock-email.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common/http'; // Incluído HttpErrorResponse
+import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs/operators';
 import { NotificationsService } from '@services/notifications.service'; 
-import { FormsModule } from '@angular/forms'; // Adicionado para completude se o template precisar
+import { FormsModule } from '@angular/forms'; 
 
 @Component({
   selector: 'app-mock-email',
@@ -15,14 +13,14 @@ import { FormsModule } from '@angular/forms'; // Adicionado para completude se o
   imports: [
     CommonModule,
     HttpClientModule,
-    FormsModule // Adicionado
+    FormsModule 
   ],
   templateUrl: './mock-email.component.html',
   styleUrls: ['./mock-email.component.scss']
 })
 export class MockEmailComponent implements OnInit {
   emailData: any;
-  isLoading = true;  
+  isLoading = true; 
   
   // Variáveis para a lógica condicional no HTML:
   isResetFlow = false; // true se vier do "Esqueceu a Senha"
@@ -47,7 +45,6 @@ export class MockEmailComponent implements OnInit {
       this.isResetFlow = type === 'reset'; 
       
       // 2. Captura dos Links/Tokens
-      // Nota: O 'link' foi passado na queryParams no fluxo de forgot-password
       this.resetLink = link || null; 
       
       // Se tiver o e-mail, buscar o corpo do mock
@@ -60,20 +57,22 @@ export class MockEmailComponent implements OnInit {
     });
   }
 
+  // MÉTODO CORRIGIDO: Alterado de GET para POST
   fetchMockEmail(email: string) {
-    const url = `${environment.apiUrl}/api/testes/emails?email=${email}`;
+    // 1. A URL base é usada, sem o query parameter do email
+    const url = `${environment.apiUrl}/api/testes/emails`;
     
-    this.http.get<any>(url).pipe(finalize(() => this.isLoading = false)).subscribe(
+    // 2. O Body da requisição (JSON que será enviado)
+    const body = { email: email };
+    
+    // Altera this.http.get para this.http.post e envia o body
+    this.http.post<any>(url, body).pipe(finalize(() => this.isLoading = false)).subscribe(
       (response) => {
         const emails = response && response.$values ? response.$values : [];
         if (emails.length > 0) {
           this.emailData = emails[emails.length - 1];
           
-          // Lógica para extrair o link de confirmação do corpo (se for o fluxo de registro)
           if (!this.isResetFlow && this.emailData.body) {
-              // Exemplo simplificado: Se o backend injetar o confirmationLink
-              // Se o link vier no body, você precisará de uma regex para extraí-lo aqui.
-              // Por simplicidade, vamos assumir que o backend pode enviar confirmationLink ou você extrai ele na mão.
               this.confirmationLink = this.emailData.confirmationLink || 'MOCK_CONFIRM_LINK'; 
           }
           
@@ -84,6 +83,7 @@ export class MockEmailComponent implements OnInit {
       },
       (error: HttpErrorResponse) => {
         console.error('Erro ao buscar e-mail simulado:', error);
+        // Esta notificação deve parar de aparecer quando o 405 for resolvido
         this.notificationsService.showNotification('Erro ao conectar com o serviço de mock.', 'erro');
         this.emailData = null;
       }
