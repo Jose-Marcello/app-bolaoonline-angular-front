@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   // Use seu domínio personalizado para todas as chamadas de API
-  apiUrl: 'https://app.palpitesbolao.com.br',
+  apiUrl: 'https://app.palpitesbolao.com.br'   ,
   imagesUrl: 'https://app.palpitesbolao.com.br'
 };
 
