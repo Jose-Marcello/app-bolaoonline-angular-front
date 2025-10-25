@@ -5,6 +5,7 @@ export const environment = {
   imagesUrl: 'https://app.palpitesbolao.com.br'
 };
 
+
 /*
 export const environment = { 
   production: true,
