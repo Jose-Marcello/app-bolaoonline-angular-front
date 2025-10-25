@@ -23,16 +23,31 @@ jobs:
       # ⬇️ PASSO 1: Configurar a versão do Node
       - uses: actions/setup-node@v3
         with:
-          node-version: '18' # Mantenha a versão que você usa no desenvolvimento
+          node-version: '18'
 
       # ⬇️ PASSO 2: Instalar dependências
       - name: Install dependencies
         run: npm install
 
-      # ⬇️ PASSO 3: Rodar o BUILD de produção explicitamente
-      # Isso cria a pasta de output que o deploy procurará.
+      # ⬇️ PASSO 3: Rodar o BUILD de produção (Cria a pasta: dist/bolao-online-app-v5/browser)
       - name: Run Angular Build
         run: npm run build -- --configuration=production --base-href /
+        
+      # 💥 NOVO PASSO (3.1): Empacota a pasta de build correta como um artefato
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: angular-app-build
+          # Usamos o caminho aninhado que definimos no build.
+          path: dist/bolao-online-app-v5/browser 
+
+      # 💥 NOVO PASSO (3.2): Baixa o artefato em uma nova pasta temporária
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: angular-app-build
+          # Cria uma pasta temporária simples para o deploy
+          path: ./app_output_temp 
 
       # ⬇️ PASSO 4: Fazer o Deploy para o Azure SWA
       - name: Deploy to Azure Static Web Apps
@@ -43,15 +58,13 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           
-          # Diz ao SWA para PULAR a etapa de build, usando os arquivos gerados no Passo 3.
+          # Ignora o build, pois já fizemos isso.
           skip_app_build: true
 
-          # A raiz do seu projeto Angular (onde o package.json e angular.json estão).
-          app_location: "/"
+          # APONTA DIRETAMENTE PARA A PASTA TEMPORÁRIA QUE CONTÉM O INDEX.HTML
+          app_location: "./app_output_temp" 
           
-          # Sem API no SWA, mantém vazio.
+          # Como a pasta app_output_temp SÓ tem o conteúdo do build, 
+          # o output_location fica vazio.
           api_location: ""
-          
-          # CORREÇÃO PRINCIPAL: O caminho aninhado onde o 'index.html'
-          # é provavelvelmente gerado pelo novo builder do Angular.
-          output_location: "dist/bolao-online-app-v5/browser"
+          output_location: ""
