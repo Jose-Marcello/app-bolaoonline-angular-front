@@ -35,12 +35,10 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "/"
-          api_location: ""
-          # CORREÇÃO CRÍTICA: O output_location é agora a pasta DENTRO de 'dist'
-          output_location: "dist/bolao-online-app-v5" 
+                # ... (outras configurações)
+              app_location: "/" 
+              api_location: ""
+               # Solução do SWA/Oryx: Use apenas a pasta dentro de 'dist'.
+              output_location: "bolao-online-app-v5"
           # Note: Reverti para 'dist/bolao-online-app-v5' pois é o caminho EXATO que você precisa
           # e incluí os passos manuais para garantir que o build aconteça ANTES do deploy.
