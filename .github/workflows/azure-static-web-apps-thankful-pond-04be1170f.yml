@@ -41,11 +41,9 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload" # ESSENCIAL: Garante que a ação de upload está presente
-          
-          # AJUSTE FINAL PARA O ERRO ORYX:
-          # app_location: "/"  -> A pasta raiz contém o angular.json
+          action: "upload" 
+          # app_location permanece na raiz onde o 'angular.json' está
           app_location: "/" 
           api_location: ""
-          # output_location: "dist" -> SWA/Oryx irá procurar o 'bolao-online-app-v5' DENTRO de 'dist'
-          output_location: "dist"
+          # O output_location DEVE ser a pasta COMPLETA gerada pelo ng build
+          output_location: "dist/bolao-online-app-v5"
