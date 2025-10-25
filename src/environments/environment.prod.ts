@@ -1,12 +1,4 @@
-export const environment = {
-  production: true,
-  // Use seu domínio personalizado para todas as chamadas de API
-  apiUrl: 'https://app.palpitesbolao.com.br'   ,
-  imagesUrl: 'https://app.palpitesbolao.com.br'
-};
 
-
-/*
 export const environment = { 
   production: true,
   // NOVO: Aponta para o Backend hospedado no Heroku (com SSL gratuito)
@@ -17,6 +9,16 @@ export const environment = {
   // Por enquanto, aponte para o backend, assumindo que ele serve as imagens.
   imagesUrl: 'https://bolao-online-final-65cf977b9a18.herokuapp.com'
 };
+
+/*
+export const environment = {
+  production: true,
+  // Use seu domínio personalizado para todas as chamadas de API
+  apiUrl: 'https://app.palpitesbolao.com.br'   ,
+  imagesUrl: 'https://app.palpitesbolao.com.br'
+};
+
+/*
   
   //apiUrl: 'https://bolaoonline-docker.azurewebsites.net',
   //imagesUrl: 'https://bolaoonline-docker.azurewebsites.net',
