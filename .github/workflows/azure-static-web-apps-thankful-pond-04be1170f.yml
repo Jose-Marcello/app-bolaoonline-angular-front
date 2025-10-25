@@ -35,10 +35,11 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-                # ... (outras configurações)
-              app_location: "/" 
-              api_location: ""
-               # Solução do SWA/Oryx: Use apenas a pasta dentro de 'dist'.
-              output_location: "bolao-online-app-v5"
+        # ... (outras configurações)
+        # NOVO: Mapeia o app_location para a pasta que contém o index.html
+         app_location: "dist/bolao-online-app-v5" 
+         api_location: ""
+         # NOVO: Se app_location aponta para o index.html, output_location deve ser vazio.
+         output_location: ""
           # Note: Reverti para 'dist/bolao-online-app-v5' pois é o caminho EXATO que você precisa
           # e incluí os passos manuais para garantir que o build aconteça ANTES do deploy.
