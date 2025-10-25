@@ -23,14 +23,14 @@ jobs:
       # ⬇️ PASSO 1: Configurar a versão do Node
       - uses: actions/setup-node@v3
         with:
-          node-version: '18' # Certifique-se de que esta é a versão que você usa
+          node-version: '18' # Mantenha a versão que você usa no desenvolvimento
 
       # ⬇️ PASSO 2: Instalar dependências
       - name: Install dependencies
         run: npm install
 
       # ⬇️ PASSO 3: Rodar o BUILD de produção explicitamente
-      # Isso garante que a correção do apiUrl seja injetada.
+      # Isso cria a pasta de output que o deploy procurará.
       - name: Run Angular Build
         run: npm run build -- --configuration=production --base-href /
 
@@ -41,14 +41,17 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload" 
-    
-          # NOVO: Diz ao SWA para PULAR o build do Oryx (que estava falhando)
-          skip_app_build: true 
-    
-           # AJUSTE DE CAMINHO: Deve apontar para a pasta que contém o 'index.html'
-           # Esta pasta foi gerada pelo 'ng build' manual no passo anterior.
-          app_location: "dist/bolao-online-app-v5" 
-          api_location: ""
-          output_location: "" # Vazio, pois o app_location já aponta para a saída.
+          action: "upload"
           
+          # Diz ao SWA para PULAR a etapa de build, usando os arquivos gerados no Passo 3.
+          skip_app_build: true
+
+          # A raiz do seu projeto Angular (onde o package.json e angular.json estão).
+          app_location: "/"
+          
+          # Sem API no SWA, mantém vazio.
+          api_location: ""
+          
+          # CORREÇÃO PRINCIPAL: O caminho aninhado onde o 'index.html'
+          # é provavelvelmente gerado pelo novo builder do Angular.
+          output_location: "dist/bolao-online-app-v5/browser"
