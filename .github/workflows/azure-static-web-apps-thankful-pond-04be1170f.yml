@@ -20,6 +20,17 @@ jobs:
           submodules: true
           lfs: false
 
+      # ⬇️ NOVO PASSO 1: Instalar dependências
+      - name: Install dependencies
+        run: npm install
+
+      # ⬇️ NOVO PASSO 2: Rodar o BUILD de produção e gerar a pasta 'dist/bolao-online-app-v5'
+      # Isso garante que a correção do apiUrl seja injetada e o base-href esteja correto.
+      - name: Run Angular Build
+        run: npm run build -- --configuration=production --base-href /
+        # Você pode usar 'ng build --configuration=production --base-href /' se o ng-cli estiver disponível globalmente no runner
+
+      # ⬇️ O SWA AGORA VAI APENAS PEGAR OS ARQUIVOS JÁ COMPILADOS
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -29,4 +40,7 @@ jobs:
           action: "upload"
           app_location: "/"
           api_location: ""
-          output_location: "bolao-online-app-v5"
+          # CORREÇÃO CRÍTICA: O output_location é agora a pasta DENTRO de 'dist'
+          output_location: "dist/bolao-online-app-v5" 
+          # Note: Reverti para 'dist/bolao-online-app-v5' pois é o caminho EXATO que você precisa
+          # e incluí os passos manuais para garantir que o build aconteça ANTES do deploy.
