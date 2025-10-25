@@ -21,7 +21,8 @@ jobs:
           lfs: false
 
       # ⬇️ PASSO 1: Configurar a versão do Node
-      - uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
 
@@ -35,18 +36,18 @@ jobs:
         
       # 💥 NOVO PASSO (3.1): Empacota a pasta de build correta como um artefato
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
+        # CORREÇÃO: Usando v4
+        uses: actions/upload-artifact@v4 
         with:
           name: angular-app-build
-          # Usamos o caminho aninhado que definimos no build.
           path: dist/bolao-online-app-v5/browser 
 
       # 💥 NOVO PASSO (3.2): Baixa o artefato em uma nova pasta temporária
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        # CORREÇÃO: Usando v4
+        uses: actions/download-artifact@v4 
         with:
           name: angular-app-build
-          # Cria uma pasta temporária simples para o deploy
           path: ./app_output_temp 
 
       # ⬇️ PASSO 4: Fazer o Deploy para o Azure SWA
@@ -61,10 +62,7 @@ jobs:
           # Ignora o build, pois já fizemos isso.
           skip_app_build: true
 
-          # APONTA DIRETAMENTE PARA A PASTA TEMPORÁRIA QUE CONTÉM O INDEX.HTML
+          # Aponta para a pasta temporária que só tem o conteúdo de build (index.html)
           app_location: "./app_output_temp" 
-          
-          # Como a pasta app_output_temp SÓ tem o conteúdo do build, 
-          # o output_location fica vazio.
           api_location: ""
           output_location: ""
