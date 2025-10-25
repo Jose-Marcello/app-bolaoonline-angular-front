@@ -8,11 +8,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
-# --- ADICIONE ESTE BLOCO AQUI ---
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-# --- FIM DO BLOCO ---
+
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -23,29 +19,33 @@ jobs:
         with:
           submodules: true
           lfs: false
-      - name: Build And Deploy
+
+      # ⬇️ PASSO 1: Configurar a versão do Node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Certifique-se de que esta é a versão que você usa
+
+      # ⬇️ PASSO 2: Instalar dependências
+      - name: Install dependencies
+        run: npm install
+
+      # ⬇️ PASSO 3: Rodar o BUILD de produção explicitamente
+      # Isso garante que a correção do apiUrl seja injetada.
+      - name: Run Angular Build
+        run: npm run build -- --configuration=production --base-href /
+
+      # ⬇️ PASSO 4: Fazer o Deploy para o Azure SWA
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "dist/bolao-online-app-v5"
-          api_location: "" # Api source code path - optional
-          output_location: "" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
-
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    name: Close Pull Request Job
-    steps:
-      - name: Close Pull Request
-        id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
-          action: "close"
-
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload" # ESSENCIAL: Garante que a ação de upload está presente
+          
+          # AJUSTE FINAL PARA O ERRO ORYX:
+          # app_location: "/"  -> A pasta raiz contém o angular.json
+          app_location: "/" 
+          api_location: ""
+          # output_location: "dist" -> SWA/Oryx irá procurar o 'bolao-online-app-v5' DENTRO de 'dist'
+          output_location: "dist"
