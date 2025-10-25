@@ -42,8 +42,13 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload" 
-          # app_location permanece na raiz onde o 'angular.json' está
-          app_location: "/" 
+    
+          # NOVO: Diz ao SWA para PULAR o build do Oryx (que estava falhando)
+          skip_app_build: true 
+    
+           # AJUSTE DE CAMINHO: Deve apontar para a pasta que contém o 'index.html'
+           # Esta pasta foi gerada pelo 'ng build' manual no passo anterior.
+          app_location: "dist/bolao-online-app-v5" 
           api_location: ""
-          # O output_location DEVE ser a pasta COMPLETA gerada pelo ng build
-          output_location: "dist/bolao-online-app-v5"
+          output_location: "" # Vazio, pois o app_location já aponta para a saída.
+          
