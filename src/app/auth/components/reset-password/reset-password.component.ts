@@ -61,12 +61,18 @@ export class ResetPasswordComponent implements OnInit {
     this.route.queryParamMap.subscribe(params => {
       this.userId = params.get('userId');
       this.code = params.get('code');
-      this.token = this.code; // Atribui o código ao token
+      
+      // 💥 CORREÇÃO PRINCIPAL: Decodifica o componente da URL antes de usar
+      if (this.code) {
+          this.token = decodeURIComponent(this.code); // Atribui o código DECODIFICADO ao token
+      } else {
+          this.token = null;
+      }
       
       // Captura o link completo da página (usado para debugging/referência)
       this.resetLink = window.location.href; 
 
-      if (!this.userId || !this.code) {
+      if (!this.userId || !this.token) { // Verifica o token DECODIFICADO
         this.notificationsService.showNotification('Token de redefinição de senha não encontrado. Por favor, tente novamente.', 'erro');
         // Desabilita o formulário se o token for inválido
         this.resetPasswordForm.disable(); 
@@ -78,7 +84,6 @@ export class ResetPasswordComponent implements OnInit {
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
     }, { 
-      // Aplica o validador que checa se os dois campos são iguais no FormGroup
       validators: this.passwordMatchValidator 
     });
   }
