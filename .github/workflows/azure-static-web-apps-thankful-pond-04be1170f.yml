@@ -20,37 +20,35 @@ jobs:
           submodules: true
           lfs: false
 
-      # ⬇️ PASSO 1: Configurar a versão do Node
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # ⬇️ PASSO 2: Instalar dependências
       - name: Install dependencies
         run: npm install
 
-      # ⬇️ PASSO 3: Rodar o BUILD de produção (Cria a pasta: dist/bolao-online-app-v5/browser)
       - name: Run Angular Build
         run: npm run build -- --configuration=production --base-href /
+      
+      # 💥 CORREÇÃO FORÇADA: COPIA O ARQUIVO DE ROTEAMENTO PARA A PASTA FINAL DE DEPLOY 💥
+      # Isso garante que o SWA o encontre na raiz do deploy.
+      - name: Copy SWA Config to Output
+        run: cp staticwebapp.config.json dist/bolao-online-app-v5/browser/
         
-      # 💥 NOVO PASSO (3.1): Empacota a pasta de build correta como um artefato
+      # ⬇️ Upload Build Artifact (usando a pasta que agora tem o config)
       - name: Upload Build Artifact
-        # CORREÇÃO: Usando v4
         uses: actions/upload-artifact@v4 
         with:
           name: angular-app-build
           path: dist/bolao-online-app-v5/browser 
 
-      # 💥 NOVO PASSO (3.2): Baixa o artefato em uma nova pasta temporária
       - name: Download Build Artifact
-        # CORREÇÃO: Usando v4
         uses: actions/download-artifact@v4 
         with:
           name: angular-app-build
           path: ./app_output_temp 
 
-      # ⬇️ PASSO 4: Fazer o Deploy para o Azure SWA
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -58,11 +56,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFUL_RIVER_0D4566F1E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          
-          # Ignora o build, pois já fizemos isso.
           skip_app_build: true
-
-          # Aponta para a pasta temporária que só tem o conteúdo de build (index.html)
           app_location: "./app_output_temp" 
           api_location: ""
           output_location: ""
