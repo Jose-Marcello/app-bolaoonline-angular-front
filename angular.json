@@ -32,6 +32,12 @@
                 "glob": "fundo_bolao.png",
                 "input": "src/assets/images",
                 "output": "/assets/images"
+              },
+              // 💥 CORREÇÃO: ADICIONADO staticwebapp.config.json PARA O AZURE SWA 💥
+              {
+                "glob": "staticwebapp.config.json",
+                "input": ".", 
+                "output": "." 
               }
             ],
             "styles": [
