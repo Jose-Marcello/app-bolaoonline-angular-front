@@ -34,7 +34,7 @@ jobs:
       # 💥 CORREÇÃO FORÇADA: COPIA O ARQUIVO DE ROTEAMENTO PARA A PASTA FINAL DE DEPLOY 💥
       # Isso garante que o SWA o encontre na raiz do deploy.
       - name: Copy SWA Config to Output
-        run: cp staticwebapp.config.json dist/bolao-online-app-v5/browser/
+        run: cp src/staticwebapp.config.json dist/bolao-online-app-v5/browser/
         
       # ⬇️ Upload Build Artifact (usando a pasta que agora tem o config)
       - name: Upload Build Artifact
