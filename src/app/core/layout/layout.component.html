@@ -1,0 +1,92 @@
+<!-- Localização: src/app/components/dashboard-layout/dashboard-layout.component.html -->
+<mat-sidenav-container class="sidenav-container">
+  <!-- Sidenav -->
+  <mat-sidenav #sidenav mode="over" [(opened)]="isSidenavOpen" class="w-64 bg-gray-500 text-white shadow-lg">
+    <mat-nav-list>
+      <!-- Logo e Título do App (dentro do sidenav) -->
+      <div class="p-4 border-b border-gray-600">
+        <h2 class="text-xl font-bold text-blue-400">Bolão Online</h2>
+      </div>
+
+      <!-- Informações do Usuário (removidas daqui para evitar duplicidade) -->
+      <!-- Links de Navegação -->
+      <a mat-list-item routerLink="/dashboard" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">dashboard</mat-icon>
+        Dashboard
+      </a>
+      
+      <!-- <<-- Botão para a tela de Perfil adicionado aqui -->> -->
+      <a mat-list-item routerLink="/dashboard/perfil" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">person</mat-icon>
+        Perfil
+      </a>
+
+      <a mat-list-item routerLink="/dashboard/aposta-rodada" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">sports_soccer</mat-icon>
+        Aposta Rodada
+      </a>
+      <a mat-list-item routerLink="/dashboard/meus-palpites" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">history</mat-icon>
+        Meus Palpites
+      </a>
+      <a mat-list-item routerLink="/dashboard/financeiro" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">account_balance_wallet</mat-icon>
+        Financeiro
+      </a>
+      <a mat-list-item routerLink="/dashboard/ranking" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">leaderboard</mat-icon>
+        Ranking
+      </a>
+      <a mat-list-item routerLink="/dashboard/configuracoes" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">settings</mat-icon>
+        Configurações
+      </a>
+      <a mat-list-item routerLink="/dashboard/regrasDoBolao" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
+        <mat-icon class="mr-3 text-primary-300">settings</mat-icon>
+        Regras do Bolão
+      </a>
+      <mat-divider class="my-4 border-gray-600"></mat-divider>
+
+      <!-- Botão Sair -->
+      <button mat-list-item (click)="onLogout()" class="flex items-center py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200">
+        <mat-icon class="mr-3 text-red-300">logout</mat-icon>
+        Sair
+      </button>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Toolbar principal (Header) -->
+  <mat-toolbar class="bg-gray-600 text-white shadow-md">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-icon class="text-xl ml-4 mr-2">sports_soccer</mat-icon>
+    <span class="text-xl font-bold">Bolão Online</span>
+    <span class="flex-grow"></span> <!-- Espaçador -->
+
+    <!-- Nome do apostador adicionado aqui -->
+    <span class="text-sm mr-4" *ngIf="isAuthenticated">{{ apostadorNome || 'Apostador' }}</span>
+    
+    <!-- Botão de Logout na Toolbar (para desktop) -->
+    <button mat-button (click)="onLogout()" class="hidden md:flex items-center text-red-300 hover:text-red-400">
+      <mat-icon class="mr-2">logout</mat-icon>
+      Sair
+    </button>
+
+    <!-- Menu para mobile (se necessário, para saldo e logout) -->
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="isAuthenticated && !isLoggingOut" class="md:hidden">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <!-- Conteúdo principal -->
+  <div class="flex-grow p-4 bg-gray-800">
+    <router-outlet></router-outlet>
+  </div>
+</mat-sidenav-container>

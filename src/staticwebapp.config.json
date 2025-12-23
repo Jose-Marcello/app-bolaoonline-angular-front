@@ -1,0 +1,14 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{png,jpg,gif}", "/css/*"]
+  },
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"],
+      "redirect": "https://aca-bancodeitens-v3.politesea-ef0261dc.brazilsouth.azurecontainerapps.io/api/*",
+      "statusCode": 302
+    }
+  ]
+}

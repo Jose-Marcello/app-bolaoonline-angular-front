@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Simulação de Envio de E-mail</h2>
+
+<mat-dialog-content class="text-gray-900">
+  <p>
+    <strong>Parabéns!</strong> O processo de cadastro está quase completo.
+  </p>
+  <p>
+    Um e-mail de confirmação foi **SIMULADAMENTE** enviado para:
+    <br />
+    <strong class="text-blue-600">{{ data.email }}</strong>
+  </p>
+
+  <p class="mt-4">
+    Em um ambiente de desenvolvimento (MOCK), você precisa simular o clique no link. Por favor, clique no botão abaixo para **simular a Confirmação do seu E-mail** e prosseguir:
+  </p>
+  
+  <p class="warning-text text-sm italic mt-2 text-red-600">
+    **Atenção:** Esta ação só é necessária em ambiente de MOCK.
+  </p>
+
+  <!-- O link de Confirmação transformado em botão de Ação -->
+ <a [href]="data.link" 
+     target="_blank" 
+     class="confirmation-link block text-center mt-6 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+        Clique para {{ data.actionType === 'confirm' ? 'Confirmar Cadastro' : 'Redefinir a nova Senha' }}
+  </a>
+ 
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="mt-6">
+  <!-- O Botão 'Entendi, ir para o Login' foi REMOVIDO para focar na ação de confirmação -->
+</mat-dialog-actions>

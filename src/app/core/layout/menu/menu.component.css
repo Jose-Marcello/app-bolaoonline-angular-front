@@ -1,0 +1,51 @@
+.menu-item {
+    /* ✅ ALTERAÇÃO: Trocamos gray-100 por gray-800 para dar leitura sobre o Bege */
+    @apply w-full justify-start text-gray-800; 
+    @apply p-3 h-auto rounded-lg; 
+    @apply transition duration-150 ease-in-out;
+    @apply text-base font-normal;
+    display: flex;
+    gap: 12px;
+    /* ✅ Ajuste de cor fixa para garantir o contraste */
+    color: #2d3748; /* Um cinza bem escuro (Tailwind gray-800) */
+}
+
+/* No hover, mantemos o fundo escuro para destacar o item selecionado */
+.menu-item:hover {
+    @apply bg-indigo-500 text-white; /* Fica azul com texto branco ao passar o mouse */
+}
+
+
+/* Ajuste a cor de fundo no hover */
+.menu-item:hover {
+    background-color: #374151; /* Tailwind bg-gray-700, mantido escuro */
+    color: #ffffff; /* Garante que o texto fique branco no hover */
+}
+
+/* Estilo para item ativo: Fundo azul (indigo) para contraste */
+.active-menu-item {
+    @apply bg-indigo-600 text-white font-semibold shadow-lg;
+}
+
+.active-menu-item:hover {
+    @apply bg-indigo-500;
+}
+
+.menu-category {
+    @apply text-xs font-semibold uppercase text-gray-200 ml-1 mt-3 mb-1;
+    padding-top: 8px;
+}
+
+.menu-item-login {
+    @apply w-full justify-start bg-indigo-100 text-white font-medium rounded-lg;
+    @apply hover:bg-indigo-500;
+    @apply p-3 h-auto;
+    display: flex;
+    gap: 12px;
+}
+
+.disabled-link {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+

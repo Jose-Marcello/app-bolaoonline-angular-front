@@ -1,0 +1,82 @@
+// Localização: tsconfig.json
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./src", // Base para resolver caminhos relativos
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false, // Mantido como false para maior compatibilidade inicial
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2022", // Ou "es2020" dependendo da sua configuração Angular CLI
+    "module": "es2022", // Ou "es2020"
+    "useDefineForClassFields": false,
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
+    "paths": {
+      // Aliases gerais
+      "@environments/*": ["environments/*"],      
+      "@services/*": ["app/core/services/*"],
+      "@interceptors/*": ["app/core/interceptors*"], 
+      "@guards/*": ["app/core/guards*"], 
+      "@layout/*": ["app/core/layout*"], 
+
+      // Aliases para o domínio de AUTENTICAÇÃO (agora com login/register diretamente sob auth)
+      "@auth/*": ["app/features/auth/*"], // Aponta para a pasta auth (para auth.service.ts, etc.)
+      "@auth/services/*": ["app/features/auth/services/*"],
+      "@login/*": ["app/features/auth/components/login/*"], // Para o componente de login
+      "@register/*": ["app/features/auth/components/register/*"], // Para o componente de registro
+      "@auth/models/*": ["app/features/auth/models*"], // Para os modelos dentro de auth/models
+      
+      // Aliases para as FEATURES (agora todos sob app/features)
+      "@features/*": ["app/features/*"], // Alias geral para a pasta components
+      "@aposta-rodada/*": ["app/features/aposta-rodada*"],
+      "@apostador/*": ["app/features/apostador*"],
+      "@apostador-campeonato/*": ["app/features/apostador-campeonato*"],
+      "@campeonato/*": ["app/features/campeonato*"],
+      "@equipe/*": ["app/features/equipe*"],
+      "@financeiro/*": ["app/features/financeiro*"],
+      "@home/*": ["app/features/home*"],
+      "@perfil/*": ["app/features/perfil*"],
+      "@ranking-campeonato/*": ["app/features/ranking-campeonato*"],
+      "@ranking-rodada/*": ["app/features/ranking-rodada*"],
+      "@regras-bolao/*": ["app/features/regras-bolao*"],
+      "@rodadas-finalizadas/*": ["app/features/rodadas-finalizadas*"],
+
+      // Aliases para os MODELOS (agora genéricos sob app/models/common)
+      
+      "@shared/components/*": ["app/shared/components*"], // Para components comuns
+      "@shared/models/*": ["app/shared/models*"], // Para modelos comuns
+      
+      
+      // Adicione outros aliases de modelos específicos se necessário (ex: @models/campeonato/*)
+      "@models/aposta-rodada/*": ["app/features/aposta-rodada/models*"],      
+      "@models/apostador/*": ["app/features/apostador/models*"],
+      "@models/apostador-campeonato/*": ["app/features/apostador-campeonato/models*"],
+      "@models/campeonato/*": ["app/features/campeonato/models*"],
+      "@models/equipe": ["app/features/equipe/models*"],
+      "@models/financeiro/*": ["app/features/financeiro/models*"],
+      "@models/perfil/*": ["app/features/perfil/models*"],
+      "@models/ranking-campeonato/*": ["app/features/ranking-campeonato/models*"],
+      "@models/ranking-rodada/*":  ["app/features/ranking-rodada/models*"]
+
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

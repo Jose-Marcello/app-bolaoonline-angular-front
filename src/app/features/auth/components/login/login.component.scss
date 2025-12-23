@@ -1,0 +1,95 @@
+/* 1. Container Principal - Onde a imagem de fundo brilha */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    /* Aqui garantimos que o container não tenha cor, para a imagem de fundo aparecer */
+    background: transparent !important; 
+    padding: 20px;
+}
+
+/* 2. A Caixa de Login (Grafite com Transparência) */
+.bolao-login-box {
+    width: 100%; 
+    max-width: 420px; 
+    padding: 40px; 
+    box-sizing: border-box;
+    
+    /* O segredo: Grafite escuro com 90% de opacidade para ver o fundo de leve */
+    background-color: rgba(30, 30, 30, 0.9) !important; 
+    color: #FFFFFF;
+    border-radius: 16px; /* Bordas um pouco mais arredondadas para ar moderno */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda sutil */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
+    backdrop-filter: blur(5px); /* Efeito de desfoque no que está atrás da caixa */
+}
+
+/* 3. A Logo com destaque */
+.header-login {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo-bolao {
+    width: 120px;
+    height: 120px;
+    border: 4px solid #3F51B5 !important; /* Azul do bolão na borda */
+    display: block; 
+    margin: 0 auto 15px auto; 
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: white; /* Fundo branco interno para a logo destacar */
+}
+
+/* 4. Inputs do Material (Dark Mode) */
+:host ::ng-deep .mat-mdc-form-field-appearance-outline {
+    --mat-mdc-form-field-container-color: rgba(255, 255, 255, 0.05) !important; 
+    --mat-mdc-form-field-input-text-color: #FFF !important; 
+    --mat-mdc-form-field-label-text-color: #A0A0A0 !important; 
+    --mat-mdc-form-field-outline-color: rgba(255, 255, 255, 0.3) !important; 
+}
+
+/* Centraliza e dá tamanho igual aos inputs */
+/* Centraliza e dá tamanho igual aos inputs */
+input#email-address, input#password {
+    @apply w-full rounded-lg border-gray-600 bg-white; 
+    color: #1a202c !important; /* Texto escuro (gray-900) */
+    height: 48px !important; 
+    margin-bottom: 0.5rem;
+    padding: 0 1rem !important;
+}
+
+/* Reduz o espaçamento entre o título e os campos */
+.header-login {
+    margin-bottom: 1rem;
+}
+
+.header-login h2 {
+    @apply text-2xl mb-0; /* Título um pouco menor e sem margem inferior */
+}
+
+/* Container do formulário mais compacto */
+.bolao-login-box {
+    @apply p-6; /* Reduz o padding interno para não alongar */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Centraliza o Botão de Entrar */
+button[type="submit"] {
+    @apply w-full flex justify-center items-center font-bold uppercase tracking-wider;
+    height: 50px;
+    margin-top: 1rem;
+}
+
+/* Organiza os 3 links ao léo */
+.links-footer {
+    @apply mt-6 flex flex-col items-center space-y-3 text-sm;
+}
+
+.links-footer a {
+    @apply text-white hover:text-indigo-300 transition-colors underline-offset-4 underline;
+}

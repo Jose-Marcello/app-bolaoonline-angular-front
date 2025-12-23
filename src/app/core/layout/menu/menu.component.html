@@ -1,0 +1,48 @@
+<nav class="flex flex-col w-64 h-full bg-gray-900 text-white shadow-2xl p-4 flex-shrink-0">
+    
+    <div class="menu-header border-b border-gray-700 pb-4 mb-6">
+        <h1 class="text-2xl font-bold tracking-wider text-indigo-400">Banco de Itens</h1>
+        <p class="text-sm text-gray-300">Área Administrativa</p>
+    </div>
+    
+    <ul class="space-y-1 flex-grow">
+        
+        <li>
+            <a routerLink="/home" mat-button class="menu-item" routerLinkActive="active-menu-item">
+                <mat-icon>home</mat-icon> Home
+            </a>
+        </li>
+        
+        <li class="menu-category mt-6">✏️ Cadastros</li>
+        
+        <li>
+            <a routerLink="/questoes" mat-button class="menu-item" routerLinkActive="active-menu-item">
+                <mat-icon>description</mat-icon> Questões
+            </a>
+        </li>
+        
+        <li>
+            <a routerLink="/disciplinas" mat-button class="menu-item" routerLinkActive="active-menu-item">
+                <mat-icon>book</mat-icon> Disciplinas
+            </a>
+        </li>
+
+        <li class="menu-category mt-6">📋 Montagem</li>
+        <li>
+            <a routerLink="/provas" mat-button class="menu-item disabled-link opacity-50 cursor-not-allowed">
+                <mat-icon>print</mat-icon> Gerar Provas
+            </a>
+        </li>
+        <li>
+            <a routerLink="/relatorios" mat-button class="menu-item disabled-link opacity-50 cursor-not-allowed">
+                <mat-icon>analytics</mat-icon> Relatórios
+            </a>
+        </li>
+    </ul>
+    
+    <div class="menu-footer border-t border-gray-700 pt-4 mt-6">
+        <a routerLink="/login" mat-button color="primary" class="menu-item-login">
+            <mat-icon>lock</mat-icon> Login / Sair
+        </a>
+    </div>
+</nav>

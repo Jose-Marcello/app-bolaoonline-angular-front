@@ -1,0 +1,81 @@
+// Localização: tsconfig.json
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./src", // Base para resolver caminhos relativos
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false, // Mantido como false para maior compatibilidade inicial
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2022", // Ou "es2020" dependendo da sua configuração Angular CLI
+    "module": "es2022", // Ou "es2020"
+    "useDefineForClassFields": false,
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
+
+"paths": {
+    // Aliases gerais
+    "@environments/*": ["environments/*"],
+    // Core Services
+    "@services/*": ["app/core/services/*"],
+    // Core Infrastructure (Layout, Guards, Interceptors) - Sintaxe corrigida (/*)
+    "@interceptors/*": ["app/core/interceptors/*"], 
+    "@guards/*": ["app/core/guards/*"], 
+    "@layout/*": ["app/core/layout/*"], 
+
+    // --- DOMÍNIO DE AUTENTICAÇÃO ---
+    "@auth/*": ["app/features/auth/*"], 
+    "@auth/services/*": ["app/features/auth/services/*"], 
+    
+    "@login/*": ["app/features/auth/components/login/*"], 
+    // Corrigido: Incluído 'auth/'
+    "@register/*": ["app/features/auth/components/register/*"], 
+    // Corrigido: Incluído 'auth/'
+    "@auth/models/*": ["app/features/auth/models/*"], 
+    
+    // --- FEATURES (Fluxos de Negócio) - Sintaxe corrigida (/*)
+    "@features/*": ["app/features/*"], 
+    "@aposta-rodada/*": ["app/features/aposta-rodada/*"],
+    "@apostador/*": ["app/features/apostador/*"],
+    "@apostador-campeonato/*": ["app/features/apostador-campeonato/*"],
+    "@campeonato/*": ["app/features/campeonato/*"],
+    "@equipe/*": ["app/features/equipe/*"],
+    "@financeiro/*": ["app/features/financeiro/*"],
+    "@home/*": ["app/features/home/*"],
+    "@perfil/*": ["app/features/perfil/*"],
+    "@ranking-campeonato/*": ["app/features/ranking-campeonato/*"],
+    "@ranking-rodada/*": ["app/features/ranking-rodada/*"],
+    "@regras-bolao/*": ["app/features/regras-bolao/*"],
+    "@rodadas-finalizadas/*": ["app/features/rodadas-finalizadas/*"],
+
+    // --- SHARED (Comuns) - Sintaxe corrigida (/*)
+    "@shared/components/*": ["app/shared/components/*"], 
+    "@shared/models/*": ["app/shared/models/*"], 
+    
+    // --- MODELOS ESPECÍFICOS - Sintaxe corrigida (/*)
+    "@models/aposta-rodada/*": ["app/features/aposta-rodada/models/*"],      
+    "@models/apostador/*": ["app/features/apostador/models/*"],
+    "@models/apostador-campeonato/*": ["app/features/apostador-campeonato/models/*"],
+    "@models/campeonato/*": ["app/features/campeonato/models/*"],
+    // Corrigido: Para usar o alias, deve ser @models/equipe/*, e o caminho deve ter 'models/*'
+    "@models/equipe/*": ["app/features/equipe/models/*"], 
+    "@models/financeiro/*": ["app/features/financeiro/models/*"],
+    "@models/perfil/*": ["app/features/perfil/models/*"],
+    "@models/ranking-campeonato/*": ["app/features/ranking-campeonato/models/*"],
+    "@models/ranking-rodada/*":  ["app/features/ranking-rodada/models/*"]
+}
+
+  }
+}
