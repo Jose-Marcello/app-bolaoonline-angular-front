@@ -8,6 +8,7 @@
     gap: 12px;
     /* ✅ Ajuste de cor fixa para garantir o contraste */
     color: #2d3748; /* Um cinza bem escuro (Tailwind gray-800) */
+    
 }
 
 /* No hover, mantemos o fundo escuro para destacar o item selecionado */
