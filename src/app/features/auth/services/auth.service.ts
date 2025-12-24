@@ -63,7 +63,7 @@ export class AuthService {
     console.log('[AuthService] login: Tentando login para:', credentials.email);
   
     
-    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/Account/login`, credentials).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/account/login`, credentials).pipe(
       tap((response: ApiResponse<LoginResponse>) => {
         
         if (response.success && response.data?.loginSucesso) {
