@@ -201,6 +201,15 @@ loadDashboardData(): void {
   this.subscriptions.add(fluxoDashboard$.subscribe());
 }
 
+informarEmDesenvolvimento(): void {
+  this.snackBar.open('Funcionalidade em desenvolvimento. Disponível em breve!', 'Fechar', {
+    duration: 3000,
+    horizontalPosition: 'center',
+    verticalPosition: 'bottom',
+    panelClass: ['snackbar-info'] // ou 'snackbar-warning'
+  });
+}
+
 carregarRodadasSecundarias(): void {
   // Filtra apenas os campeonatos que o usuário já participa
   const aderidos = this.campeonatosDisponiveis.filter(c => c.aderidoPeloUsuario && c.id);

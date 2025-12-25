@@ -13,6 +13,7 @@ import { RankingCampeonatoFormComponent } from './features/ranking-campeonato/ra
 import { RegrasBolaoComponent } from './features/regras-bolao/regras-bolao-form.component'; 
 import { PerfilComponent } from './features/perfil/perfil.component'; 
 
+import { DepositarComponent } from './features/financeiro/depositar/depositar.component'; 
 
 export const routes: Routes = [
   {
@@ -63,6 +64,16 @@ export const routes: Routes = [
   component: PerfilComponent
   // Se tiver 'canActivate: [AuthGuard]' aqui, ele vai pedir login sempre!
   },
+
+  // No seu app.routes.ts, dentro do array children: [ ... ]
+{ 
+  path: 'dashboard/financeiro/depositar', 
+  component: DepositarComponent 
+},
+{ 
+  path: 'dashboard/financeiro/sacar', 
+  component: SacarComponent // Se já tiver este componente criado
+},
 
 
   { path: '**', redirectTo: 'auth/login' }
