@@ -14,15 +14,15 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
 // Services
-import { AuthService } from '@auth/auth.service';
-import { FinanceiroService } from '@services/financeiro.service';
-import { ApostadorService } from '@services/apostador.service';
+import { AuthService } from '../../../features/auth/services/auth.service';
+import { FinanceiroService } from '../../../core/services/financeiro.service';
+import { ApostadorService } from '../../../core/services/apostador.service';
 
 // Models
-import { DepositarRequestDto } from '@models/financeiro/depositar-request-dto.model';
-import { PixResponseDto } from '@models/financeiro/pix-response.model';
-import { isPreservedCollection } from '@models/common/api-response.model';
-import { ApostadorDto } from '@models/apostador/apostador-dto.model';
+import { DepositarRequestDto } from '../../../features/financeiro/models/depositar-request-dto.model';
+import { PixResponseDto } from '../../../features/financeiro/models/pix-response.model';
+import { isPreservedCollection } from '../../../shared/models/api-response.model';
+import { ApostadorDto } from '../../../features/apostador/models/apostador-dto.model';
 
 @Component({
   selector: 'app-depositar',

@@ -69,11 +69,12 @@ export const routes: Routes = [
 { 
   path: 'dashboard/financeiro/depositar', 
   component: DepositarComponent 
-},
-{ 
-  path: 'dashboard/financeiro/sacar', 
-  component: SacarComponent // Se já tiver este componente criado
-},
+}
+,
+//{ 
+  //path: 'dashboard/financeiro/sacar', 
+  //component: SacarComponent // Se já tiver este componente criado
+//},
 
 
   { path: '**', redirectTo: 'auth/login' }
