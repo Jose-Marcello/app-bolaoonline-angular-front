@@ -80,7 +80,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // --- Variáveis da Galeria ---
   indiceAtual = 0;
   // Monta o array de EspMar-foto1.jpg até EspMar-foto11.jpg
-  fotos: string[] = Array.from({ length: 11 }, (_, i) => `assets/images/EspMar-foto${i + 1}.jpg`);
+  fotos: string[] = Array.from({ length: 11 }, (_, i) => `assets/marketing/parceiros/EspMar-foto${i + 1}.jpeg`);
   fotoAtual: string = this.fotos[0];
   intervaloGaleria: any;
 
