@@ -3,6 +3,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { Subscription, Observable, combineLatest, of, forkJoin } from 'rxjs';
+import { finalize, tap, filter, switchMap, take, catchError, map, startWith } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 // Importações do Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -15,9 +18,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 
-import { Subscription, Observable, combineLatest, of, forkJoin } from 'rxjs';
-import { finalize, tap, filter, switchMap, take, catchError, map, startWith } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
 
 // Importa os serviços e modelos necessários
 import { AuthService } from '../../../features/auth/services/auth.service';
@@ -77,6 +77,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   campeonatoTotais: { [key: string]: ApostasCampeonatoTotaisDto } = {};
   taxaAdministrativa = 0.20;
 
+  // --- Variáveis da Galeria ---
+  indiceAtual = 0;
+  // Monta o array de EspMar-foto1.jpg até EspMar-foto11.jpg
+  fotos: string[] = Array.from({ length: 11 }, (_, i) => `assets/images/EspMar-foto${i + 1}.jpg`);
+  fotoAtual: string = this.fotos[0];
+  intervaloGaleria: any;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -93,24 +100,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('[DashboardComponent] Constructor: isLoading:', this.isLoading);
   }
 
-  ngOnInit(): void {
-    //this.obterCampeonatosDisponiveis();
+
+ngOnInit(): void {
     console.log('[DashboardComponent] ngOnInit: Iniciado.');
+
+    // 1. Lógica de Autenticação e Carga de Dados
     this.subscriptions.add(
       this.authService.isAuthenticated$.pipe(
         filter(isAuthenticated => isAuthenticated),
         take(1)
       ).subscribe(() => {
-        console.log('[DashboardComponent] Usuário autenticado. Carregando dados do dashboard...');
+        console.log('[DashboardComponent] Usuário autenticado. Carregando dados...');
         this.loadDashboardData();
       })
     );
+
+    // 2. Inicia a rotação das fotos (Carrossel)
+    this.iniciarCarrossel();
   }
 
+  iniciarCarrossel() {
+    this.intervaloGaleria = setInterval(() => {
+      this.indiceAtual = (this.indiceAtual + 1) % this.fotos.length;
+      this.fotoAtual = this.fotos[this.indiceAtual];
+    }, 4000); 
+  }
 
   ngOnDestroy(): void {
-    console.log('[DashboardComponent] ngOnDestroy: Desinscrevendo todas as subscriptions.');
+    // Limpa as subscrições e o intervalo do carrossel ao sair da tela
     this.subscriptions.unsubscribe();
+    if (this.intervaloGaleria) {
+      clearInterval(this.intervaloGaleria);
+    }
   }
 
 
