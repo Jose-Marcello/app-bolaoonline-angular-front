@@ -28,33 +28,33 @@
             <p class="mt-2 text-center text-xl font-extrabold subtitulo">
                 Preencha o formulário para se registrar
             </p>
+
             <form class="mt-8 space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
                 <div class="space-y-2">
                     <label for="profilePhoto" class="text-sm font-medium text-white">Foto de Perfil</label>
                     <div class="mt-1 flex items-center space-x-2">
-                        <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100 border border-gray-600">
+                        <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-700 border border-gray-600">
                             <img *ngIf="profilePhotoPreview" [src]="profilePhotoPreview" alt="Preview da Foto" class="h-full w-full object-cover">
-                            <svg *ngIf="!profilePhotoPreview" class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                            <svg *ngIf="!profilePhotoPreview" class="h-full w-full text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M24 20.993c-.438 1.48-1.748 2.507-3.238 2.507H3.238C1.748 23.5 0 22.02 0 20.53V3.469C0 1.979 1.748.5 3.238.5h17.524c1.49 0 3.238 1.48 3.238 2.969V20.993zM5.5 12a2.5 2.5 0 110-5 2.5 2.5 0 010 5zM12 12a2.5 2.5 0 110-5 2.5 2.5 0 010 5zM18.5 12a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
                             </svg>
                         </span>
-                        <input id="profilePhoto" name="profilePhoto" type="file" formControlName="profilePhoto"
-                               (change)="onFileSelected($event)"
-                               class="sr-only">
-                        <label for="profilePhoto" class="cursor-pointer bg-bolao-green-dark text-white px-4 py-2 rounded-md hover:bg-bolao-green-dark/80">
+                        <input id="profilePhoto" name="profilePhoto" type="file" (change)="onFileSelected($event)" class="sr-only">
+                        <label for="profilePhoto" class="cursor-pointer bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-bold">
                             Carregar
                         </label>
                     </div>
                 </div>
 
-                <div class="rounded-md shadow-sm -space-y-px">
+                <div class="rounded-md shadow-sm space-y-3">
                     <div>
                         <input id="email-address" name="email" type="email" formControlName="email"
-                               class="appearance-none relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 
-                                     !text-white bg-bolao-card-bg-light focus:outline-none 
-                                     focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm rounded-t-md"
-                               placeholder="Endereço de Email">
-                        <div *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)" class="text-red-500 text-sm mt-1">
+                               class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="Endereço de Email"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
+                        <div *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)" class="text-red-400 text-xs mt-1">
                             <span *ngIf="registerForm.get('email')?.errors?.['required']">Email é obrigatório.</span>
                             <span *ngIf="registerForm.get('email')?.errors?.['email']">Email inválido.</span>
                         </div>
@@ -62,136 +62,100 @@
 
                     <div>
                         <input id="nomeCompleto" name="nomeCompleto" type="text" formControlName="nomeCompleto"
-                               class="appearance-none relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 !text-white bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm"
-                               placeholder="Nome Completo">
-                        <div *ngIf="registerForm.get('nomeCompleto')?.invalid && (registerForm.get('nomeCompleto')?.dirty || registerForm.get('nomeCompleto')?.touched)" class="text-red-500 text-sm mt-1">
-                            <span *ngIf="registerForm.get('nomeCompleto')?.errors?.['required']">Nome Completo é obrigatório.</span>
-                        </div>
+                               class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="Nome Completo"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     </div>
 
                     <div>
                         <input id="apelido" name="apelido" type="text" formControlName="apelido"
-                               class="appearance-none relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 !text-white bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm"
-                               placeholder="Apelido">
-                        <div *ngIf="registerForm.get('apelido')?.invalid && (registerForm.get('apelido')?.dirty || registerForm.get('apelido')?.touched)" class="text-red-500 text-sm mt-1">
-                            <span *ngIf="registerForm.get('apelido')?.errors?.['required']">Apelido é obrigatório.</span>
-                        </div>
+                               class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="Apelido"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     </div>
 
                     <div>
                         <input id="cpf" name="cpf" type="text" formControlName="cpf"
-                               class="appearance-none relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 !text-white bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm"
-                               placeholder="CPF" mask="000.000.000-00">
-                        <div *ngIf="registerForm.get('cpf')?.invalid && (registerForm.get('cpf')?.dirty || registerForm.get('cpf')?.touched)" class="text-red-500 text-sm mt-1">
-                            <span *ngIf="registerForm.get('cpf')?.errors?.['required']">CPF é obrigatório.</span>
-                            <span *ngIf="registerForm.get('cpf')?.errors?.['invalidCpfLength']">CPF inválido (11 números).</span>
-                        </div>
+                               class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="CPF" mask="000.000.000-00"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     </div>
                     
                     <div>
                         <input id="celular" name="celular" type="text" formControlName="celular"
-                               class="appearance-none relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 !text-white bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm"
-                               placeholder="Telefone" mask="(00) 00000-0000">
-                        <div *ngIf="registerForm.get('celular')?.invalid && (registerForm.get('celular')?.dirty || registerForm.get('celular')?.touched)" class="text-red-500 text-sm mt-1">
-                            <span *ngIf="registerForm.get('celular')?.errors?.['required']">Telefone é obrigatório.</span>
-                            <span *ngIf="registerForm.get('celular')?.errors?.['invalidCelularLength']">Telefone inválido (10 ou 11 números).</span>
-                        </div>
+                               class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="Telefone" mask="(00) 00000-0000"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     </div>
 
-                    <div class="relative flex items-center w-full">
+                    <div class="relative">
                         <input id="password" name="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password"
-                               class="appearance-none block w-full px-3 py-2 pr-10 border border-gray-600 placeholder-gray-400 !text-white bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm"
-                               placeholder="Senha">
+                               class="appearance-none block w-full px-3 py-3 pr-10 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="Senha"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
                         <button type="button" (click)="togglePasswordVisibility()"
-                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-bolao-green-light">
-                            <i class="material-icons">{{ hidePassword ? 'visibility_off' : 'visibility' }}</i>
+                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-green-400">
+                            <i class="material-icons text-xl">{{ hidePassword ? 'visibility_off' : 'visibility' }}</i>
                         </button>
-                    </div>
-                    <div *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)" class="text-red-500 text-sm mt-1">
-                        <span *ngIf="registerForm.get('password')?.errors?.['required']">Senha é obrigatória.</span>
-                        <span *ngIf="registerForm.get('password')?.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres.</span>
                     </div>
                     
-                    <div class="relative flex items-center w-full">
+                    <div class="relative">
                         <input id="confirm-password" name="confirmPassword" [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword"
-                               class="appearance-none block w-full px-3 py-2 pr-10 border border-gray-600 placeholder-gray-400 !text-white bg-bolao-card-bg-light focus:outline-none focus:ring-bolao-green-light focus:border-bolao-green-light focus:z-10 sm:text-sm rounded-b-md"
-                               placeholder="Confirmar Senha">
-                        <button type="button" (click)="togglePasswordVisibility()"
-                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-bolao-green-light">
-                            <i class="material-icons">{{ hidePassword ? 'visibility_off' : 'visibility' }}</i>
-                        </button>
-                    </div>
-                    <div *ngIf="registerForm.get('confirmPassword')?.invalid && (registerForm.get('confirmPassword')?.dirty || registerForm.get('confirmPassword')?.touched) || (registerForm.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched)" class="text-red-500 text-sm mt-1">
-                        <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirmação de senha é obrigatória.</span>
-                        <span *ngIf="registerForm.errors?.['mismatch']">As senhas não coincidem.</span>
+                               class="appearance-none block w-full px-3 py-3 pr-10 border border-gray-600 placeholder-gray-400 
+                                     text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 
+                                     focus:border-transparent sm:text-sm rounded-md shadow-inner"
+                               placeholder="Confirmar Senha"
+                               style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     </div>
                 </div>
 
                 <div class="flex items-start mt-4">
                     <div class="flex items-center h-5">
                         <input id="terms" name="terms" type="checkbox" formControlName="terms"
-                               class="h-4 w-4 text-bolao-green-light focus:ring-bolao-green-light border-gray-600 rounded">
+                               class="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-600 rounded bg-gray-800">
                     </div>
                     <div class="ml-3 text-sm">
-                        <label for="terms" class="aviso-termos font-medium text-white">
-                            Estou ciente da veracidade das informações acima, li e concordo com os <a href="#" class="text-bolao-green-light hover:text-bolao-green-light/80">termos de uso</a>.
+                        <label for="terms" class="aviso-termos font-medium text-white leading-tight">
+                            Estou ciente da veracidade das informações acima, li e concordo com os <a href="#" class="text-green-400 hover:underline">termos de uso</a>.
                         </label>
-                        <div *ngIf="registerForm.get('terms')?.invalid && (registerForm.get('terms')?.dirty || registerForm.get('terms')?.touched)" class="text-red-500 text-sm mt-1">
-                            <span>Você deve concordar com os termos de uso para se registrar.</span>
-                        </div>
                     </div>
-                </div>
-
-                <div class="text-sm mt-2 text-gray-400">
-                    <p>Fique tranquilo(a)! Não utilizaremos seus dados para outros fins além dos estabelecidos nos <a href="#" class="text-bolao-green-light hover:text-bolao-green-light/80">termos de uso do portal</a>.</p>
-                    <p class="mt-1">Os dados pessoais coletados para este serviço serão tratados de acordo com a Lei Geral de Proteção de Dados (Lei Federal nº 13.709/2018). Para maiores informações, visite o <a href="#" class="text-bolao-green-light hover:text-bolao-green-light/80">nosso site</a>.</p>
                 </div>
 
                 <div>
                     <button type="submit"
                         [disabled]="registerForm.invalid || isLoading"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-bolao-green-dark hover:bg-bolao-green-dark/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolao-green-dark disabled:opacity-50">
-                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-white group-hover:text-white/80" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-md text-white 
+                               bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
+                               focus:ring-green-500 disabled:opacity-50 disabled:bg-gray-600 transition-all uppercase tracking-wider">
+                        <span *ngIf="isLoading" class="mr-2">Processando...</span>
                         Registrar
                     </button>
                 </div>
             </form>
             
-            <div class="flex items-center justify-between mt-4">
-                <div class="text-sm">
-                    <a routerLink="/login" class="font-medium text-bolao-green-light hover:text-bolao-green-light/80">
-                        Já tem uma conta? Faça login.
-                    </a>
-                </div>
+            <div class="text-center mt-6">
+                <a routerLink="/login" class="text-sm font-medium text-green-400 hover:text-green-300 transition-colors">
+                    Já tem uma conta? Faça login.
+                </a>
             </div>
         </div>
         
-        <div *ngIf="isRegistered" class="flex flex-col items-center text-center mt-8 space-y-4">
-            <p class="aviso-email text-xl font-bold text-bolao-green-light">Registro concluído!</p>
-
-            <div *ngIf="!isProduction">
-                <p class="text-white">
-                    Um e-mail de confirmação SIMULADO foi gerado. Por favor, clique no botão abaixo para obtê-lo.
-                </p>
-                <button 
-                    (click)="navigateToMockEmail()" 
-                    class="bg-bolao-green-dark text-white px-6 py-2 rounded-md font-medium hover:bg-bolao-green-dark/80 mt-3">
-                    Ver E-mail Simulado
-                </button>
-            </div>
-
-            <div *ngIf="isProduction">
-                <p class="text-white">
-                    Um e-mail de confirmação foi enviado para você. Por favor, verifique sua caixa de entrada para ativar sua conta.
-                </p>
-            </div>
-
-            <a routerLink="/login" class="font-medium text-bolao-green-light hover:text-bolao-green-light/80 mt-4">
-                Voltar para a página de login
+        <div *ngIf="isRegistered" class="flex flex-col items-center text-center mt-8 space-y-4 p-4">
+            <mat-icon class="text-6xl text-green-500 h-16 w-16 mb-2">check_circle</mat-icon>
+            <p class="aviso-email text-2xl font-bold text-green-400">Registro concluído!</p>
+            <p class="text-white opacity-90">Verifique seu e-mail para ativar sua conta e começar a jogar.</p>
+            <a routerLink="/login" class="inline-block bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-700 transition-all mt-6 shadow-lg">
+                IR PARA LOGIN
             </a>
         </div>
     </div>
