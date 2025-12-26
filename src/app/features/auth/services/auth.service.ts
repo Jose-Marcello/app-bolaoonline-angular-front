@@ -202,15 +202,15 @@ resendConfirmationEmail(email: string): Observable<ApiResponse<any>> {
       return !!token;
   }
 
-// 1. Método para solicitar recuperação de senha
 forgotPassword(email: string): Observable<ApiResponse<any>> {
-    const url = `${this.apiUrlAuth}/forgot-password`;
+    // Adicionamos o /account/ para alinhar com o Backend
+    const url = `${this.apiUrlAuth}/account/forgot-password`;
     return this.http.post<ApiResponse<any>>(url, { email });
 }
 
-// 2. Método para registrar um novo usuário
 register(registrationData: any): Observable<ApiResponse<any>> {
-    const url = `${this.apiUrlAuth}/register`;
+    // Adicionamos o /account/ para bater com o [Route("api/account")] do C#
+    const url = `${this.apiUrlAuth}/account/register`; 
     return this.http.post<ApiResponse<any>>(url, registrationData);
 }
 
