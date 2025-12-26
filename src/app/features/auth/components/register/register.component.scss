@@ -2,6 +2,31 @@
 /* 1. ESTILO DA CAIXA (.bolao-login-box) */
 /* ===================================== */
 
+/* src/app/features/auth/register/register.component.scss */
+
+.mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Cor do texto que o usuário digita */
+input.mat-mdc-input-element {
+  color: #333333 !important; /* Grafite escuro para leitura clara */
+  caret-color: #1e3a8a; /* Cor do cursor */
+}
+
+/* Garante que o fundo do input seja branco ou cinza muito claro */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: #ffffff !important; 
+  border-radius: 4px 4px 0 0;
+}
+
+/* Cor do rótulo (Label) quando não está focado */
+.mat-mdc-form-field-label {
+  color: #666666 !important;
+}
+
+
 .bolao-login-box {
     /* Dimensões e Posicionamento */
     width: 90%; 
