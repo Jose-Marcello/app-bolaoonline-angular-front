@@ -42,7 +42,7 @@
               <mat-card-subtitle class="text-xs text-gray-500">
                 {{ campeonato.dataInicio | date:'dd/MM/yyyy' }} - {{ campeonato.dataFim | date:'dd/MM/yyyy' }}
               </mat-card-subtitle>
-            </div>
+            </div> 
           </div>
           <div [class]="campeonato.aderidoPeloUsuario ? 'bg-green-500 shadow-lg text-white text-[10px] font-bold py-1 px-3 rounded-full' : 'bg-orange-600 text-white text-[10px] font-bold py-1 px-3 rounded-full'">
             {{ campeonato.aderidoPeloUsuario ? 'JOGANDO!' : 'VAMOS JOGAR?' }}
