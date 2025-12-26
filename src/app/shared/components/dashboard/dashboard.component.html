@@ -45,7 +45,7 @@
             </div>
           </div>
           <div [class]="campeonato.aderidoPeloUsuario ? 'bg-green-500 shadow-lg text-white text-[10px] font-bold py-1 px-3 rounded-full' : 'bg-orange-600 text-white text-[10px] font-bold py-1 px-3 rounded-full'">
-            {{ campeonato.aderidoPeloUsuario ? 'JOGANDO!' : 'VITRINE' }}
+            {{ campeonato.aderidoPeloUsuario ? 'JOGANDO!' : 'VAMOS JOGAR?' }}
           </div>
         </div>
 
@@ -65,35 +65,35 @@
         <div class="flex flex-col space-y-3">
           
           <div class="border-l-4 border-green-500 pl-3 py-1 bg-green-50/50" *ngIf="campeonato.rodadasEmAposta?.length > 0">
-            <p class="text-[10px] font-bold text-green-700 uppercase mb-1">Rodada Aberta</p>
-            
-            <button *ngIf="campeonato.aderidoPeloUsuario" mat-flat-button class="bg-green-600 hover:bg-green-700 text-white w-full text-sm" 
+            <p class="text-[10px] font-bold text-green-700 uppercase mb-1">Próxima Rodada</p>
+            <button mat-flat-button class="w-full text-sm" 
+                    [ngClass]="campeonato.aderidoPeloUsuario ? 'bg-green-600 text-white' : 'bg-white border border-green-600 text-green-700'"
                     (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0].id)">
-              <mat-icon>sports_soccer</mat-icon> APOSTAR AGORA
-            </button>
-
-            <button *ngIf="!campeonato.aderidoPeloUsuario" mat-stroked-button class="border-green-600 text-green-700 w-full text-sm" 
-                    (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0].id)">
-              <mat-icon>visibility</mat-icon> VER JOGOS DA RODADA
+              <mat-icon>{{ campeonato.aderidoPeloUsuario ? 'sports_soccer' : 'visibility' }}</mat-icon>
+              {{ campeonato.aderidoPeloUsuario ? 'APOSTAR AGORA' : 'CONSULTAR JOGOS' }}
             </button>
           </div>
           
           <div class="border-l-4 border-blue-500 pl-3 py-1 bg-blue-50/50" *ngIf="campeonato.rodadasCorrentes?.length > 0">
-            <p class="text-[10px] font-bold text-blue-700 uppercase mb-1">Ranking e Resultados</p>
+            <p class="text-[10px] font-bold text-blue-700 uppercase mb-1">Resultados</p>
             <button mat-flat-button class="bg-blue-600 hover:bg-blue-700 text-white w-full text-sm" 
                     (click)="verRodadasCorrentes(campeonato.id)">
-              <mat-icon>trending_up</mat-icon> VER QUEM ESTÁ GANHANDO
+              <mat-icon>trending_up</mat-icon> VER CLASSIFICAÇÃO
             </button>
           </div>
 
           <hr class="border-gray-100 my-1">
 
-          <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" mat-raised-button color="warn" class="w-full" (click)="entrarEmCampeonato(campeonato.id)">
-            <mat-icon>add_circle_outline</mat-icon> ENTRAR NO BOLÃO AGORA
+          <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" 
+                  mat-raised-button color="warn" class="w-full mt-1 font-bold" 
+                  (click)="entrarEmCampeonato(campeonato.id)">
+            <mat-icon>add_circle_outline</mat-icon> ADERIR AO CAMPEONATO
           </button>
 
-          <button *ngIf="!isLoggedIn" mat-raised-button color="primary" class="w-full" routerLink="/auth/register">
-            <mat-icon>person_add</mat-icon> CRIAR CONTA E JOGAR
+          <button *ngIf="!isLoggedIn" 
+                  mat-raised-button color="primary" class="w-full mt-1 font-bold" 
+                  routerLink="/auth/register">
+            <mat-icon>person_add</mat-icon> REGISTRE-SE PARA JOGAR
           </button>
         </div>
       </mat-card>
@@ -110,7 +110,7 @@
           </div>
         </div>
         <div class="flex-1 relative bg-slate-900 min-h-[350px] flex items-center justify-center">
-          <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000 ease-in-out" alt="Espaço Mar Rodando">
+          <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000 ease-in-out">
           <div class="relative z-10 text-white p-8 w-full h-full flex flex-col justify-end bg-gradient-to-t from-slate-900 via-transparent to-transparent">
             <h3 class="font-black text-2xl tracking-tight mb-2 uppercase">Conheça o Espaço Mar Fitness</h3>
             <div class="flex items-center space-x-2">
