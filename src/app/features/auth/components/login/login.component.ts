@@ -106,39 +106,38 @@ export class LoginComponent implements OnInit {
   }
 
   resendEmail() {
-    if (this.resendForm.invalid) {
-      this.resendForm.markAllAsTouched();
-      return;
-    }
-
-    this.isLoading = true;
-    const email = this.resendForm.get('emailToResend')?.value;
-
-    // Se o Mock estiver ativo no environment.ts
-    if (environment.isMockEnabled) {
-      setTimeout(() => {
-        this.isLoading = false;
-        this.closeResendEmailModal(); // FECHA O MODAL ANTES DE ABRIR O MOCK
-
-        // O link de confirmação deve apontar para o seu componente de teste
-        // Passando userId (se tiver) ou apenas o email para o Mock
-        const simulatedLink = `/confirm-email?email=${email}&code=MOCK_TOKEN_RESEND`;
-        
-        this.mockEmailService.openMockEmailDialog(email, simulatedLink, 'confirm').subscribe();
-      }, 1500);
-    } else {
-      // Chamada real para o seu Backend C#
-      this.authService.resendConfirmationEmail(email).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.closeResendEmailModal();
-          this.notifications.push({ tipo: 'Sucesso', mensagem: 'E-mail de confirmação enviado!' });
-        },
-        error: () => {
-          this.isLoading = false;
-          this.notifications.push({ tipo: 'Erro', mensagem: 'Erro ao reenviar e-mail.' });
-        }
-      });
-    }
+  if (this.resendForm.invalid) {
+    this.resendForm.markAllAsTouched();
+    return;
   }
+
+  this.isLoading = true;
+  const email = this.resendForm.get('emailToResend')?.value;
+
+  // Chamamos o serviço real para o C# gerar um NOVO TOKEN
+  this.authService.resendConfirmationEmail(email).pipe(
+    finalize(() => this.isLoading = false)
+  ).subscribe({
+    next: (res: any) => {
+      this.closeResendEmailModal();
+
+      if (environment.isMockEnabled) {
+        // Capturamos os dados REAIS que o C# acabou de gerar
+        const userId = res.data?.userId;
+        const token = (res.data as any)?.emailToken;
+
+        // Montamos o link VÁLIDO para o banco aceitar
+        const linkReal = `${window.location.origin}/api/account/confirm-email?userId=${userId}&stringcode=${token}`;
+
+        this.mockEmailService.openMockEmailDialog(email, linkReal, 'confirm').subscribe();
+      } else {
+        this.notifications.push({ tipo: 'Sucesso', mensagem: 'E-mail de confirmação enviado!' });
+      }
+    },
+    error: (err: any) => {
+      const msg = err.error?.notifications?.[0]?.mensagem || 'Erro ao reenviar e-mail.';
+      this.notifications.push({ tipo: 'Erro', mensagem: msg });
+    }
+  });
+}
 }

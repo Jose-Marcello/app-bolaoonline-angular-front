@@ -1,27 +1,21 @@
-// Localização: src/app/auth/components/register/register.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationsService } from '../../../../core/services/notifications.service';
-
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
-
-// DEPOIS: Inclui o provider para que o Angular o reconheça.
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 
-import { RegisterRequestDto } from  '../../../../features/auth/models/register-request.model';
-import { RegisterResponse } from  '../../../../features/auth/models/register-response.model';
-import { ApiResponse } from  '../../../../shared/models/api-response.model';
+import { RegisterRequestDto } from '../../../../features/auth/models/register-request.model';
+import { RegisterResponse } from '../../../../features/auth/models/register-response.model';
+import { ApiResponse } from '../../../../shared/models/api-response.model';
 import { FileUploadService } from '../../../../core/services/file-upload.service';
-
+import { MockEmailService } from '../../../../core/services/mock-email.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -39,36 +33,34 @@ import { environment } from '../../../../../environments/environment';
     MatIconModule
   ],
   providers: [
-    provideNgxMask() // ✅ INSERIR ESTA LINHA PARA FORNECER A CONFIGURAÇÃO
+    provideNgxMask()
   ]
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   isLoading = false;
-  errorMessage = "";
+  errorMessage: string | null = null;
+  
+  // VARIÁVEIS DE VISIBILIDADE (O que causou o erro)
   hidePassword = true;
   hideConfirmPassword = true;
+  
   notifications: any[] = [];
   profilePhotoPreview: string | ArrayBuffer | null = null;
   selectedFile: File | null = null;
-  private readonly fotoPerfilMaxFileSize = 5242880;
   isRegistered = false;
   registrationSuccess = false;    
-  registeredUserEmail: string;
+  registeredUserEmail: string = '';
 
-  // APLICAÇÃO DA LÓGICA DE 3 AMBIENTES
-  isMockEnvironment = 
-    window.location.host.includes('localhost') || 
-    window.location.host === 'app.palpitesbolao.com.br';
-  isProduction = environment.production;
-
+  isMockEnvironment = environment.isMockEnabled;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private notificationsService: NotificationsService,
-    private fileUploadService: FileUploadService
+    private fileUploadService: FileUploadService,
+    private mockEmailService: MockEmailService
   ) { }
 
   ngOnInit(): void {
@@ -85,11 +77,18 @@ export class RegisterComponent implements OnInit {
     }, { validators: this.passwordMatchValidator });
   }
 
+  // MÉTODOS DE VISIBILIDADE CORRIGIDOS
+  togglePasswordVisibility(): void {
+    this.hidePassword = !this.hidePassword;
+  }
 
-onSubmit(): void {
+  toggleConfirmPasswordVisibility(): void {
+    this.hideConfirmPassword = !this.hideConfirmPassword;
+  }
+
+  onSubmit(): void {
     this.notifications = [];
     this.errorMessage = null;
-    this.registrationSuccess = true;
     this.registeredUserEmail = this.registerForm.get('email')?.value;
 
     if (this.registerForm.invalid) {
@@ -120,83 +119,43 @@ onSubmit(): void {
     ).subscribe(
         (response: ApiResponse<RegisterResponse>) => {
             if (response.success) {
-                const mensagem = response.message || 'Registro realizado com sucesso!';
-                this.notificationsService.showNotification(mensagem, 'sucesso');
-
-                // <<-- LÓGICA DE TESTE REAL COM TOKEN -->>
                 if (this.isMockEnvironment) { 
                     const userId = response.data?.userId;
-                    const email = this.registeredUserEmail;
-                    
-                    // Captura o token real que o Backend enviou no registro
                     const token = (response.data as any)?.emailToken; 
+                    const email = this.registeredUserEmail;
 
-                    // Navega para o mock passando o TOKEN real para a confirmação ser válida
-                    this.router.navigate(['/testes/email'], { 
-                        queryParams: { userId, email, token } 
+                    // Link com stringcode para o C# funcionar
+                    const linkConfirmacao = `${window.location.origin}/api/account/confirm-email?userId=${userId}&stringcode=${token}`;
+
+                    this.mockEmailService.openMockEmailDialog(email, linkConfirmacao, 'confirm').subscribe({
+                      next: () => this.router.navigate(['/auth/login'])
                     });
                 } else {
+                    this.registrationSuccess = true; 
                     this.isRegistered = true;
                     if (this.selectedFile && response.data?.userId) {
                         this.uploadProfilePhoto(response.data.userId);
                     }
                 }
             } else {
-                let errorMessage = 'Ocorreu um erro no registro.';
-                // Tratamento para o formato do Notificador C# ($values)
-                if (response.notifications && (response.notifications as any).$values?.length > 0) {
-                    errorMessage = (response.notifications as any).$values[0].mensagem;
-                }
-                this.notificationsService.showNotification(errorMessage, 'erro');
+                let errorMsg = response.message || 'Erro no registro.';
+                this.notificationsService.showNotification(errorMsg, 'erro');
             }
         },
         (errorResponse: HttpErrorResponse) => {
-            let message = 'Erro de conexão.';
-            if (errorResponse.error?.notifications?.$values?.length > 0) {
-                message = errorResponse.error.notifications.$values[0].mensagem;
-            }
-            this.notificationsService.showNotification(message, 'erro');
+            this.notificationsService.showNotification('Erro de conexão.', 'erro');
         }
     );
-}
-
-
-
-  private uploadProfilePhoto(userId: string): void {
-    if (!this.selectedFile) return;
-
-    this.isLoading = true;
-    this.fileUploadService.uploadFile(this.selectedFile).pipe(
-      finalize(() => this.isLoading = false)
-    ).subscribe({
-      next: (url: string) => {
-        this.notificationsService.showNotification('Foto de perfil enviada com sucesso.', 'sucesso');
-      },
-      error: (error: any) => {
-        console.error('Erro no upload do arquivo:', error);
-        this.notificationsService.showNotification('Erro no upload da foto. Por favor, tente novamente.', 'erro');
-      }
-    });
   }
 
-// Novo método para navegação
-  navigateToMockEmail() {
-    this.router.navigate(['/testes/email'], {
-      queryParams: { email: this.registeredUserEmail }
-    });
+  // MÉTODOS AUXILIARES
+  private uploadProfilePhoto(userId: string): void {
+    if (!this.selectedFile) return;
+    this.fileUploadService.uploadFile(this.selectedFile).subscribe();
   }
 
   passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null : { 'mismatch': true };
-  }
-  
-  togglePasswordVisibility(): void {
-    this.hidePassword = !this.hidePassword;
-  }
-
-  toggleConfirmPasswordVisibility(): void {
-    this.hideConfirmPassword = !this.hideConfirmPassword;
+    return g.get('password')?.value === g.get('confirmPassword')?.value ? null : { 'mismatch': true };
   }
 
   onFileSelected(event: Event): void {
@@ -204,50 +163,19 @@ onSubmit(): void {
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
       const reader = new FileReader();
-      reader.onload = (e) => {
-        this.profilePhotoPreview = e.target?.result;
-      };
+      reader.onload = (e) => this.profilePhotoPreview = e.target?.result;
       reader.readAsDataURL(this.selectedFile);
     }
   }
-
-  resendConfirmationEmail(): void {
-    this.isLoading = true;
-    const email = this.registerForm.get('email')?.value;
-    const host = window.location.host;
-    const scheme = window.location.protocol.slice(0, -1);
-
-    if (email) {
-      this.authService.resendConfirmationEmail(email).pipe(
-        finalize(() => this.isLoading = false)
-      ).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.notificationsService.showNotification('Novo e-mail de confirmação enviado. Verifique sua caixa de entrada.', 'sucesso');
-          } else {
-            this.notificationsService.showNotification(response.message || 'Erro ao reenviar e-mail de confirmação.', 'erro');
-          }
-        },
-        error: () => {
-          this.notificationsService.showNotification('Erro de rede ao tentar reenviar o e-mail.', 'erro');
-        }
-      });
-    }
-  }
 }
 
-export function CpfValidator(control: AbstractControl): { [key: string]: any } | null {
+// VALIDADORES FORA DA CLASSE
+export function CpfValidator(control: AbstractControl) {
   const rawCpf = (control.value || '').replace(/\D/g, '');
-  if (rawCpf.length !== 11) {
-    return { 'invalidCpfLength': true };
-  }
-  return null;
+  return rawCpf.length !== 11 ? { 'invalidCpfLength': true } : null;
 }
 
-export function CelularValidator(control: AbstractControl): { [key: string]: any } | null {
+export function CelularValidator(control: AbstractControl) {
   const rawCelular = (control.value || '').replace(/\D/g, '');
-  if (rawCelular.length !== 10 && rawCelular.length !== 11) {
-    return { 'invalidCelularLength': true };
-  }
-  return null;
+  return rawCelular.length !== 10 && rawCelular.length !== 11 ? { 'invalidCelularLength': true } : null;
 }
