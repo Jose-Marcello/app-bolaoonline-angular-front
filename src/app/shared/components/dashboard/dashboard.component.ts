@@ -105,8 +105,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 ngOnInit(): void {
 
     // Verificamos se há um token salvo para definir o estado de login
-    this.isLoggedIn = !!localStorage.getItem('token');
+  // 2. Tente capturar o token diretamente do armazenamento do navegador
+    const tokenSalvo = localStorage.getItem('token'); 
     
+    // 3. Define se está logado (true se o token existir)
+    this.isLoggedIn = !!tokenSalvo;
+
+    // 4. O CONSOLE LOG que você pediu para matar a dúvida
+    console.log('======= DEBUG LOGIN DASHBOARD =======');
+    console.log('Status Logado:', this.isLoggedIn);
+    console.log('Conteúdo do Token:', tokenSalvo ? 'Token Encontrado' : 'NENHUM TOKEN NO STORAGE');
+    console.log('======================================');
+
     console.log('[DashboardComponent] ngOnInit: Iniciado.');
 
     // 1. Lógica de Autenticação e Carga de Dados
