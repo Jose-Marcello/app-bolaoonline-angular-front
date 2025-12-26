@@ -5,7 +5,7 @@
 
   <div *ngIf="!isLoading && !errorMessage" class="container mx-auto">
     
-    <div class="max-w-4xl mx-auto my-6">
+    <div class="max-w-4xl mx-auto my-6" *ngIf="isLoggedIn">
       <mat-card class="rounded-lg shadow-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
@@ -18,13 +18,9 @@
           <button mat-flat-button color="primary" class="flex-1 py-2 font-bold" (click)="navigateToDepositar()">
             <mat-icon>add</mat-icon> DEPOSITAR
           </button>
-
           <button mat-flat-button color="accent" class="flex-1 py-2 font-bold" (click)="informarEmDesenvolvimento()">
             <mat-icon>remove</mat-icon> SACAR
           </button>
-          <!--<button mat-flat-button color="accent" class="flex-1 py-2 font-bold" (click)="navigateToSacar()">
-            <mat-icon>remove</mat-icon> SACAR
-          </button>-->
         </div>
       </mat-card>
     </div>
@@ -49,7 +45,7 @@
             </div>
           </div>
           <div [class]="campeonato.aderidoPeloUsuario ? 'bg-green-500 shadow-lg text-white text-[10px] font-bold py-1 px-3 rounded-full' : 'bg-orange-600 text-white text-[10px] font-bold py-1 px-3 rounded-full'">
-            {{ campeonato.aderidoPeloUsuario ? 'JOGANDO!' : 'VAMOS JOGAR?' }}
+            {{ campeonato.aderidoPeloUsuario ? 'JOGANDO!' : 'VITRINE' }}
           </div>
         </div>
 
@@ -67,24 +63,37 @@
         </div>
         
         <div class="flex flex-col space-y-3">
+          
           <div class="border-l-4 border-green-500 pl-3 py-1 bg-green-50/50" *ngIf="campeonato.rodadasEmAposta?.length > 0">
-            <p class="text-[10px] font-bold text-green-700 uppercase mb-1">Próxima Rodada Aberta</p>
-            <button mat-flat-button class="bg-green-600 hover:bg-green-700 text-white w-full text-sm" 
+            <p class="text-[10px] font-bold text-green-700 uppercase mb-1">Rodada Aberta</p>
+            
+            <button *ngIf="campeonato.aderidoPeloUsuario" mat-flat-button class="bg-green-600 hover:bg-green-700 text-white w-full text-sm" 
                     (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0].id)">
               <mat-icon>sports_soccer</mat-icon> APOSTAR AGORA
+            </button>
+
+            <button *ngIf="!campeonato.aderidoPeloUsuario" mat-stroked-button class="border-green-600 text-green-700 w-full text-sm" 
+                    (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0].id)">
+              <mat-icon>visibility</mat-icon> VER JOGOS DA RODADA
             </button>
           </div>
           
           <div class="border-l-4 border-blue-500 pl-3 py-1 bg-blue-50/50" *ngIf="campeonato.rodadasCorrentes?.length > 0">
-            <p class="text-[10px] font-bold text-blue-700 uppercase mb-1">Acompanhar Resultados</p>
+            <p class="text-[10px] font-bold text-blue-700 uppercase mb-1">Ranking e Resultados</p>
             <button mat-flat-button class="bg-blue-600 hover:bg-blue-700 text-white w-full text-sm" 
                     (click)="verRodadasCorrentes(campeonato.id)">
-              <mat-icon>trending_up</mat-icon> VER RESULTADOS
+              <mat-icon>trending_up</mat-icon> VER QUEM ESTÁ GANHANDO
             </button>
           </div>
 
-          <button *ngIf="!campeonato.aderidoPeloUsuario" mat-raised-button color="warn" class="w-full mt-2" (click)="entrarEmCampeonato(campeonato.id)">
-            <mat-icon>add_circle_outline</mat-icon> ENTRAR NO BOLÃO
+          <hr class="border-gray-100 my-1">
+
+          <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" mat-raised-button color="warn" class="w-full" (click)="entrarEmCampeonato(campeonato.id)">
+            <mat-icon>add_circle_outline</mat-icon> ENTRAR NO BOLÃO AGORA
+          </button>
+
+          <button *ngIf="!isLoggedIn" mat-raised-button color="primary" class="w-full" routerLink="/auth/register">
+            <mat-icon>person_add</mat-icon> CRIAR CONTA E JOGAR
           </button>
         </div>
       </mat-card>
@@ -93,21 +102,15 @@
     <div class="mt-16 mb-10">
       <hr class="border-t border-gray-200 mb-10">
       <mat-card class="rounded-xl shadow-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 border-blue-500/10">
-        
         <div class="bg-white p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 min-w-[240px]">
           <span class="text-blue-600 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Parceiro Oficial</span>
-          <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" 
-               alt="Espaço Mar Fitness" 
-               class="w-32 h-32 rounded-full shadow-lg object-cover border-4 border-slate-50">
+          <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" alt="Espaço Mar Fitness" class="w-32 h-32 rounded-full shadow-lg object-cover border-4 border-slate-50">
           <div class="mt-4 text-center">
             <p class="text-xs text-slate-400 italic">"Saúde e performance para nossos campeões."</p>
           </div>
         </div>
-        
         <div class="flex-1 relative bg-slate-900 min-h-[350px] flex items-center justify-center">
-          <img [src]="fotoAtual" 
-               class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000 ease-in-out" 
-               alt="Espaço Mar Rodando">
+          <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000 ease-in-out" alt="Espaço Mar Rodando">
           <div class="relative z-10 text-white p-8 w-full h-full flex flex-col justify-end bg-gradient-to-t from-slate-900 via-transparent to-transparent">
             <h3 class="font-black text-2xl tracking-tight mb-2 uppercase">Conheça o Espaço Mar Fitness</h3>
             <div class="flex items-center space-x-2">
@@ -118,8 +121,9 @@
         </div>
       </mat-card>
     </div>
+  </div>
 
-  </div> <div *ngIf="errorMessage" class="max-w-md mx-auto bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mt-10 text-center shadow-md">
+  <div *ngIf="errorMessage" class="max-w-md mx-auto bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mt-10 text-center shadow-md">
     <mat-icon class="align-middle mr-2">error</mat-icon>
     <span class="font-bold">Atenção: </span>
     <span>{{ errorMessage }}</span>
