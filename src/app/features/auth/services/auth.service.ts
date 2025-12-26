@@ -192,7 +192,7 @@ getStoredUserEmail(): string {
 }
 
 resendConfirmationEmail(email: string): Observable<ApiResponse<any>> {
-    const url = `${this.apiUrlAuth}/api/account/resend-confirmation-email`; // Ajuste a rota conforme o seu backend
+    const url = `${this.apiUrlAuth}/account/resend-confirmation-email`; // Ajuste a rota conforme o seu backend
     return this.http.post<ApiResponse<any>>(url, { email });
 }
 
