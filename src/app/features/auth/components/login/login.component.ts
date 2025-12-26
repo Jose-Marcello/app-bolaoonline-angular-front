@@ -122,42 +122,35 @@ export class LoginComponent {
         isPersistent: true 
       };
 
-      this.authService.login(loginRequestDto).subscribe({ 
-        next: () => {
-          this.isSubmitting = false;
-          this.router.navigate(['/dashboard']);
-        },
 
-        error: (err: any) => {
-          this.isSubmitting = false;
-          
-          if (err instanceof HttpErrorResponse) {
-              // Captura a mensagem vinda do Notificador do C#
-              const apiMessage = err.error?.notifications?.[0]?.mensagem;
-
-              if (err.status === 400 || err.status === 401) {
-                 this.notifications.push({ 
-                    tipo: 'Erro', 
-                    mensagem: apiMessage || 'Credenciais inválidas. Verifique seu email e senha.' 
-                 });
-              } else if (err.status === 403) {
-                 this.notifications.push({ 
-                    tipo: 'Erro', 
-                    mensagem: 'Sua conta não foi confirmada. Verifique seu email.' 
-                 });
-              } else {
-                 this.notifications.push({ 
-                    tipo: 'Erro', 
-                    mensagem: `Erro (${err.status}): Tente novamente em instantes.` 
-                 });
-              }
-          } else {
-              this.notifications.push({ tipo: 'Erro', mensagem: 'Ocorreu um erro inesperado ao tentar logar.' });
-          }
-        }
-      });
-    } else {
+this.authService.login(loginRequestDto).subscribe({ 
+  next: (res: any) => {
+    // Verificamos se o loginSucesso é falso, mesmo com Status 200
+    if (res.data && res.data.loginSucesso === false) {
       this.isSubmitting = false;
+      this.notifications = [];
+      
+      // Pegamos a mensagem de "Sua conta ainda não foi confirmada"
+      const msg = res.notifications?.[0]?.mensagem || 'Falha no login.';
+      this.notifications.push({ tipo: 'Erro', mensagem: msg });
+      
+    } else {
+      // Sucesso real: redireciona
+      this.isSubmitting = false;
+      this.router.navigate(['/dashboard']);
+    }
+  },
+  error: (err: any) => {
+    // Este bloco só é executado para erros 400, 401, 500, etc.
+    this.isSubmitting = false;
+    this.notifications = [{ tipo: 'Erro', mensagem: 'Erro de conexão com o servidor.' }];
+  }
+});
     }
   }
 }
+
+/*
+else {
+      this.isSubmitting = false;
+    }*/
