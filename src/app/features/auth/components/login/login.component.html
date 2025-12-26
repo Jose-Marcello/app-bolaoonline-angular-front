@@ -1,21 +1,33 @@
 <div class="min-h-screen w-screen flex items-center justify-center relative px-4" 
      style="background-image: url('/assets/images/fundobolao.png'); background-size: cover; background-position: center; background-attachment: fixed;">
      
-    <div class="max-w-md w-full bolao-login-box"> 
+    <div class="max-w-md w-full bolao-login-box bg-[#2D2D2D] p-8 rounded-xl shadow-2xl"> 
         
-        <div class="text-center"> 
-            <img src="/assets/images/logobolao.png" alt="Logo Bolão Online" class="logo-bolao">
-            <h2 class="text-2xl font-extrabold text-white">Bolão Online</h2>
+        <div class="text-center mb-6"> 
+            <img src="/assets/images/logobolao.png" alt="Logo Bolão Online" class="logo-bolao mx-auto mb-4">
+            <h2 class="text-3xl font-extrabold text-white">Bolão Online</h2>
             <p class="text-lg font-semibold text-gray-300">Faça login na sua conta</p>
         </div>
 
-        <form class="mt-6 space-y-4" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div *ngIf="notifications.length > 0" class="mb-4">
+            <div *ngFor="let notif of notifications"
+                [ngClass]="{
+                  'bg-red-700 bg-opacity-20 border-red-400 text-red-300': notif.tipo === 'Erro',
+                  'bg-green-700 bg-opacity-20 border-green-400 text-green-300': notif.tipo === 'Sucesso'
+                }"
+                class="px-4 py-3 rounded relative border text-sm font-medium">
+                <span class="block sm:inline">{{ notif.mensagem }}</span>
+            </div>
+        </div>
+
+        <form class="space-y-4" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="space-y-3">
                 <div class="flex flex-col">
                     <input id="email-address" name="email" type="email" autocomplete="email" required
                            formControlName="email"
-                           class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-white text-black focus:ring-2 focus:ring-indigo-500 outline-none"
-                           placeholder="Endereço de Email">
+                           class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                           placeholder="Endereço de Email"
+                           style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)"
                          class="text-red-400 text-xs mt-1">
                         <span *ngIf="loginForm.get('email')?.errors?.['required']">Email é obrigatório.</span>
@@ -26,35 +38,36 @@
                 <div class="relative flex flex-col">
                     <input id="password" name="password" [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password" required
                            formControlName="password"
-                           class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-white text-black focus:ring-2 focus:ring-indigo-500 outline-none"
-                           placeholder="Senha">
+                           class="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                           placeholder="Senha"
+                           style="background-color: #2d2d2d !important; color: #ffffff !important;">
                     <button type="button" (click)="togglePasswordVisibility()" 
-                            class="absolute right-3 top-3 text-gray-500">
+                            class="absolute right-3 top-3 text-gray-400 hover:text-white transition-colors">
                         <i class="material-icons">{{ hidePassword ? 'visibility_off' : 'visibility' }}</i>
                     </button>
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-6">
                 <button type="submit"
                         [disabled]="loginForm.invalid || isLoading"
-                        class="w-full py-3 px-4 rounded-lg text-white font-bold uppercase tracking-wide transition-all duration-200 disabled:opacity-50"
-                        [style.background-color]="loginForm.invalid || isLoading ? '#81C784' : '#6A994E'"> 
+                        class="w-full py-3 px-4 rounded-lg text-white font-bold uppercase tracking-wider transition-all duration-200 
+                               bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:bg-gray-600 shadow-lg"> 
                         {{ isLoading ? 'Entrando...' : 'Entrar' }}
                 </button>
             </div>
         </form>
 
-        <div class="mt-8 flex flex-col items-center space-y-3 border-t border-gray-600 pt-4 text-sm">
-            <a routerLink="/auth/forgot-password" class="text-white hover:text-indigo-300 underline">Esqueceu sua senha?</a>
+        <div class="mt-8 flex flex-col items-center space-y-4 border-t border-gray-600 pt-6 text-sm">
+            <a routerLink="/auth/forgot-password" class="text-gray-300 hover:text-green-400 transition-colors underline">Esqueceu sua senha?</a>
             
-            <a (click)="openResendEmailModal()" class="text-gray-300 hover:text-white cursor-pointer">
-                Não recebeu a confirmação? <span class="font-bold underline">Reenviar.</span>
+            <a (click)="openResendEmailModal()" class="text-gray-400 hover:text-white cursor-pointer transition-colors">
+                Não recebeu a confirmação? <span class="font-bold underline text-green-400">Reenviar.</span>
             </a>
 
             <div class="text-white pt-2">
                 Não tem conta? 
-                <a routerLink="/auth/register" class="font-bold text-indigo-300 hover:text-indigo-100 underline">
+                <a routerLink="/auth/register" class="font-bold text-green-400 hover:text-green-300 underline">
                     Registre-se aqui
                 </a>
             </div>
