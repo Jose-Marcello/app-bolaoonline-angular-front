@@ -69,6 +69,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isLoggingOut: boolean = false;
   errorMessage: string | null = null;
   notifications: NotificationDto[] = [];
+  isLoggedIn: boolean = false;
 
   apostador: ApostadorDto | null = null;
   apostadorSaldo: number | null = null;
@@ -102,6 +103,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
 
 ngOnInit(): void {
+
+    // Verificamos se há um token salvo para definir o estado de login
+    this.isLoggedIn = !!localStorage.getItem('token');
+    
     console.log('[DashboardComponent] ngOnInit: Iniciado.');
 
     // 1. Lógica de Autenticação e Carga de Dados
