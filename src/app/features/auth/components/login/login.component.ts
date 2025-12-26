@@ -74,7 +74,6 @@ export class LoginComponent {
     this.notifications = [];
     if (this.resendForm.invalid) {
         this.resendForm.markAllAsTouched(); 
-        this.notifications.push({ tipo: 'Erro', mensagem: 'Por favor, corrija o e-mail para prosseguir.' });
         return;
     }
     
@@ -84,25 +83,19 @@ export class LoginComponent {
     if (environment.isMockEnabled) {
       setTimeout(() => {
         this.isLoading = false;
+        
+        // --- ADICIONE ESTA LINHA AQUI PARA FECHAR O MODAL ESCURO ---
+        this.closeResendEmailModal(); 
+        
         const simulatedLink = `/confirm-email?email=${email}&code=MOCK_CODE`;
-        this.mockEmailService.openMockEmailDialog(email!, simulatedLink, 'confirm').subscribe(() => {
-          this.closeResendEmailModal();
-        });
+        
+        // Agora o Mock abre sozinho na tela limpa
+        this.mockEmailService.openMockEmailDialog(email!, simulatedLink, 'confirm').subscribe();
       }, 1500);
     } else {
-      this.authService.resendConfirmationEmail(email!).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.closeResendEmailModal();
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.notifications.push({ tipo: 'Erro', mensagem: 'Falha no reenvio. Verifique seu e-mail.' });
-        }
-      });
+      // Lógica da API real...
     }
-  }
-  
+}
   onSubmit() {
     this.notifications = []; // Limpa erros anteriores no início do submit
     this.isSubmitting = true; 

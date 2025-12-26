@@ -84,82 +84,82 @@ export class RegisterComponent implements OnInit {
       terms: [false, Validators.requiredTrue]
     }, { validators: this.passwordMatchValidator });
   }
+
+
 onSubmit(): void {
     this.notifications = [];
     this.errorMessage = null;
     this.registrationSuccess = true;
-    this.registeredUserEmail = this.registerForm.get('email').value;
+    this.registeredUserEmail = this.registerForm.get('email')?.value;
 
     if (this.registerForm.invalid) {
-      this.notificationsService.showNotification('Por favor, preencha o formulário corretamente.', 'alerta');
-      this.registerForm.markAllAsTouched();
-      return;
+        this.notificationsService.showNotification('Por favor, preencha o formulário corretamente.', 'alerta');
+        this.registerForm.markAllAsTouched();
+        return;
     }
 
     this.isLoading = true;
 
     const registrationData: RegisterRequestDto = {
-      email: this.registerForm.get('email')?.value,
-      password: this.registerForm.get('password')?.value,
-      confirmPassword: this.registerForm.get('confirmPassword')?.value,
-      apelido: this.registerForm.get('apelido')?.value,
-      nomeCompleto: this.registerForm.get('nomeCompleto')?.value,
-      cpf: this.registerForm.get('cpf')?.value,
-      celular: this.registerForm.get('celular')?.value,
-      fotoPerfil: '',
-      termsAccepted: this.registerForm.get('terms')?.value,
-      host: window.location.host,
-      scheme: window.location.protocol.slice(0, -1),
-      sendConfirmationEmail: true
+        email: this.registerForm.get('email')?.value,
+        password: this.registerForm.get('password')?.value,
+        confirmPassword: this.registerForm.get('confirmPassword')?.value,
+        apelido: this.registerForm.get('apelido')?.value,
+        nomeCompleto: this.registerForm.get('nomeCompleto')?.value,
+        cpf: this.registerForm.get('cpf')?.value,
+        celular: this.registerForm.get('celular')?.value,
+        fotoPerfil: '',
+        termsAccepted: this.registerForm.get('terms')?.value,
+        host: window.location.host,
+        scheme: window.location.protocol.slice(0, -1),
+        sendConfirmationEmail: true
     };
-    
+
     this.authService.register(registrationData).pipe(
-      finalize(() => this.isLoading = false)
+        finalize(() => this.isLoading = false)
     ).subscribe(
-      (response: ApiResponse<RegisterResponse>) => {
-        if (response.success) {
-          const mensagem = response.message || 'Registro realizado com sucesso! Um e-mail de confirmação foi enviado.';
-          this.notificationsService.showNotification(mensagem, 'sucesso');
-          
-          // <<-- AQUI ESTÁ A CORREÇÃO PRINCIPAL -->>
-          // A navegação de teste ágil só ocorre em ambiente de desenvolvimento
-          // <<-- LÓGICA DE 3 AMBIENTES APLICADA AQUI -->>
-          // Se for ambiente de Mock (Localhost OU Staging/Testes), redireciona para a simulação.
-          if (this.isMockEnvironment) { 
-            const userId = response.data?.userId;
-            const email = this.registeredUserEmail;
-            this.router.navigate(['/testes/email'], { queryParams: { userId, email } });
-          } else {
-            // Se for Produção (ambiente que não é mock), segue o fluxo normal de produção.
-            this.isRegistered = true;
-            if (this.selectedFile && response.data?.userId) {
-              this.uploadProfilePhoto(response.data.userId);
+        (response: ApiResponse<RegisterResponse>) => {
+            if (response.success) {
+                const mensagem = response.message || 'Registro realizado com sucesso!';
+                this.notificationsService.showNotification(mensagem, 'sucesso');
+
+                // <<-- LÓGICA DE TESTE REAL COM TOKEN -->>
+                if (this.isMockEnvironment) { 
+                    const userId = response.data?.userId;
+                    const email = this.registeredUserEmail;
+                    
+                    // Captura o token real que o Backend enviou no registro
+                    const token = (response.data as any)?.emailToken; 
+
+                    // Navega para o mock passando o TOKEN real para a confirmação ser válida
+                    this.router.navigate(['/testes/email'], { 
+                        queryParams: { userId, email, token } 
+                    });
+                } else {
+                    this.isRegistered = true;
+                    if (this.selectedFile && response.data?.userId) {
+                        this.uploadProfilePhoto(response.data.userId);
+                    }
+                }
+            } else {
+                let errorMessage = 'Ocorreu um erro no registro.';
+                // Tratamento para o formato do Notificador C# ($values)
+                if (response.notifications && (response.notifications as any).$values?.length > 0) {
+                    errorMessage = (response.notifications as any).$values[0].mensagem;
+                }
+                this.notificationsService.showNotification(errorMessage, 'erro');
             }
-          }
-        } else {
-          let errorMessage = 'Ocorreu um erro no registro. Por favor, tente novamente.';
-          if (response.notifications && (response.notifications as any).$values?.length > 0) {
-            errorMessage = (response.notifications as any).$values[0].mensagem;
-          } else if (response.message) {
-            errorMessage = response.message;
-          }
-          this.notificationsService.showNotification(errorMessage, 'erro');
+        },
+        (errorResponse: HttpErrorResponse) => {
+            let message = 'Erro de conexão.';
+            if (errorResponse.error?.notifications?.$values?.length > 0) {
+                message = errorResponse.error.notifications.$values[0].mensagem;
+            }
+            this.notificationsService.showNotification(message, 'erro');
         }
-      },
-      (errorResponse: HttpErrorResponse) => {
-        let message = 'Erro de conexão. Verifique sua rede e tente novamente.';
-        if (errorResponse.error) {
-          if ((errorResponse.error as any).notifications?.$values?.length > 0) {
-            message = (errorResponse.error as any).notifications.$values[0].mensagem;
-          } else if ((errorResponse.error as any).message) {
-            message = (errorResponse.error as any).message;
-          }
-        }
-        this.notificationsService.showNotification(message, 'erro');
-      },
-      () => { }
     );
-  }
+}
+
 
 
   private uploadProfilePhoto(userId: string): void {
