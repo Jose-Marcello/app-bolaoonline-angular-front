@@ -65,10 +65,17 @@ export class RodadaService {
       );
   }
 
-  getJogosByRodada(rodadaId: string): Observable<any[]> {
-  // Esta rota deve retornar apenas os confrontos (Times, Escudos, Data) 
-  // Sem nenhum vínculo com apostas de usuários.
-  return this.http.get<any[]>(`${this.apiUrlRodada}/rodadas/${rodadaId}/jogos`);
+  getJogosByRodada(rodadaId: string): Observable<any> {
+  // 🛑 ERRO ANTERIOR: return this.http.get<any[]>(`${this.apiUrlRodada}/rodadas/${rodadaId}/jogos`);
+  
+  // ✅ CORREÇÃO: Usar a rota que o seu Backend reconhece
+  const url = `${this.apiUrlRodada}/ListarJogosPorRodada/${rodadaId}`;
+  
+  console.log('[RodadaService] Buscando jogos para o grid com URL:', url);
+  
+  return this.http.get<any>(url).pipe(
+    catchError(this.handleError)
+  );
 }
 
 obterDadosPlanilhaConferencia(rodadaId: string): Observable<PreservedCollection<ConferenciaPalpiteDto>> {
