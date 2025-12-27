@@ -1,17 +1,24 @@
-<div class="dashboard-container p-3 md:p-5 bg-[#121212] min-h-screen text-gray-400">
+<div class="dashboard-container p-3 md:p-5 min-h-screen text-gray-400 bg-cover bg-center bg-fixed"
+     style="background-color: #f1f5f9; background-image: linear-gradient(rgba(241, 245, 249, 0.94), rgba(241, 245, 249, 0.94)), url('assets/images/fundobolao.png');">
   
+  <div class="flex justify-end mb-4 px-2">
+    <button mat-button (click)="logout()" class="!flex !items-center !text-slate-500 hover:!text-slate-800 transition-colors">
+      <mat-icon class="mr-1 scale-75">logout</mat-icon>
+      <span class="text-[11px] font-black uppercase tracking-tighter">Sair</span>
+    </button>
+  </div>
 
   <div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-8">
-    <mat-card style="background-color: #444444 !important; padding: 4px 16px !important; border-radius: 4px !important; border: 1px solid rgba(255,255,255,0.15) !important;" class="shadow-xl">
-      <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 44px !important;">
+    <mat-card style="background-color: #334155 !important; padding: 4px 16px !important; border-radius: 8px !important;" class="shadow-2xl border border-slate-300">
+      <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 48px !important;">
         <div style="display: flex !important; align-items: center !important;">
           <mat-icon style="color: #60a5fa !important; margin-right: 10px !important; transform: scale(0.8) !important;">account_balance_wallet</mat-icon>
-          <span style="font-size: 10px !important; font-weight: 900 !important; color: #d1d5db !important; text-transform: uppercase !important; margin-right: 8px !important;">Saldo :</span>
+          <span style="font-size: 10px !important; font-weight: 900 !important; color: #cbd5e1 !important; text-transform: uppercase !important; margin-right: 8px !important;">Saldo :</span>
           <span style="font-size: 16px !important; font-weight: 900 !important; color: #ffffff !important;">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
         </div>
         <div style="display: flex !important; gap: 8px !important;">
-          <button mat-flat-button style="background-color: #2563eb !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 30px !important; padding: 0 15px !important;" (click)="navigateToDepositar()">+ DEPOSITAR</button>
-          <button mat-flat-button style="background-color: #ea580c !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 30px !important; padding: 0 15px !important;" (click)="informarEmDesenvolvimento()">- SACAR</button>
+          <button mat-flat-button style="background-color: #2563eb !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 32px !important;" (click)="navigateToDepositar()">+ DEPOSITAR</button>
+          <button mat-flat-button style="background-color: #f97316 !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 32px !important;" (click)="informarEmDesenvolvimento()">- SACAR</button>
         </div>
       </div>
     </mat-card>
@@ -19,75 +26,59 @@
 
   <div *ngIf="!isLoading" class="container mx-auto max-w-5xl">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-white/5 bg-[#1e1e1e] shadow-2xl">
-        
-        <div class="p-2.5 bg-[#2a2a2a] border-b border-white/5">
+      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-slate-200 bg-[#1e293b] shadow-xl">
+        <div class="p-2.5 bg-[#0f172a] border-b border-white/5">
           <div class="flex flex-col space-y-2">
-            <mat-card-title class="text-[8px] font-bold text-gray-400 uppercase tracking-widest truncate">
+            <mat-card-title class="text-[8px] font-bold text-slate-400 uppercase tracking-widest truncate">
               {{ campeonato.nome }}
             </mat-card-title>
             <div class="flex items-center justify-between">
-              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-7 h-7 rounded-full border border-white/10 grayscale-[0.2]">
-              
-              <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-green-600 text-white text-[10px] font-black py-1 px-3 rounded transform rotate-2 shadow-md uppercase">
+              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-7 h-7 rounded-full border border-white/10">
+              <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-emerald-600 text-white text-[10px] font-black py-1 px-3 rounded uppercase">
                 JOGANDO!
-              </div>
-              <div *ngIf="!campeonato.aderidoPeloUsuario" class="bg-orange-600 text-white text-[10px] font-black py-1 px-3 rounded transform -rotate-2 shadow-md uppercase">
-                VAMOS JOGAR?
               </div>
             </div>
           </div>
         </div>
 
-        <div class="p-4 bg-[#1e1e1e] space-y-3">
-          <div class="flex flex-col space-y-2">
-            <button *ngIf="campeonato.rodadasEmAposta" mat-flat-button 
-                    class="w-full !bg-green-600/20 !text-green-500 !text-[14px] !font-black !h-11 border border-green-500/20 uppercase" 
-                    (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
-              Rodadas em Aposta ({{ campeonato.rodadasEmAposta?.length || 0 }})
-            </button>
-            <button *ngIf="campeonato.rodadasCorrentes" mat-flat-button 
-                    class="w-full !bg-blue-600/20 !text-blue-400 !text-[14px] !font-black !h-11 border border-blue-400/20 uppercase" 
-                    (click)="verRodadasCorrentes(campeonato.id)">
-              Rodadas Corrente ({{ campeonato.rodadasCorrentes?.length || 0 }})
-            </button>
-            <button *ngIf="campeonato.rodadasFinalizadas" mat-button 
-                    class="w-full !text-gray-500 !text-[10px] !font-black !h-8 uppercase hover:bg-white/5" 
-                    (click)="verRodadasFinalizadas(campeonato.id)">
-              Histórico de Rodadas ({{ campeonato.rodadasFinalizadas?.length || 0 }})
-            </button>
-          </div>
+        <div class="p-4 bg-[#1e293b] space-y-2.5">
+          <button *ngIf="campeonato.rodadasEmAposta" mat-flat-button 
+                  class="w-full !bg-emerald-600/20 !text-emerald-400 !text-[14px] !font-black !h-11 border border-emerald-500/20 uppercase tracking-tighter" 
+                  (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
+            Rodadas em Aposta ({{ campeonato.rodadasEmAposta?.length || 0 }})
+          </button>
+          <button *ngIf="campeonato.rodadasCorrentes" mat-flat-button 
+                  class="w-full !bg-blue-600/20 !text-blue-400 !text-[14px] !font-black !h-11 border border-blue-400/20 uppercase tracking-tighter" 
+                  (click)="verRodadasCorrentes(campeonato.id)">
+            Rodadas Correntes ({{ campeonato.rodadasCorrentes?.length || 0 }})
+          </button>
+          <button *ngIf="campeonato.rodadasFinalizadas" mat-flat-button 
+                  class="w-full !bg-slate-700/40 !text-slate-400 !text-[14px] !font-black !h-11 border border-slate-500/20 uppercase tracking-tighter" 
+                  (click)="verRodadasFinalizadas(campeonato.id)">
+            Histórico de Rodadas ({{ campeonato.rodadasFinalizadas?.length || 0 }})
+          </button>
         </div>
       </mat-card>
     </div>
 
-   <div class="mt-12 mb-10 max-w-4xl mx-auto px-2">
-  <mat-card class="rounded-lg border border-white/10 bg-[#1e1e1e] p-0 overflow-hidden flex h-44 shadow-2xl transition-all duration-500 hover:border-blue-500/30">
-    
-    <div class="bg-[#2a2a2a] p-5 flex flex-col items-center justify-center border-r border-white/10 min-w-[150px] sm:min-w-[180px]">
-      <div class="relative">
-        <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" 
-             class="w-20 h-20 rounded-full border-2 border-blue-600/50 shadow-lg object-cover">
-        <div class="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-1 shadow-md">
-          <mat-icon class="text-white scale-75">verified</mat-icon>
+    <div class="mt-12 mb-10 max-w-4xl mx-auto px-2">
+      <div class="rounded-lg border border-slate-300 bg-white overflow-hidden flex h-52 shadow-2xl">
+        <div class="bg-slate-100 p-5 flex flex-col items-center justify-center border-r border-slate-200 min-w-[150px] sm:min-w-[180px]">
+          <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="w-20 h-20 rounded-full border-2 border-blue-600/50 shadow-lg object-cover">
+          <span class="text-[8px] text-blue-600 font-black uppercase mt-3 tracking-widest text-center">Parceiro Oficial</span>
+        </div>
+        <div class="flex-1 relative bg-black overflow-hidden">
+          <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-80 transition-opacity duration-1000">
+          <div class="relative z-10 p-8 h-full flex flex-col justify-center bg-gradient-to-r from-black via-black/20 to-transparent">
+            <h3 class="text-white font-black text-xl sm:text-2xl uppercase tracking-tighter drop-shadow-xl">
+              Espaço Mar Fitness
+            </h3>
+            <p class="text-[11px] sm:text-[13px] text-gray-100 font-bold italic mt-2 drop-shadow-md">
+              A melhor performance para o seu treino.
+            </p>
+          </div>
         </div>
       </div>
-      <span class="text-[9px] text-blue-500 font-black uppercase mt-4 tracking-[0.3em]">Parceiro Oficial</span>
     </div>
-    
-    <div class="flex-1 relative bg-black overflow-hidden">
-      <img [src]="fotoAtual" 
-           class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000 ease-in-out">
-      
-      <div class="relative z-10 p-8 h-full flex flex-col justify-center bg-gradient-to-r from-black/90 via-black/40 to-transparent">
-        <h3 class="text-white font-black text-xl sm:text-2xl uppercase tracking-tighter leading-tight drop-shadow-xl">
-          Espaço Mar Fitness
-        </h3>
-        <div class="h-1 w-16 bg-blue-600 my-2 rounded-full shadow-lg"></div>
-        <p class="text-[11px] sm:text-[13px] text-gray-200 font-bold italic leading-snug max-w-xs drop-shadow-md">
-          A melhor estrutura para o seu treinamento. Performance e saúde em um só lugar.
-        </p>
-      </div>
-    </div>
-  </mat-card>
+  </div>
 </div>
