@@ -218,30 +218,29 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   onApostaSelected(apostaId: string) {
   if (!apostaId) return;
 
+  // 1. Inicia o loading e reseta o formulário atual para evitar "sujeira" visual
   this.isLoadingPalpites = true;
-  
-  // 1. Primeiro, resetamos o estado atual para o sistema entender a transição
-  this.apostaAtual = null; 
-  this.palpites.clear(); 
+  this.palpites.clear(); // Limpa o FormArray imediatamente
 
-  // 2. Buscamos a nova aposta selecionada
+  // 2. Busca os detalhes da nova aposta clicada
   this.apostaService.getApostaById(apostaId).subscribe({
     next: (res: any) => {
-      // Ajuste para lidar com o retorno da sua API ($values ou objeto direto)
+      // Ajuste para garantir que pegamos o objeto correto (com ou sem $values)
       this.apostaAtual = res.data || res;
-      this.isReadOnly = false; // Garante que o grid abra para edição
+      this.isReadOnly = false; // Habilita o grid de palpites para edição
       
-      console.log(`[ApostarRodadaFormComponent] Aposta trocada para: ${this.apostaAtual.identificadorAposta}`);
-
-      // 3. Carregamos os jogos e palpites específicos desta nova aposta
+      // 3. Carrega os palpites específicos desta nova aposta
       this.loadJogosDaApostaAtual(apostaId).subscribe({
-        complete: () => this.isLoadingPalpites = false
+        complete: () => {
+          this.isLoadingPalpites = false;
+          console.log(`[Aposta Selecionada] ID: ${this.apostaAtual.id} - ${this.apostaAtual.identificadorAposta}`);
+        }
       });
     },
     error: (err) => {
-      console.error('[ApostarRodadaFormComponent] Erro ao trocar de aposta:', err);
+      console.error('Erro ao selecionar aposta:', err);
       this.isLoadingPalpites = false;
-      this.showSnackBar('Erro ao carregar a aposta selecionada.', 'Fechar', 'error');
+      this.showSnackBar('Erro ao carregar os dados da aposta.', 'Fechar', 'error');
     }
   });
 }
