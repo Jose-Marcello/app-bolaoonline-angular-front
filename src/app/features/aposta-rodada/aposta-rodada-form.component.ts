@@ -350,24 +350,23 @@ montarGridVazio() {
   onApostaSelected(apostaId: string) {
   this.isLoadingPalpites = true;
   
-  this.apostaService.getApostaById(apostaId).subscribe(res => {
-    this.apostaAtual = res.data;
-    
-    // LÓGICA DE TRAVA: 
-    // Se a aposta não pertencer ao usuário logado, isReadOnly vira true.
-    // Se a rodada já estiver fechada, isReadOnly vira true.
-    const usuarioLogadoId = this.authService.getUsuarioId();
-    
-    if (this.apostaAtual.usuarioId === usuarioLogadoId) {
-      this.isReadOnly = false; // MODO EDIÇÃO
-    } else {
-      this.isReadOnly = true;  // MODO CONSULTA
+  // 1. Busca os detalhes da aposta (incluindo os palpites já feitos)
+  this.apostaService.getApostaById(apostaId).subscribe({
+    next: (aposta) => {
+      this.apostaAtual = aposta;
+      this.isReadOnly = false; // HABILITA O GRID PARA EDIÇÃO
+      
+      // 2. Preenche o formulário com os palpites desta aposta específica
+      this.preencherFormularioComPalpites();
+      this.isLoadingPalpites = false;
+    },
+    error: () => {
+      this.isLoadingPalpites = false;
+      // Tratar erro aqui
     }
-
-    this.preencherFormularioComPalpites();
-    this.isLoadingPalpites = false;
   });
 }
+
 
 preencherFormularioComPalpites(): void {
   if (!this.apostaAtual || !this.apostaAtual.palpites) return;
