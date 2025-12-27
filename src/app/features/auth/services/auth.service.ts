@@ -200,14 +200,22 @@ resendConfirmationEmail(email: string): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(url, { email });
 }
 
-  checkToken() {
-  const token = localStorage.getItem('token'); // ou 'access_token', veja como você salvou
-  if (token) {
-    // Se achou o token, avisa o sistema todo que o usuário está autenticado
-    this._isAuthenticated.next(true);
-  } else {
-    this._isAuthenticated.next(false);
+ checkToken(): boolean {
+  // Use a constante correta que você definiu no topo do arquivo!
+  const token = localStorage.getItem(AUTH_TOKEN_KEY); 
+  
+  const isAuth = !!token;
+
+  // Atualiza os Subjects para o Dashboard ouvir
+  if (this._isAuthenticated) {
+    this._isAuthenticated.next(isAuth);
   }
+  
+  if (isAuth && this._currentUser) {
+    this._currentUser.next(this.getStoredClaims());
+  }
+
+  return isAuth;
 }
 
 
