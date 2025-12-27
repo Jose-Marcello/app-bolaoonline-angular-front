@@ -5,75 +5,67 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <mat-icon class="text-gray-400 scale-75">account_balance_wallet</mat-icon>
-          <span class="text-sm font-medium text-gray-300 uppercase tracking-wider">Saldo Atual</span>
+          <span class="text-[11px] font-medium text-gray-400 uppercase tracking-widest">Saldo Atual</span>
         </div>
         <span class="text-xl font-bold text-white">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
       </div>
-      
       <div class="mt-4 flex space-x-3">
-        <button mat-flat-button class="flex-1 !bg-blue-900/30 !text-blue-400 !text-[10px] !font-bold !py-0 !h-8 uppercase border border-blue-400/20" (click)="navigateToDepositar()">
-          + DEPOSITAR
-        </button>
-        <button mat-flat-button class="flex-1 !bg-gray-800 !text-gray-400 !text-[10px] !font-bold !py-0 !h-8 uppercase border border-white/5" (click)="informarEmDesenvolvimento()">
-          - SACAR
-        </button>
+        <button mat-flat-button class="flex-1 !bg-blue-900/20 !text-blue-400 !text-[10px] !h-8 uppercase border border-blue-400/20" (click)="navigateToDepositar()">+ DEPOSITAR</button>
+        <button mat-flat-button class="flex-1 !bg-gray-800 !text-gray-400 !text-[10px] !h-8 uppercase border border-white/5" (click)="informarEmDesenvolvimento()">- SACAR</button>
       </div>
     </mat-card>
   </div>
 
   <div *ngIf="!isLoading" class="container mx-auto max-w-5xl">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" 
-                class="p-0 overflow-hidden border border-white/5 shadow-xl bg-[#252525]">
-        
+      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-white/5 bg-[#252525]">
         <div class="p-3 bg-[#2d2d2d] border-b border-white/5">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-10 h-10 rounded-full mr-3 border border-white/10 grayscale-[0.3]">
+              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-10 h-10 rounded-full mr-3 border border-white/10 grayscale-[0.2]">
               <div>
-                <mat-card-title class="text-[12px] font-bold text-gray-200 leading-tight uppercase tracking-tight">{{ campeonato.nome }}</mat-card-title>
+                <mat-card-title class="text-[11px] font-bold text-gray-200 uppercase">{{ campeonato.nome }}</mat-card-title>
                 <div class="flex items-center mt-1">
                    <span [class]="campeonato.aderidoPeloUsuario ? 'bg-green-500' : 'bg-orange-500'" class="w-1.5 h-1.5 rounded-full mr-2"></span>
-                   <span [class]="campeonato.aderidoPeloUsuario ? 'text-green-500' : 'text-orange-500'" class="text-[9px] font-bold uppercase tracking-tighter">
-                     {{ campeonato.aderidoPeloUsuario ? 'Jogando' : 'Não aderido' }}
-                   </span>
+                   <span [class]="campeonato.aderidoPeloUsuario ? 'text-green-500' : 'text-orange-500'" class="text-[9px] font-bold uppercase">{{ campeonato.aderidoPeloUsuario ? 'Jogando' : 'Não aderido' }}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="p-3 bg-[#252525] space-y-3">
-          <div *ngIf="campeonatoTotais[campeonato.id]" class="bg-black/10 p-2 rounded flex justify-between text-[9px] text-gray-400 uppercase font-medium">
-            <span>Apostadores: <b class="text-gray-200">{{ campeonatoTotais[campeonato.id].numeroDeApostadores }}</b></span>
+        <div class="p-3 space-y-3">
+          <div *ngIf="campeonatoTotais[campeonato.id]" class="bg-black/10 p-2 rounded flex justify-between text-[9px] text-gray-500 uppercase">
+            <span>Apostadores: <b class="text-gray-300">{{ campeonatoTotais[campeonato.id].numeroDeApostadores }}</b></span>
             <span>Total: <b class="text-blue-400">{{ campeonatoTotais[campeonato.id].valorTotalArrecadado | currency:'BRL' }}</b></span>
           </div>
 
           <div class="flex flex-col space-y-1.5">
-            
-            <button *ngIf="campeonato.rodadasEmAposta" mat-flat-button 
-                    class="w-full !bg-green-900/40 !text-green-400 !text-[10px] !font-bold !h-8 uppercase border border-green-500/20" 
-                    (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
+            <button *ngIf="campeonato.rodadasEmAposta" mat-flat-button class="w-full !bg-green-900/30 !text-green-400 !text-[10px] !h-8 border border-green-500/20" (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
               RODADA(S) EM APOSTA ({{ campeonato.rodadasEmAposta?.length || 0 }})
             </button>
-            
-            <button *ngIf="campeonato.rodadasCorrentes" mat-flat-button 
-                    class="w-full !bg-blue-900/40 !text-blue-400 !text-[10px] !font-bold !h-8 uppercase border border-blue-500/20" 
-                    (click)="verRodadasCorrentes(campeonato.id)">
+            <button *ngIf="campeonato.rodadasCorrentes" mat-flat-button class="w-full !bg-blue-900/30 !text-blue-400 !text-[10px] !h-8 border border-blue-500/20" (click)="verRodadasCorrentes(campeonato.id)">
               RODADA(S) CORRENTES ({{ campeonato.rodadasCorrentes?.length || 0 }})
             </button>
-
-            <button *ngIf="campeonato.rodadasFinalizadas" mat-button 
-                    class="w-full !text-gray-500 !text-[9px] !font-bold !h-7 uppercase" 
-                    (click)="verRodadasFinalizadas(campeonato.id)">
-              Histórico ({{ campeonato.rodadasFinalizadas?.length || 0 }})
-            </button>
-
-            <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" 
-                    mat-flat-button class="w-full !bg-orange-900/30 !text-orange-400 !text-[10px] !font-black !h-9 uppercase border border-orange-500/20 mt-2" 
-                    (click)="entrarEmCampeonato(campeonato.id)">
+            <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" mat-flat-button class="w-full !bg-orange-900/20 !text-orange-500 !text-[10px] !h-8 border border-orange-500/20 mt-1" (click)="entrarEmCampeonato(campeonato.id)">
               ADERIR AO CAMPEONATO
             </button>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="mt-12 mb-10 max-w-4xl mx-auto">
+      <mat-card class="rounded border border-white/5 bg-[#252525] p-0 overflow-hidden flex flex-col md:flex-row h-auto md:h-48 shadow-2xl">
+        <div class="bg-[#2d2d2d] p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-white/5 min-w-[200px]">
+          <span class="text-blue-400 text-[9px] uppercase font-black tracking-widest mb-3">Parceiro Oficial</span>
+          <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="w-20 h-20 rounded-full shadow-lg object-cover border-2 border-white/10">
+        </div>
+        <div class="flex-1 relative bg-black/40 flex items-center justify-center overflow-hidden">
+          <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-40 transition-opacity duration-1000">
+          <div class="relative z-10 p-6 w-full text-left bg-gradient-to-t from-[#252525] via-transparent to-transparent flex flex-col justify-end h-full">
+            <h3 class="text-white font-bold text-sm uppercase tracking-tight">Espaço Mar Fitness</h3>
+            <p class="text-[10px] text-gray-400 italic">Saúde e performance para nossos campeões.</p>
           </div>
         </div>
       </mat-card>
