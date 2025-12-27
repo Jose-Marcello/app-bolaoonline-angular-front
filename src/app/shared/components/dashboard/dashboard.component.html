@@ -1,71 +1,50 @@
-<div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-6">
-  <mat-card 
-    style="background-color: #333333 !important; padding: 8px 16px !important; border-radius: 4px !important; border: 1px solid rgba(255,255,255,0.1) !important;"
-    class="shadow-xl">
-    
-    <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 48px !important;">
-      
-      <div style="display: flex !important; align-items: center !important;">
-        <mat-icon style="color: #60a5fa !important; margin-right: 12px !important; transform: scale(1.1) !important;">account_balance_wallet</mat-icon>
-        <span style="font-size: 11px !important; font-weight: 900 !important; color: #9ca3af !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; margin-right: 10px !important;">
-          Saldo :
-        </span>
-        <span style="font-size: 24px !important; font-weight: 900 !important; color: #ffffff !important; letter-spacing: -0.05em !important;">
-          {{ (apostadorSaldo || 0) | currency:'BRL' }}
-        </span>
+<div class="dashboard-container p-3 md:p-5 bg-[#121212] min-h-screen text-gray-400">
+  
+  <div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-6">
+    <mat-card 
+      style="background-color: #444444 !important; padding: 4px 16px !important; border-radius: 4px !important; border: 1px solid rgba(255,255,255,0.15) !important;"
+      class="shadow-xl">
+      <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 44px !important;">
+        <div style="display: flex !important; align-items: center !important;">
+          <mat-icon style="color: #60a5fa !important; margin-right: 10px !important; transform: scale(0.9) !important;">account_balance_wallet</mat-icon>
+          <span style="font-size: 10px !important; font-weight: 900 !important; color: #d1d5db !important; text-transform: uppercase !important; letter-spacing: 0.15em !important; margin-right: 8px !important;">Saldo :</span>
+          <span style="font-size: 22px !important; font-weight: 900 !important; color: #ffffff !important;">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
+        </div>
+        <div style="display: flex !important; gap: 8px !important;">
+          <button mat-flat-button style="background-color: #2563eb !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 30px !important; padding: 0 15px !important;" (click)="navigateToDepositar()">+ DEPOSITAR</button>
+          <button mat-flat-button style="background-color: #ea580c !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 30px !important; padding: 0 15px !important;" (click)="informarEmDesenvolvimento()">- SACAR</button>
+        </div>
       </div>
-      
-      <div style="display: flex !important; gap: 12px !important;">
-        <button mat-flat-button 
-                style="background-color: #2563eb !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 36px !important; padding: 0 20px !important; text-transform: uppercase !important;"
-                (click)="navigateToDepositar()">
-          + DEPOSITAR
-        </button>
-        <button mat-flat-button 
-                style="background-color: #ea580c !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 36px !important; padding: 0 20px !important; text-transform: uppercase !important;"
-                (click)="informarEmDesenvolvimento()">
-          - SACAR
-        </button>
-      </div>
-      
-    </div>
-  </mat-card>
-</div>
+    </mat-card>
+  </div>
 
   <div *ngIf="!isLoading" class="container mx-auto max-w-5xl">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
       <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-white/5 bg-[#1e1e1e] shadow-2xl">
         
-        <div class="p-3 bg-[#2a2a2a] border-b border-white/5 relative">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-10 h-10 rounded-full mr-3 border border-white/10">
-              <mat-card-title class="text-[11px] font-bold text-gray-200 uppercase tracking-tight max-w-[120px] leading-tight">
+        <div class="p-2 bg-[#2a2a2a] border-b border-white/5 relative">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center min-w-0">
+              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-7 h-7 rounded-full mr-2 border border-white/10 grayscale-[0.3]">
+              <mat-card-title class="text-[9px] font-bold text-gray-300 uppercase truncate pr-1 tracking-tighter">
                 {{ campeonato.nome }}
               </mat-card-title>
             </div>
-            
-            <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-green-600 text-white text-[9px] font-black py-1 px-2 rounded transform rotate-2 shadow-md uppercase">
+            <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-green-600 text-white text-[7px] font-black py-0.5 px-1.5 rounded transform rotate-2 shadow-md shrink-0 uppercase">
               JOGANDO!
             </div>
           </div>
         </div>
 
-        <div class="p-4 bg-[#1e1e1e] space-y-4">
-          <div *ngIf="campeonatoTotais[campeonato.id]" class="bg-black/40 p-2 rounded flex justify-between text-[10px] text-gray-400 font-bold uppercase">
-            <span>Apostadores: <b class="text-white">{{ campeonatoTotais[campeonato.id].numeroDeApostadores }}</b></span>
-            <span>Total: <b class="text-blue-500">{{ campeonatoTotais[campeonato.id].valorTotalArrecadado | currency:'BRL' }}</b></span>
-          </div>
-
-          <div class="flex flex-col space-y-2">
+        <div class="p-3 bg-[#1e1e1e] space-y-2">
+          <div class="flex flex-col space-y-1.5">
             <button *ngIf="campeonato.rodadasEmAposta" mat-flat-button 
-                    class="w-full !bg-green-600/20 !text-green-500 !text-[12px] !font-black !h-10 border border-green-500/30 uppercase" 
+                    class="w-full !bg-green-600/20 !text-green-500 !text-[13px] !font-black !h-10 border border-green-500/20 uppercase" 
                     (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
               Aposta ({{ campeonato.rodadasEmAposta?.length || 0 }})
             </button>
-            
             <button *ngIf="campeonato.rodadasCorrentes" mat-flat-button 
-                    class="w-full !bg-blue-600/20 !text-blue-400 !text-[12px] !font-black !h-10 border border-blue-400/30 uppercase" 
+                    class="w-full !bg-blue-600/20 !text-blue-400 !text-[13px] !font-black !h-10 border border-blue-400/20 uppercase" 
                     (click)="verRodadasCorrentes(campeonato.id)">
               Corrente ({{ campeonato.rodadasCorrentes?.length || 0 }})
             </button>
@@ -73,6 +52,15 @@
         </div>
       </mat-card>
     </div>
-  
-  
+
+    <div class="mt-8 max-w-2xl mx-auto opacity-50 hover:opacity-100 transition-opacity">
+      <mat-card class="rounded border border-white/5 bg-[#1e1e1e] p-0 flex h-14 items-center px-4 shadow-xl">
+        <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="w-8 h-8 rounded-full grayscale mr-3 border border-white/10">
+        <div class="flex flex-col">
+          <span class="text-white font-bold text-[10px] uppercase tracking-tighter">Espaço Mar Fitness</span>
+          <span class="text-blue-500 font-black text-[7px] uppercase tracking-[0.2em]">Parceiro Oficial</span>
+        </div>
+      </mat-card>
+    </div>
+  </div>
 </div>
