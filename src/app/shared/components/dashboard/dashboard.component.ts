@@ -123,7 +123,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = null;
 
-    // 1. Busca dados do Apostador
     this.apostadorService.getDadosApostador().pipe(
       catchError(() => {
         console.warn('[Dashboard] Perfil não encontrado. Operando como Vitrine.');
@@ -131,10 +130,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }),
       tap(response => {
         if (response?.success && response.data) {
-          // Trata se vier como lista ou objeto único
           const data = isPreservedCollection<ApostadorDto>(response.data) 
-                       ? response.data.$values[0] 
-                       : response.data as ApostadorDto;
+                        ? response.data.$values[0] 
+                        : response.data as ApostadorDto;
           
           if (data) {
             this.apostador = data;
@@ -142,13 +140,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
         }
       }),
-      // 2. Busca Campeonatos Disponíveis
       switchMap(() => {
         const userId = this.apostador?.usuarioId || '';
         return this.campeonatoService.getAvailableCampeonatos(userId);
       }),
       map(response => unwrap<CampeonatoDto[]>(response.data) || []),
-      // 3. Busca Rodadas e Totais para cada campeonato
       switchMap(campeonatos => {
         this.campeonatosDisponiveis = campeonatos;
         if (campeonatos.length === 0) return of([]);
@@ -157,11 +153,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
           forkJoin({
             emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({data: []}))),
             correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({data: []}))),
+            // ADICIONADO: Busca de rodadas finalizadas para o botão Histórico
+            finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({data: []}))),
             totais: this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({data: null})))
           }).pipe(
             tap(res => {
               camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta.data) || [];
               camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes.data) || [];
+              camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas.data) || []; // Preenche o histórico
               if (res.totais.data) this.campeonatoTotais[camp.id] = res.totais.data;
             })
           )
@@ -171,8 +170,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       finalize(() => this.isLoading = false)
     ).subscribe({
       error: (err) => {
-        console.error('[Dashboard] Erro crítico no carregamento:', err);
-        this.errorMessage = "Não foi possível carregar os dados do Bolão. Tente novamente.";
+        console.error('[Dashboard] Erro crítico:', err);
+        this.errorMessage = "Erro ao carregar dados.";
       }
     });
   }
@@ -221,29 +220,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const aderidos = unwrap<ApostadorCampeonatoDto[]>(this.apostador?.campeonatosAderidos);
       const vinculo = aderidos?.find(ac => ac.campeonatoId === campeonatoId);
       
+      // Se não tiver vinculo, envia null para a tela entrar em MODO CONSULTA
       this.router.navigate(['/apostas-resultados', campeonatoId, rodadaId], {
-        queryParams: { apostadorCampeonatoId: vinculo?.id }
+        queryParams: { apostadorCampeonatoId: vinculo?.id || null }
       });
     } else {
       this.showSnackBar('Nenhuma rodada em andamento.', 'Fechar', 'info');
     }
   }
 
-
   verRodadasFinalizadas(campeonatoId: string): void {
     const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
     
-    // Se houver rodadas finalizadas, pegamos a última (índice 0 ou conforme sua ordenação)
     if (camp?.rodadasFinalizadas?.length) {
       const rodadaId = camp.rodadasFinalizadas[0].id;
       const aderidos = unwrap<ApostadorCampeonatoDto[]>(this.apostador?.campeonatosAderidos);
       const vinculo = aderidos?.find(ac => ac.campeonatoId === campeonatoId);
       
       this.router.navigate(['/apostas-resultados', campeonatoId, rodadaId], {
-        queryParams: { apostadorCampeonatoId: vinculo?.id }
+        queryParams: { apostadorCampeonatoId: vinculo?.id || null }
       });
     } else {
-      this.showSnackBar('Nenhum histórico de rodadas finalizadas para este campeonato.', 'Fechar', 'info');
+      this.showSnackBar('Nenhum histórico disponível.', 'Fechar', 'info');
     }
   }
 
@@ -252,6 +250,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.indiceAtual = (this.indiceAtual + 1) % this.fotos.length;
       this.fotoAtual = this.fotos[this.indiceAtual];
     }, 4000);
+  }
+
+// Adicione este método junto aos outros métodos de navegação
+  logout(): void {
+    this.authService.logout(); // Chama a lógica de limpeza de token do seu serviço
+    this.router.navigate(['/auth/login']); // Redireciona para a tela de login que definimos
+    this.showSnackBar('Você foi desconectado com sucesso!', 'OK', 'success');
   }
 
   getCampeonatoLogo(nome: string): string {
