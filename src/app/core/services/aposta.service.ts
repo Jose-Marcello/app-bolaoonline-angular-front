@@ -19,12 +19,28 @@ import { ApostasCampeonatoTotaisDto } from '../../features/campeonato/models/apo
   providedIn: 'root'
 })
 export class ApostaService {
+  // Ajuste as URLs para apontarem sempre para o controlador de ApostaRodada
   private apiUrl = `${environment.apiUrl}/api/ApostaRodada`;
-  private apiUrlSalvarApostas = `${environment.apiUrl}/api/ApostadorCampeonato`;
   private apiUrlCampeonato = `${environment.apiUrl}/api/Campeonato`;
 
   constructor(private http: HttpClient) { }
 
+  // CORREÇÃO DO SALVAR: Use a apiUrl correta (ApostaRodada)
+  salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
+    // A rota correta para salvar palpites é no controlador de ApostaRodada
+    // Se o backend espera /api/ApostaRodada/Salvar, adicione o sufixo abaixo:
+    const url = `${this.apiUrl}/SalvarApostas`; 
+    console.log('[ApostaService] Chamando salvarApostas com URL:', url);
+    
+    return this.http.post<ApiResponse<any>>(url, apostaRequest)
+      .pipe(catchError(this.handleError));
+  }
+
+  // CORREÇÃO DO GET BY ID (Para a seleção de outras apostas)
+  getApostaById(id: string): Observable<any> {
+    // Se o 404 persistir, verifique se o backend não exige uma rota como '/ObterPorId/'
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
   getApostasPorRodadaEApostadorCampeonato(rodadaId: string, apostadorCampeonatoId: string | null): Observable<ApiResponse<ApostaRodadaDto[]>> {
     let params = new HttpParams().set('rodadaId', rodadaId);
     if (apostadorCampeonatoId) {
@@ -73,16 +89,6 @@ export class ApostaService {
       );
   }
 
-  salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
-    // Tente remover o sufixo '/SalvarApostas' se o seu Swagger indicar que o POST é na raiz
-    const url = `${this.apiUrlSalvarApostas}`; 
-    console.log('[ApostaService] Chamando salvarApostas com URL:', url);
-    
-    return this.http.post<ApiResponse<any>>(url, apostaRequest)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
 
   criarNovaApostaAvulsa(requestBody: CriarApostaAvulsaRequestDto): Observable<ApiResponse<ApostaRodadaDto>> {
     console.log('[ApostaService] Chamando CriarNovaApostaAvulsa com URL:', `${this.apiUrl}/CriarApostaAvulsa`, 'e dados:', requestBody);
@@ -121,13 +127,7 @@ export class ApostaService {
       );
   }
 
- // 1. O GET precisa do ID na rota
- getApostaById(id: string): Observable<any> {
-  // Verifique se o seu backend exige '/api/ApostaRodada/' + id
-  // ou se há um método intermediário como '/api/ApostaRodada/obter/' + id
-  return this.http.get<any>(`${this.apiUrl}/${id}`);
- }
-
+ 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('[ApostaService] Erro na requisição HTTP:', error);
     return throwError(() => error);
