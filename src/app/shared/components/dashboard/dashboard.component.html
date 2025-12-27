@@ -1,21 +1,28 @@
 <div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-6">
-  <mat-card class="rounded border border-white/10 bg-[#333333] p-2 shadow-xl">
-    <div class="flex flex-row items-center justify-between px-4 h-12">
+  <mat-card 
+    style="background-color: #333333 !important; padding: 8px 16px !important; border-radius: 4px !important; border: 1px solid rgba(255,255,255,0.1) !important;"
+    class="shadow-xl">
+    
+    <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 48px !important;">
       
-      <div class="flex items-center space-x-4">
-        <mat-icon class="text-blue-400 scale-110">account_balance_wallet</mat-icon>
-        <span class="text-[12px] font-black text-gray-300 uppercase tracking-widest">Saldo Disponível:</span>
-        <span class="text-2xl font-black text-white tracking-tighter">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
+      <div style="display: flex !important; align-items: center !important;">
+        <mat-icon style="color: #60a5fa !important; margin-right: 12px !important; transform: scale(1.1) !important;">account_balance_wallet</mat-icon>
+        <span style="font-size: 11px !important; font-weight: 900 !important; color: #9ca3af !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; margin-right: 10px !important;">
+          Saldo Disponível:
+        </span>
+        <span style="font-size: 24px !important; font-weight: 900 !important; color: #ffffff !important; letter-spacing: -0.05em !important;">
+          {{ (apostadorSaldo || 0) | currency:'BRL' }}
+        </span>
       </div>
       
-      <div class="flex space-x-3">
+      <div style="display: flex !important; gap: 12px !important;">
         <button mat-flat-button 
-                class="!bg-blue-600 !text-white !text-[11px] !font-black !h-9 uppercase shadow-lg px-6" 
+                style="background-color: #2563eb !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 36px !important; padding: 0 20px !important; text-transform: uppercase !important;"
                 (click)="navigateToDepositar()">
           + DEPOSITAR
         </button>
         <button mat-flat-button 
-                class="!bg-orange-600 !text-white !text-[11px] !font-black !h-9 uppercase shadow-lg px-6" 
+                style="background-color: #ea580c !important; color: #ffffff !important; font-size: 10px !important; font-weight: 900 !important; height: 36px !important; padding: 0 20px !important; text-transform: uppercase !important;"
                 (click)="informarEmDesenvolvimento()">
           - SACAR
         </button>
