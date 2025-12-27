@@ -57,32 +57,19 @@
 
   <!-- Toolbar principal (Header) -->
   <mat-toolbar class="bg-gray-600 text-white shadow-md">
-    <button mat-icon-button (click)="sidenav.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-icon class="text-xl ml-4 mr-2">sports_soccer</mat-icon>
-    <span class="text-xl font-bold">Bolão Online</span>
-    <span class="flex-grow"></span> <!-- Espaçador -->
+  <button mat-icon-button (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-icon class="text-xl ml-4 mr-2">sports_soccer</mat-icon>
+  <span class="text-xl font-bold">Bolão Online</span>
+  
+  <span class="flex-grow"></span> <span class="text-sm mr-4" *ngIf="isAuthenticated">{{ apostadorNome || 'Apostador' }}</span>
+  
+  <button mat-button (click)="onLogout()" *ngIf="isAuthenticated" class="flex items-center text-red-300 hover:text-red-400">
+    <mat-icon class="mr-1 scale-75">logout</mat-icon>
+    <span class="text-[11px] font-black uppercase">Sair</span>
+  </button>
 
-    <!-- Nome do apostador adicionado aqui -->
-    <span class="text-sm mr-4" *ngIf="isAuthenticated">{{ apostadorNome || 'Apostador' }}</span>
-    
-    <!-- Botão de Logout na Toolbar (para desktop) -->
-    <button mat-button (click)="onLogout()" class="hidden md:flex items-center text-red-300 hover:text-red-400">
-      <mat-icon class="mr-2">logout</mat-icon>
-      Sair
-    </button>
-
-    <!-- Menu para mobile (se necessário, para saldo e logout) -->
-    <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="isAuthenticated && !isLoggingOut" class="md:hidden">
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #userMenu="matMenu">
-      <button mat-menu-item (click)="onLogout()">
-        <mat-icon>logout</mat-icon>
-        <span>Sair</span>
-      </button>
-    </mat-menu>
   </mat-toolbar>
 
   <!-- Conteúdo principal -->
