@@ -74,8 +74,11 @@ export class ApostaService {
   }
 
   salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
-    console.log('[ApostaService] Chamando salvarApostas com URL:', `${this.apiUrlSalvarApostas}/SalvarApostas`);
-    return this.http.post<ApiResponse<any>>(`${this.apiUrlSalvarApostas}/SalvarApostas`, apostaRequest)
+    // Tente remover o sufixo '/SalvarApostas' se o seu Swagger indicar que o POST é na raiz
+    const url = `${this.apiUrlSalvarApostas}`; 
+    console.log('[ApostaService] Chamando salvarApostas com URL:', url);
+    
+    return this.http.post<ApiResponse<any>>(url, apostaRequest)
       .pipe(
         catchError(this.handleError)
       );
@@ -118,12 +121,16 @@ export class ApostaService {
       );
   }
 
-  getApostaById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
-  }
+ // 1. O GET precisa do ID na rota
+ getApostaById(id: string): Observable<any> {
+  // Verifique se o seu backend exige '/api/ApostaRodada/' + id
+  // ou se há um método intermediário como '/api/ApostaRodada/obter/' + id
+  return this.http.get<any>(`${this.apiUrl}/${id}`);
+ }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('[ApostaService] Erro na requisição HTTP:', error);
     return throwError(() => error);
   }
+
 }
