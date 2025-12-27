@@ -156,69 +156,69 @@ ngOnInit(): void {
 
 
 loadDashboardData(): void {
-  console.log('[DashboardComponent] loadDashboardData: Iniciando fluxo linear...');
+  console.log('[DashboardComponent] loadDashboardData: Iniciando carregamento...');
   this.isLoading = true;
   this.errorMessage = null;
 
-  const fluxoDashboard$ = this.apostadorService.getDadosApostador().pipe(
-    // 1. Processa dados do Apostador
-    map(response => {
-      if (response.success && response.data) {
+  // 1. Primeiro, tentamos pegar os dados do apostador (Saldo)
+  this.apostadorService.getDadosApostador().pipe(
+    catchError(err => {
+      console.warn('[Dashboard] Perfil de apostador não encontrado ou erro. Seguindo como Vitrine.');
+      return of({ success: false, data: null }); // Não trava o fluxo
+    }),
+    switchMap(response => {
+      if (response && response.success && response.data) {
+        // Extrai os dados tratando se é PreservedCollection
         const data = isPreservedCollection<ApostadorDto>(response.data) 
           ? (response.data.$values?.[0] || null) 
           : response.data as ApostadorDto;
         
-        if (data) this.apostadorSaldo = data.saldo.valor;
-        return data;
+        if (data) {
+          this.apostador = data;
+          this.apostadorSaldo = data.saldo.valor;
+        }
       }
-      throw new Error('Falha ao obter dados do apostador');
-    }),
-    // 2. Busca Campeonatos baseados no Apostador
-    switchMap(apostador => {
-      this.apostador = apostador;
-      return this.campeonatoService.getAvailableCampeonatos(apostador!.usuarioId);
+
+      // 2. Independente de ter saldo ou não, buscamos os campeonatos
+      // Se não tiver ID de apostador, passamos null (o C# deve tratar como vitrine)
+      const userId = this.apostador?.usuarioId || ''; 
+      return this.campeonatoService.getAvailableCampeonatos(userId);
     }),
     map(response => {
-      const campeonatos = response.success && response.data 
-        ? (isPreservedCollection<CampeonatoDto>(response.data) ? response.data.$values : response.data as CampeonatoDto[])
-        : [];
-      return campeonatos.map(c => ({ ...c, aderidoPeloUsuario: c.aderidoPeloUsuario || false }));
+      // Processa a lista de campeonatos
+      if (response.success && response.data) {
+        return isPreservedCollection<CampeonatoDto>(response.data) 
+          ? response.data.$values 
+          : response.data as CampeonatoDto[];
+      }
+      return [];
     }),
-    // 3. Busca Totais para cada Campeonato
+    // 3. Busca os totais financeiros e as rodadas
     switchMap(campeonatos => {
+      this.campeonatosDisponiveis = campeonatos;
       if (campeonatos.length === 0) return of([]);
-      
-      const totais$ = campeonatos.map(c => 
-        this.apostaService.obterTotaisCampeonato(c.id).pipe(
-          map(res => ({ id: c.id, totais: res.data })),
-          catchError(() => of({ id: c.id, totais: null }))
+
+      // Carrega as rodadas para todos os campeonatos (modo consulta)
+      const observables = campeonatos.map(camp => 
+        forkJoin([
+          this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ data: [] }))),
+          this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ data: [] }))),
+          this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({ data: null })))
+        ]).pipe(
+          tap(([resAposta, resCorrente, resTotais]) => {
+            camp.rodadasEmAposta = this.extrairRodadas(resAposta.data);
+            camp.rodadasCorrentes = this.extrairRodadas(resCorrente.data);
+            if (resTotais.data) this.campeonatoTotais[camp.id] = resTotais.data;
+          })
         )
       );
-      
-      return forkJoin(totais$).pipe(
-        map(totaisArray => {
-          totaisArray.forEach(t => { if (t.totais) this.campeonatoTotais[t.id] = t.totais; });
-          return campeonatos;
-        })
-      );
+      return forkJoin(observables);
     }),
-    // Finalização e atribuição
-    tap(campeonatos => {
-      this.campeonatosDisponiveis = campeonatos;
-      console.log('[DashboardComponent] Sucesso! Campeonatos carregados:', campeonatos.length);
-      
-      // Aqui você pode disparar as chamadas secundárias de rodadas para campeonatos aderidos
-      this.carregarRodadasSecundarias();
-    }),
-    catchError(err => {
-      console.error('[DashboardComponent] Erro no fluxo:', err);
-      this.errorMessage = 'Erro ao carregar dados do dashboard.';
-      return of(null);
-    }),
-    finalize(() => this.isLoading = false)
-  );
-
-  this.subscriptions.add(fluxoDashboard$.subscribe());
+    finalize(() => {
+      this.isLoading = false;
+      console.log('[Dashboard] Carregamento finalizado.');
+    })
+  ).subscribe();
 }
 
 informarEmDesenvolvimento(): void {
