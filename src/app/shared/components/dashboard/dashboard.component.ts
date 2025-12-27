@@ -229,6 +229,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  verRodadasFinalizadas(campeonatoId: string): void {
+    const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
+    
+    // Se houver rodadas finalizadas, pegamos a última (índice 0 ou conforme sua ordenação)
+    if (camp?.rodadasFinalizadas?.length) {
+      const rodadaId = camp.rodadasFinalizadas[0].id;
+      const aderidos = unwrap<ApostadorCampeonatoDto[]>(this.apostador?.campeonatosAderidos);
+      const vinculo = aderidos?.find(ac => ac.campeonatoId === campeonatoId);
+      
+      this.router.navigate(['/apostas-resultados', campeonatoId, rodadaId], {
+        queryParams: { apostadorCampeonatoId: vinculo?.id }
+      });
+    } else {
+      this.showSnackBar('Nenhum histórico de rodadas finalizadas para este campeonato.', 'Fechar', 'info');
+    }
+  }
+
   iniciarCarrossel() {
     this.intervaloGaleria = setInterval(() => {
       this.indiceAtual = (this.indiceAtual + 1) % this.fotos.length;

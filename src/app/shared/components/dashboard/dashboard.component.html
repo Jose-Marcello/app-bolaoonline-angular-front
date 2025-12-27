@@ -1,76 +1,64 @@
-<div class="dashboard-container p-4 md:p-10">
-  <div *ngIf="isLoading" class="flex justify-center items-center h-64">
-    <mat-spinner diameter="50"></mat-spinner>
-  </div>
-
-  <div *ngIf="!isLoading && !errorMessage" class="container mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-4 border border-gray-100 shadow-sm">
     
-    <div class="max-w-4xl mx-auto my-6" *ngIf="isLoggedIn && apostador">
-      <mat-card class="rounded-lg shadow-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <mat-icon>account_balance_wallet</mat-icon>
-            <span class="text-xl font-bold">Saldo Atual</span>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-14 h-14 rounded-full mr-4 object-cover border">
+        <div>
+          <mat-card-title class="text-base font-bold">{{ campeonato.nome }}</mat-card-title>
+          <div [class]="campeonato.aderidoPeloUsuario ? 'text-green-600' : 'text-orange-600'" class="text-[10px] font-bold uppercase">
+            {{ campeonato.aderidoPeloUsuario ? '● JOGANDO' : '● NÃO ADERIDO' }}
           </div>
-          <span class="text-3xl font-bold">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
-        </div>
-        <div class="mt-6 flex space-x-4">
-          <button mat-flat-button color="primary" class="flex-1" (click)="navigateToDepositar()">DEPOSITAR</button>
-          <button mat-flat-button color="accent" class="flex-1" (click)="informarEmDesenvolvimento()">SACAR</button>
-        </div>
-      </mat-card>
+        </div> 
+      </div>
     </div>
 
-    <div class="text-center mb-8 mt-10">
-      <h2 class="text-2xl font-bold text-gray-800 border-b-4 border-blue-600 inline-block pb-2 uppercase">
-        Campeonatos Disponíveis
-      </h2>
+    <div *ngIf="campeonatoTotais[campeonato.id]" class="bg-slate-50 p-2 rounded border mb-4 text-[11px]">
+      <div class="flex justify-between">
+        <span>APOSTADORES: <strong>{{ campeonatoTotais[campeonato.id].numeroDeApostadores }}</strong></span>
+        <span>TOTAL: <strong class="text-blue-700">{{ campeonatoTotais[campeonato.id].valorTotalArrecadado | currency:'BRL' }}</strong></span>
+      </div>
     </div>
+    
+    <div class="flex flex-col space-y-2">
+      
+      <div *ngIf="campeonato.rodadasEmAposta?.length >= 0">
+        <button mat-flat-button class="w-full text-sm font-bold bg-green-600 text-white" 
+                (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
+          <mat-icon>edit_note</mat-icon>
+          RODADA(S) EM APOSTA ({{ campeonato.rodadasEmAposta?.length || 0 }})
+        </button>
+      </div>
+      
+      <div *ngIf="campeonato.rodadasCorrentes?.length >= 0">
+        <button mat-flat-button class="w-full text-sm font-bold bg-blue-600 text-white" 
+                (click)="verRodadasCorrentes(campeonato.id)">
+          <mat-icon>sports_soccer</mat-icon>
+          RODADA(S) CORRENTES ({{ campeonato.rodadasCorrentes?.length || 0 }})
+        </button>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-4 hover:shadow-2xl transition-shadow">
-        
-        <div class="flex items-center justify-between mb-4">
-          <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-14 h-14 rounded-full object-cover">
-          <div [class]="campeonato.aderidoPeloUsuario ? 'bg-green-500 text-white px-3 py-1 rounded-full text-[10px]' : 'bg-orange-600 text-white px-3 py-1 rounded-full text-[10px]'">
-            {{ campeonato.aderidoPeloUsuario ? 'JOGANDO!' : 'VAMOS JOGAR?' }}
-          </div>
-        </div>
+      <div *ngIf="campeonato.rodadasFinalizadas?.length >= 0">
+        <button mat-stroked-button class="w-full text-sm font-bold border-slate-300 text-slate-600" 
+                (click)="verRodadasFinalizadas(campeonato.id)">
+          <mat-icon>history</mat-icon>
+          RODADAS FINALIZADAS ({{ campeonato.rodadasFinalizadas?.length || 0 }})
+        </button>
+      </div>
 
-        <mat-card-title class="text-base font-bold">{{ campeonato.nome }}</mat-card-title>
-        
-        <div *ngIf="campeonatoTotais[campeonato.id]" class="bg-slate-50 p-3 rounded-lg my-4">
-           <div class="flex justify-between text-xs">
-             <span>Apostadores:</span>
-             <span class="font-bold">{{ campeonatoTotais[campeonato.id].numeroDeApostadores }}</span>
-           </div>
-           <div class="flex justify-between text-xs text-blue-700">
-             <span>Total Arrecadado:</span>
-             <span class="font-bold">{{ campeonatoTotais[campeonato.id].valorTotalArrecadado | currency:'BRL' }}</span>
-           </div>
-        </div>
+      <hr class="my-1 border-slate-100">
 
-        <div class="flex flex-col space-y-2 mt-4">
-          <button *ngIf="campeonato.rodadasEmAposta?.length" mat-flat-button color="primary"
-                  (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0].id)">
-            {{ campeonato.aderidoPeloUsuario ? 'APOSTAR AGORA' : 'VER JOGOS' }}
-          </button>
+      <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" 
+              mat-raised-button color="warn" class="w-full font-bold" 
+              (click)="entrarEmCampeonato(campeonato.id)">
+        <mat-icon>add_shopping_cart</mat-icon> ADERIR AO CAMPEONATO
+      </button>
 
-          <button *ngIf="campeonato.rodadasCorrentes?.length" mat-stroked-button color="primary"
-                  (click)="verRodadasCorrentes(campeonato.id)">
-            CLASSIFICAÇÃO
-          </button>
-
-          <button *ngIf="isLoggedIn && !campeonato.aderidoPeloUsuario" mat-raised-button color="warn"
-                  (click)="entrarEmCampeonato(campeonato.id)">
-            ADERIR AO CAMPEONATO
-          </button>
-        </div>
-      </mat-card>
+      <button *ngIf="!isLoggedIn" 
+              mat-raised-button color="primary" class="w-full font-bold" 
+              routerLink="/auth/register">
+        REGISTRE-SE PARA JOGAR
+      </button>
     </div>
-  </div>
-
-  <div *ngIf="errorMessage" class="max-w-md mx-auto bg-red-50 text-red-700 p-4 rounded mt-10 text-center">
-    <mat-icon>error</mat-icon> {{ errorMessage }}
-  </div>
+  </mat-card>
 </div>
