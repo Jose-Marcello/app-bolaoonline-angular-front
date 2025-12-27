@@ -61,20 +61,33 @@
       </mat-card>
     </div>
 
-    <div class="mt-12 max-w-3xl mx-auto opacity-95">
-      <mat-card class="rounded border border-white/10 bg-[#1e1e1e] p-0 overflow-hidden flex h-40 shadow-2xl">
-        <div class="bg-[#2a2a2a] p-5 flex flex-col items-center justify-center border-r border-white/10 min-w-[140px]">
-          <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="w-16 h-16 rounded-full border-2 border-blue-600/50 shadow-lg">
-          <span class="text-[8px] text-blue-500 font-black uppercase mt-3 tracking-widest">Parceiro Oficial</span>
+   <div class="mt-12 mb-10 max-w-4xl mx-auto px-2">
+  <mat-card class="rounded-lg border border-white/10 bg-[#1e1e1e] p-0 overflow-hidden flex h-44 shadow-2xl transition-all duration-500 hover:border-blue-500/30">
+    
+    <div class="bg-[#2a2a2a] p-5 flex flex-col items-center justify-center border-r border-white/10 min-w-[150px] sm:min-w-[180px]">
+      <div class="relative">
+        <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" 
+             class="w-20 h-20 rounded-full border-2 border-blue-600/50 shadow-lg object-cover">
+        <div class="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-1 shadow-md">
+          <mat-icon class="text-white scale-75">verified</mat-icon>
         </div>
-        <div class="flex-1 relative bg-black overflow-hidden">
-          <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000">
-          <div class="relative z-10 p-6 h-full flex flex-col justify-center bg-gradient-to-r from-black via-transparent to-transparent">
-            <h3 class="text-white font-black text-[18px] uppercase tracking-tighter shadow-black drop-shadow-md">Espaço Mar Fitness</h3>
-            <p class="text-[11px] text-gray-200 font-bold italic mt-2 shadow-black drop-shadow-sm">A melhor performance para o seu treino.</p>
-          </div>
-        </div>
-      </mat-card>
+      </div>
+      <span class="text-[9px] text-blue-500 font-black uppercase mt-4 tracking-[0.3em]">Parceiro Oficial</span>
     </div>
-  </div>
+    
+    <div class="flex-1 relative bg-black overflow-hidden">
+      <img [src]="fotoAtual" 
+           class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000 ease-in-out">
+      
+      <div class="relative z-10 p-8 h-full flex flex-col justify-center bg-gradient-to-r from-black/90 via-black/40 to-transparent">
+        <h3 class="text-white font-black text-xl sm:text-2xl uppercase tracking-tighter leading-tight drop-shadow-xl">
+          Espaço Mar Fitness
+        </h3>
+        <div class="h-1 w-16 bg-blue-600 my-2 rounded-full shadow-lg"></div>
+        <p class="text-[11px] sm:text-[13px] text-gray-200 font-bold italic leading-snug max-w-xs drop-shadow-md">
+          A melhor estrutura para o seu treinamento. Performance e saúde em um só lugar.
+        </p>
+      </div>
+    </div>
+  </mat-card>
 </div>
