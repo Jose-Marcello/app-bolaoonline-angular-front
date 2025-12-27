@@ -1,11 +1,5 @@
 <div class="dashboard-container p-3 md:p-5 bg-[#121212] min-h-screen text-gray-400">
   
-  <div class="flex justify-end mb-4 px-2">
-    <button mat-button (click)="logout()" class="!flex !items-center !text-gray-400 hover:!text-white transition-colors">
-      <mat-icon class="mr-1 scale-75">logout</mat-icon>
-      <span class="text-[11px] font-black uppercase tracking-tighter">Sair</span>
-    </button>
-  </div>
 
   <div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-8">
     <mat-card style="background-color: #444444 !important; padding: 4px 16px !important; border-radius: 4px !important; border: 1px solid rgba(255,255,255,0.15) !important;" class="shadow-xl">
