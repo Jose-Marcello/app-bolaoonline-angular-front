@@ -1,15 +1,10 @@
 <div class="dashboard-container p-3 md:p-5 min-h-screen text-gray-400 bg-cover bg-center bg-fixed"
-     style="background-color: #f1f5f9; background-image: linear-gradient(rgba(241, 245, 249, 0.94), rgba(241, 245, 249, 0.94)), url('assets/images/fundobolao.png');">
+     style="background-color: #f5f5dc; background-image: linear-gradient(rgba(245, 245, 220, 0.93), rgba(245, 245, 220, 0.93)), url('assets/images/fundobolao.png');">
   
-  <div class="flex justify-end mb-4 px-2">
-    <button mat-button (click)="logout()" class="!flex !items-center !text-slate-500 hover:!text-slate-800 transition-colors">
-      <mat-icon class="mr-1 scale-75">logout</mat-icon>
-      <span class="text-[11px] font-black uppercase tracking-tighter">Sair</span>
-    </button>
-  </div>
+  <div class="mb-4 h-4"></div> 
 
   <div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-8">
-    <mat-card style="background-color: #334155 !important; padding: 4px 16px !important; border-radius: 8px !important;" class="shadow-2xl border border-slate-300">
+    <mat-card style="background-color: #334155 !important; padding: 4px 16px !important; border-radius: 8px !important;" class="shadow-2xl border border-slate-400/20">
       <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 48px !important;">
         <div style="display: flex !important; align-items: center !important;">
           <mat-icon style="color: #60a5fa !important; margin-right: 10px !important; transform: scale(0.8) !important;">account_balance_wallet</mat-icon>
@@ -26,7 +21,7 @@
 
   <div *ngIf="!isLoading" class="container mx-auto max-w-5xl">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-slate-200 bg-[#1e293b] shadow-xl">
+      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-slate-300 bg-[#1e293b] shadow-xl">
         <div class="p-2.5 bg-[#0f172a] border-b border-white/5">
           <div class="flex flex-col space-y-2">
             <mat-card-title class="text-[8px] font-bold text-slate-400 uppercase tracking-widest truncate">
@@ -70,11 +65,11 @@
         <div class="flex-1 relative bg-black overflow-hidden">
           <img [src]="fotoAtual" class="absolute inset-0 w-full h-full object-cover opacity-80 transition-opacity duration-1000">
           <div class="relative z-10 p-8 h-full flex flex-col justify-center bg-gradient-to-r from-black via-black/20 to-transparent">
-            <h3 class="text-white font-black text-xl sm:text-2xl uppercase tracking-tighter drop-shadow-xl">
+            <h3 class="text-white font-black text-xl sm:text-2xl uppercase tracking-tighter drop-shadow-xl leading-tight">
               Espaço Mar Fitness
             </h3>
             <p class="text-[11px] sm:text-[13px] text-gray-100 font-bold italic mt-2 drop-shadow-md">
-              A melhor performance para o seu treino.
+              A melhor estrutura para o seu treinamento.
             </p>
           </div>
         </div>
