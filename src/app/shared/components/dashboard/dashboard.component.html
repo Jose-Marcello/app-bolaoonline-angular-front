@@ -44,17 +44,17 @@
             <button *ngIf="campeonato.rodadasEmAposta" mat-flat-button 
                     class="w-full !bg-green-600/20 !text-green-500 !text-[14px] !font-black !h-11 border border-green-500/20 uppercase" 
                     (click)="navegarParaApostasRodada(campeonato.id, campeonato.rodadasEmAposta[0]?.id)">
-              Aposta ({{ campeonato.rodadasEmAposta?.length || 0 }})
+              Rodadas em Aposta ({{ campeonato.rodadasEmAposta?.length || 0 }})
             </button>
             <button *ngIf="campeonato.rodadasCorrentes" mat-flat-button 
                     class="w-full !bg-blue-600/20 !text-blue-400 !text-[14px] !font-black !h-11 border border-blue-400/20 uppercase" 
                     (click)="verRodadasCorrentes(campeonato.id)">
-              Corrente ({{ campeonato.rodadasCorrentes?.length || 0 }})
+              Rodadas Corrente ({{ campeonato.rodadasCorrentes?.length || 0 }})
             </button>
             <button *ngIf="campeonato.rodadasFinalizadas" mat-button 
                     class="w-full !text-gray-500 !text-[10px] !font-black !h-8 uppercase hover:bg-white/5" 
                     (click)="verRodadasFinalizadas(campeonato.id)">
-              Histórico ({{ campeonato.rodadasFinalizadas?.length || 0 }})
+              Histórico de Rodadas ({{ campeonato.rodadasFinalizadas?.length || 0 }})
             </button>
           </div>
         </div>
