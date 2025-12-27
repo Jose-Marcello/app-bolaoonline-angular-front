@@ -56,17 +56,29 @@
     </button>
 
     <div *ngIf="rodadaSelecionadaId" 
-         class="flex items-center px-6 py-4 rounded-xl border-2 shadow-2xl mb-8 transition-all"
-         [ngClass]="apostaAtual ? 'bg-emerald-600 border-emerald-400' : 'bg-blue-700 border-blue-500'">
-      <mat-icon class="text-white scale-125 mr-4">{{ apostaAtual ? 'edit_document' : 'visibility' }}</mat-icon>
-      <div class="flex flex-col text-white">
-        <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">Painel de Palpites:</span>
-        <h3 class="font-black text-lg uppercase leading-none">
-          {{ apostaAtual ? 'Editando: ' + apostaAtual.identificadorAposta : 'Modo Consulta (Selecione uma Aposta no Passo 2)' }}
-        </h3>
-      </div>
-    </div>
+        class="flex items-center px-6 py-4 rounded-xl border-2 shadow-2xl mb-8 transition-all duration-500"
+        [ngClass]="apostaAtual ? 'bg-emerald-600 border-emerald-400' : 'bg-blue-700 border-blue-500'">
+  
+       <mat-icon class="text-white scale-125 mr-4">
+          {{ apostaAtual ? 'edit_document' : 'visibility' }}
+       </mat-icon>
 
+      <div class="flex flex-col flex-grow">
+        <span class="text-[10px] text-white/70 font-black uppercase tracking-[0.3em] mb-1">
+          Sincronização de Palpites:
+        </span>
+         <div class="flex items-center gap-3">
+           <h3 class="text-white font-black text-lg uppercase leading-none m-0">
+            {{ apostaAtual ? 'Editando: ' + apostaAtual.identificadorAposta : 'Modo Consulta' }}
+           </h3>
+        <span *ngIf="apostaAtual" 
+            class="px-2 py-0.5 rounded text-[10px] font-black uppercase border border-white/30 bg-white/10 text-white">
+        {{ apostaAtual.ehApostaCampeonato ? 'Campeonato' : 'Avulsa' }}
+      </span>
+    </div>
+  </div>
+</div>
+    
     <form [formGroup]="apostaForm" (ngSubmit)="salvarApostas()">
       <div formArrayName="palpites" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
            [ngClass]="{'opacity-50 grayscale pointer-events-none': !rodadaSelecionadaId}">
