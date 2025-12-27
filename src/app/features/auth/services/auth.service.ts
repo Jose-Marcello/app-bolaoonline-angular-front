@@ -1,3 +1,5 @@
+// Localização: src/app/features/auth/services/auth.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -10,34 +12,31 @@ import { LoginRequestDto } from '../models/login-request.model';
 import { LoginResponse } from '../models/login-response.model';
 import { ApiResponse } from '../../../shared/models/api-response.model';
 
-// Constantes CRÍTICAS
-const AUTH_TOKEN_KEY = 'authToken';
-const USER_EMAIL_KEY = 'userEmail';
-const USER_CLAIMS_KEY = 'userClaims';
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
   private apiUrlBase = environment.apiUrl;
-  private apiUrlAuth = `${this.apiUrlBase}/api`; 
-  private _isAuthReady = new BehaviorSubject<boolean>(false);
+  private apiUrlAuth = `${this.apiUrlBase}/api/account`; // Padronizado com /account
   
-  // Inicialização correta lendo do storage
-  private _isAuthenticated = new BehaviorSubject<boolean>(this.checkToken());
+  // Chaves padronizadas para todo o sistema
+  private readonly AUTH_TOKEN_KEY = 'authToken';
+  private readonly USER_EMAIL_KEY = 'userEmail';
+
+  private _isAuthReady = new BehaviorSubject<boolean>(false);
+  private _isAuthenticated = new BehaviorSubject<boolean>(this.hasValidToken());
   private _currentUser = new BehaviorSubject<UserClaims | null>(this.getStoredClaims());
 
-  isAuthenticated$ = this._isAuthenticated.asObservable();
-  currentUser$ = this._currentUser.asObservable();  
-  isAuthReady$ = this._isAuthReady.asObservable();
+  public isAuthenticated$ = this._isAuthenticated.asObservable();
+  public currentUser$ = this._currentUser.asObservable();  
+  public isAuthReady$ = this._isAuthReady.asObservable();
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private notificationsService: NotificationsService
   ) {
-    this.checkToken(); 
     this._isAuthReady.next(true);
   }
 
@@ -46,19 +45,17 @@ export class AuthService {
   // ====================================================================
 
   login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
-    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/account/login`, credentials).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login`, credentials).pipe(
       tap((response: ApiResponse<LoginResponse>) => {
-        if (response.success && response.data?.loginSucesso) {
+        if (response.success && response.data?.token) {
           const receivedToken = response.data.token;
           const email = response.data.email;
           
-          if (receivedToken) {
-            localStorage.setItem(AUTH_TOKEN_KEY, receivedToken);
-            if (email) localStorage.setItem(USER_EMAIL_KEY, email);
+          localStorage.setItem(this.AUTH_TOKEN_KEY, receivedToken);
+          if (email) localStorage.setItem(this.USER_EMAIL_KEY, email);
 
-            this._isAuthenticated.next(true); 
-            this._currentUser.next(this.getStoredClaims());
-          }
+          this._isAuthenticated.next(true); 
+          this._currentUser.next(this.getStoredClaims());
         } else {
           this.clearSession();
           const errorMessage = response.message || 'Credenciais inválidas.';
@@ -69,80 +66,94 @@ export class AuthService {
     );
   }
 
-  register(registrationData: any): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/account/register`, registrationData);
-  }
-
   logout(): void {
     this.clearSession();
     this.router.navigate(['/login']);
   }
 
   // ====================================================================
-  // 📧 MÉTODOS DE RECUPERAÇÃO E E-MAIL (Recuperados agora)
+  // 📧 RECUPERAÇÃO E SUPORTE
   // ====================================================================
 
   forgotPassword(email: string): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/account/forgot-password`, { email });
+    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/forgot-password`, { email });
   }
 
   resetPassword(userId: string, code: string, newPassword: string): Observable<ApiResponse<any>> {
-    const url = `${this.apiUrlAuth}/reset-password`; 
     const body = { userId, code, newPassword };
-    return this.http.post<ApiResponse<any>>(url, body);
+    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/reset-password`, body);
   }
 
   resendConfirmationEmail(email: string): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/account/resend-confirmation-email`, { email });
+    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/resend-confirmation-email`, { email });
   }
 
+// ====================================================================
+  // 📧 MÉTODOS DE SUPORTE
+  // ====================================================================
+
+  // Adicione este método de volta para curar o erro da imagem 2
   getStoredUserEmail(): string {
-    return localStorage.getItem(USER_EMAIL_KEY) || '';
+    return localStorage.getItem(this.USER_EMAIL_KEY) || '';
   }
 
-  // ====================================================================
-  // 🛠️ MÉTODOS DE SUPORTE E ESTADO
-  // ====================================================================
-
-  checkToken(): boolean {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY); 
-    const isAuth = !!token;
-
-    if (this._isAuthenticated) this._isAuthenticated.next(isAuth);
-    if (isAuth && this._currentUser) this._currentUser.next(this.getStoredClaims());
-
-    return isAuth;
+  private hasValidToken(): boolean {
+    const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
+    return !!token;
   }
 
-  private getStoredClaims(): UserClaims | null {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY); 
+  public getStoredClaims(): UserClaims | null {
+    const token = localStorage.getItem(this.AUTH_TOKEN_KEY); 
     if (!token) return null;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      const payload = JSON.parse(jsonPayload);
+      
+      // Retorno corrigido para curar o erro da imagem 1
       return {
-        uid: payload.nameid,
-        nome: payload.apelido,
+        uid: payload.nameid || payload.sub,
+        nome: payload.apelido || payload.unique_name,
         email: payload.email,
         displayName: payload.apelido || '', 
         authToken: token,
-        refreshToken: '',
-        tokenExpiration: new Date() 
+        refreshToken: '', // Preenchido para satisfazer a interface
+        tokenExpiration: payload.exp ? new Date(payload.exp * 1000) : new Date()
       } as UserClaims;
     } catch (error) {
+      console.error('Erro ao decodificar claims do token:', error);
       return null;
     }
   }
 
-  public clearSession = (): void => { 
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(USER_EMAIL_KEY);
-    localStorage.removeItem(USER_CLAIMS_KEY);
+  // ====================================================================
+  // 🛠️ AUXILIARES DE ESTADO
+  // ====================================================================
+ 
+  public clearSession(): void { 
+    localStorage.removeItem(this.AUTH_TOKEN_KEY);
+    localStorage.removeItem(this.USER_EMAIL_KEY);
     this._isAuthenticated.next(false);
     this._currentUser.next(null);
-  };
+  }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
+    let msg = 'Ocorreu um erro na autenticação.';
+    if (error.status === 401) msg = 'Usuário ou senha inválidos.';
+    this.notificationsService.showNotification(msg, 'erro');
     return throwError(() => error);
   }
+
+
+  // No seu auth.service.ts
+register(registrationData: any): Observable<ApiResponse<any>> {
+  // Como definimos apiUrlAuth como `${this.apiUrlBase}/api/account`
+  // Esta chamada resultará em .../api/account/register
+  return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
+}
 }
