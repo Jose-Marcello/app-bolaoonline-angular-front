@@ -24,6 +24,7 @@ import { ApostadorCampeonatoService } from '../../core/services/apostadorCampeon
 import { ApostadorService } from '../../core/services/apostador.service';
 import { AuthService } from '../auth/services/auth.service';
 
+
 // Models
 import { RodadaDto } from '../../features/rodada/model/rodada-dto.model';
 import { ApostaRodadaDto } from '../../features/aposta-rodada/models/aposta-rodada-dto.model';
@@ -65,22 +66,25 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   notifications: NotificationDto[] = [];
   hasNotifications: boolean = false;
+  isReadOnly: boolean = true; 
+  isLoadingPalpites: boolean = false;
+  apostaAtual: any = null;
 
   campeonatoId: string | null = null;
   rodadaId: string | null = null;
   apostadorCampeonatoId: string | null = null;
   apostaRodadaId: string | null = null;
+  rodadaSelecionadaId: string | null = null; // ADICIONE ESTA LINHA
   
   userId: string | null = null;
   apostadorSaldo: number | null = null;
   custoAposta: number = 0;
-  isApostadorReady: boolean = false;
+  isApostadorReady: boolean = false;  
 
   campeonatoSelecionado: CampeonatoDto | null = null;
   rodadasEmAposta: RodadaDto[] = [];
   rodadaSelecionada: RodadaDto | null = null;
-  apostasUsuarioRodada: ApostaRodadaDto[] = [];
-  apostaAtual: ApostaRodadaDto | null = null;
+  apostasUsuarioRodada: ApostaRodadaDto[] = []; 
   jogosDaApostaAtual: ApostaJogoEdicaoDto[] = [];
 
   apostaForm!: FormGroup;
@@ -313,36 +317,74 @@ private loadJogosDaApostaAtual(apostaRodadaId: string): Observable<ApostaJogoEdi
     };
   }
 
-  onRodadaSelected(rodadaId: string): void {
-    if (this.rodadaSelecionada?.id === rodadaId) {
-      return;
-    }
-    this.rodadaSelecionada = this.rodadasEmAposta.find(r => r.id === rodadaId) || null;
-    if (this.rodadaSelecionada) {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { rodadaId: this.rodadaSelecionada.id, apostadorCampeonatoId: this.apostadorCampeonatoId },
-        queryParamsHandling: 'merge',
-        replaceUrl: true
-      });
-      console.log(`[ApostarRodadaFormComponent] Rodada ${rodadaId} selecionada. Recarregando dados.`);
-      
-      this.loadAllIntegratedData().subscribe();
-    }
-  }
+onRodadaSelected(rodadaId: string) {
+  // 1. Limpa seleções anteriores  
+  this.rodadaSelecionadaId = rodadaId;
+  this.apostaAtual = null; 
+  this.isReadOnly = true; // Por padrão, entra em Modo Consulta
 
-  onApostaSelected(apostaId: string): void {
-    if (this.apostaAtual?.id === apostaId) {
-      return;
+  // 2. Busca os jogos para montar o Grid "Vazio" (Consulta)
+  this.isLoadingPalpites = true;
+  this.rodadaService.getJogosByRodada(rodadaId).subscribe({
+    next: (jogos) => {
+      this.jogosDaApostaAtual = jogos;
+      this.montarGridVazio(); // Função para criar o formulário bloqueado
+      this.isLoadingPalpites = false;
+    },
+    error: () => this.isLoadingPalpites = false
+  });
+}
+
+// Função auxiliar para o Modo Consulta
+montarGridVazio() {
+  this.palpites.clear();
+  this.jogosDaApostaAtual.forEach(jogo => {
+    this.palpites.push(this.fb.group({
+      jogoId: [jogo.id],
+      placarApostaCasa: [{ value: null, disabled: true }], // Campo bloqueado
+      placarApostaVisita: [{ value: null, disabled: true }]
+    }));
+  });
+}
+
+  onApostaSelected(apostaId: string) {
+  this.isLoadingPalpites = true;
+  
+  this.apostaService.getApostaById(apostaId).subscribe(res => {
+    this.apostaAtual = res.data;
+    
+    // LÓGICA DE TRAVA: 
+    // Se a aposta não pertencer ao usuário logado, isReadOnly vira true.
+    // Se a rodada já estiver fechada, isReadOnly vira true.
+    const usuarioLogadoId = this.authService.getUsuarioId();
+    
+    if (this.apostaAtual.usuarioId === usuarioLogadoId) {
+      this.isReadOnly = false; // MODO EDIÇÃO
+    } else {
+      this.isReadOnly = true;  // MODO CONSULTA
     }
-    this.apostaAtual = this.apostasUsuarioRodada.find(a => a.id === apostaId) || null;
-    if (this.apostaAtual) {
-      this.apostaRodadaId = this.apostaAtual.id;
-      console.log(`[ApostarRodadaFormComponent] Aposta ${apostaId} selecionada. Recarregando jogos.`);
-      
-      this.loadJogosDaApostaAtual(this.apostaAtual.id).subscribe();
-    }
-  }
+
+    this.preencherFormularioComPalpites();
+    this.isLoadingPalpites = false;
+  });
+}
+
+preencherFormularioComPalpites(): void {
+  if (!this.apostaAtual || !this.apostaAtual.palpites) return;
+
+  // Limpa o FormArray atual para garantir sincronia
+  this.palpites.clear();
+
+  // Preenche o formulário com os dados que vieram do banco
+  this.apostaAtual.palpites.forEach((palpite: any) => {
+    this.palpites.push(this.fb.group({
+      jogoId: [palpite.jogoId],
+      placarApostaCasa: [palpite.placarApostaCasa],
+      placarApostaVisita: [palpite.placarApostaVisita]
+    }));
+  });
+}
+
 
   onClickCriarNovaAposta(): void {
     if (this.apostaForm.dirty || this.apostaForm.touched) {
@@ -538,4 +580,29 @@ private loadJogosDaApostaAtual(apostaRodadaId: string): Observable<ApostaJogoEdi
     }
     return null;
   }
+
+// No seu .ts, ajuste a lógica de carregamento de jogos
+carregarJogosParaConsulta(rodadaId: string) {
+  this.isLoadingPalpites = true;
+  this.isReadOnly = true; // Força o modo consulta
+  this.apostaAtual = null; // Indica que não há uma aposta real vinculada
+
+  this.rodadaService.getJogosByRodada(rodadaId).subscribe({
+    next: (res: any) => {
+      this.jogosDaApostaAtual = res.data || res; // Carrega os jogos da rodada
+      
+      // Monta o formulário "vazio" apenas para exibição
+      this.palpites.clear();
+      this.jogosDaApostaAtual.forEach(jogo => {
+        this.palpites.push(this.fb.group({
+          jogoId: [jogo.id],
+          placarApostaCasa: [{value: null, disabled: true}], // Fica em branco/traçado
+          placarApostaVisita: [{value: null, disabled: true}]
+        }));
+      });
+      this.isLoadingPalpites = false;
+    }
+  });
+}
+
 }

@@ -1,14 +1,4 @@
-<style>
-  .mat-card { box-shadow: none !important; }
-  /* Fundo Grafite Escuro para alto contraste com os grids claros */
-  .fundo-grafite-contraste {
-    background-color: #1e293b; 
-    background-image: linear-gradient(rgba(30, 41, 59, 0.85), rgba(30, 41, 59, 0.85)), url('assets/images/fundobolao.png');
-    background-attachment: fixed;
-  }
-</style>
-
-<div class="flex flex-col h-full bg-cover bg-center min-h-screen text-gray-900 rounded-lg p-4 sm:p-6 fundo-grafite-contraste">
+<div class="flex flex-col h-full bg-cover bg-center text-gray-900 rounded-lg p-4 sm:p-6 fundo-grafite-contraste">
 
   <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-700">
     <h1 class="font-bold text-white min-w-0 flex-shrink-0 text-lg sm:text-xl uppercase tracking-tight">
@@ -70,25 +60,22 @@
   </div>
 
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-white font-black text-sm uppercase tracking-widest">3. Palpites da Aposta:</h2>
-    
+    <h2 class="text-white font-black text-sm uppercase tracking-widest">3. Palpites:</h2>
     <div *ngIf="rodadaSelecionada" 
-         class="flex items-center px-4 py-2 rounded-lg border-2 shadow-xl transition-all"
-         [ngClass]="(apostaAtual && !isReadOnly) ? 'bg-emerald-600 border-emerald-400' : 'bg-blue-700 border-blue-400'">
-      <mat-icon class="text-white scale-75 mr-2">{{ (apostaAtual && !isReadOnly) ? 'edit' : 'visibility' }}</mat-icon>
-      <span class="text-[11px] font-black text-white uppercase tracking-tighter">
-        {{ (apostaAtual && !isReadOnly) ? 'MODO EDIÇÃO' : 'MODO CONSULTA' }} 
-        <span class="mx-1 opacity-50">|</span> 
-        {{ apostaAtual ? apostaAtual.identificadorAposta : 'Nenhuma Selecionada' }}
-      </span>
-    </div>
+     class="flex items-center px-4 py-2 rounded-lg border-2 shadow-xl mb-4"
+     [ngClass]="apostaAtual ? 'bg-emerald-600 border-emerald-400' : 'bg-blue-800 border-blue-500'">
+  <mat-icon class="text-white mr-2">{{ apostaAtual ? 'edit' : 'visibility' }}</mat-icon>
+  <span class="text-[11px] font-black text-white uppercase tracking-tighter">
+    {{ apostaAtual ? 'MODO EDIÇÃO (Sua Aposta)' : 'MODO CONSULTA (Jogos da Rodada)' }}
+  </span>
+</div>
   </div>
 
   <form [formGroup]="apostaForm" (ngSubmit)="salvarApostas()">
     <div formArrayName="palpites" class="grid grid-cols-1 md:grid-cols-3 gap-4"
          [ngClass]="{'opacity-40 grayscale pointer-events-none': !apostaAtual}">
       
-      <mat-card *ngFor="let palpiteGroup of palpites.controls; let i = index" [formGroupName]="i"
+      <mat-card *ngFor="let palpite of palpites.controls; let i = index" [formGroupName]="i"
         class="bg-white rounded-xl p-3 border border-slate-300 shadow-lg">
         <div class="text-center text-slate-400 text-[9px] mb-2 font-black uppercase">
           {{ jogosDaApostaAtual[i]?.dataCompleta | date:'dd/MM/yy HH:mm' }}

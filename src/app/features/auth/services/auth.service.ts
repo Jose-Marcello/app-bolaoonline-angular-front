@@ -149,6 +149,11 @@ export class AuthService {
     return throwError(() => error);
   }
 
+getUsuarioId(): string | null {
+  // Ajuste conforme onde você guarda o ID (ex: localStorage ou uma variável privada)
+  const user = JSON.parse(localStorage.getItem('usuario') || '{}');
+  return user.id || null;
+}
 
   // No seu auth.service.ts
 register(registrationData: any): Observable<ApiResponse<any>> {

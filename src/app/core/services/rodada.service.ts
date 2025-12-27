@@ -20,8 +20,7 @@ export class RodadaService {
   //private apiUrl = `${environment.apiUrl}/rodada`;
 
   constructor(private http: HttpClient) { }
-
-  
+ 
 
 
   /**
@@ -66,6 +65,11 @@ export class RodadaService {
       );
   }
 
+  getJogosByRodada(rodadaId: string): Observable<any[]> {
+  // Esta rota deve retornar apenas os confrontos (Times, Escudos, Data) 
+  // Sem nenhum vínculo com apostas de usuários.
+  return this.http.get<any[]>(`${this.apiUrlRodada}/rodadas/${rodadaId}/jogos`);
+}
 
 obterDadosPlanilhaConferencia(rodadaId: string): Observable<PreservedCollection<ConferenciaPalpiteDto>> {
   return this.http.get<PreservedCollection<ConferenciaPalpiteDto>>(`${this.apiUrlRodada}/conferencia/${rodadaId}`);

@@ -1,5 +1,17 @@
 /* Localização: src/app/aposta-rodada/aposta-rodada-form/aposta-rodada-form.component.scss */
 
+.fundo-grafite-contraste {
+  background-color: #1e293b; 
+  background-image: linear-gradient(rgba(30, 41, 59, 0.85), rgba(30, 41, 59, 0.85)), url('/assets/images/fundobolao.png');
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Remove a sombra dos cards do Material para manter o visual limpo */
+::ng-deep .mat-mdc-card {
+  box-shadow: none !important;
+}
+
 /* Estilos existentes */
 .cards-container-wrapper {
   background-color: rgba(245, 245, 245, 0.068) !important;

@@ -118,7 +118,9 @@ export class ApostaService {
       );
   }
 
-
+  getApostaById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('[ApostaService] Erro na requisição HTTP:', error);
