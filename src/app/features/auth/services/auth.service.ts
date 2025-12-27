@@ -41,8 +41,7 @@ export class AuthService {
   private _currentUser = new BehaviorSubject<UserClaims | null>(this.getStoredClaims());
 
   isAuthenticated$ = this._isAuthenticated.asObservable();
-  currentUser$ = this._currentUser.asObservable();
-
+  currentUser$ = this._currentUser.asObservable();  
   isAuthReady$ = this._isAuthReady.asObservable(); // ✅ Isso resolve o erro da image_4a1598.jpg
  
   
@@ -51,6 +50,11 @@ export class AuthService {
     private router: Router,
     private notificationsService: NotificationsService
   ) {
+
+    // Verifique o estado inicial do token antes de avisar que o serviço está pronto
+    this.checkToken(); 
+  
+  
     // Inicialize o estado como pronto após as verificações iniciais
     this._isAuthReady.next(true);
   }
@@ -196,11 +200,16 @@ resendConfirmationEmail(email: string): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(url, { email });
 }
 
-  private checkToken(): boolean {
-      const token = this.getStoredToken();
-      // Lógica de validação básica (apenas presença do token)
-      return !!token;
+  checkToken() {
+  const token = localStorage.getItem('token'); // ou 'access_token', veja como você salvou
+  if (token) {
+    // Se achou o token, avisa o sistema todo que o usuário está autenticado
+    this._isAuthenticated.next(true);
+  } else {
+    this._isAuthenticated.next(false);
   }
+}
+
 
 forgotPassword(email: string): Observable<ApiResponse<any>> {
     // Adicionamos o /account/ para alinhar com o Backend

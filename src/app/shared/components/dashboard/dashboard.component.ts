@@ -106,6 +106,11 @@ ngOnInit(): void {
 
     // Verificamos se há um token salvo para definir o estado de login
   // 2. Tente capturar o token diretamente do armazenamento do navegador
+    this.authService.isAuthenticated$.subscribe(status => {
+    this.isLoggedIn = status;
+
+    console.log('[Dashboard] Estado de login atualizado via Service:', this.isLoggedIn);
+  })
     const tokenSalvo = localStorage.getItem('token'); 
     
     // 3. Define se está logado (true se o token existir)
