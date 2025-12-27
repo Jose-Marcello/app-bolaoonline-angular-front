@@ -1,10 +1,10 @@
 <div class="dashboard-container p-3 md:p-5 min-h-screen text-gray-400 bg-cover bg-center bg-fixed"
-     style="background-color: #f5f5dc; background-image: linear-gradient(rgba(245, 245, 220, 0.93), rgba(245, 245, 220, 0.93)), url('assets/images/fundobolao.png');">
+     style="background-color: #e2e8f0; background-image: linear-gradient(rgba(226, 232, 240, 0.94), rgba(226, 232, 240, 0.94)), url('assets/images/fundobolao.png');">
   
   <div class="mb-4 h-4"></div> 
 
   <div *ngIf="isLoggedIn && apostador" class="max-w-4xl mx-auto mb-8">
-    <mat-card style="background-color: #334155 !important; padding: 4px 16px !important; border-radius: 8px !important;" class="shadow-2xl border border-slate-400/20">
+    <mat-card style="background-color: #334155 !important; padding: 4px 16px !important; border-radius: 8px !important;" class="shadow-2xl border border-slate-300">
       <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; min-height: 48px !important;">
         <div style="display: flex !important; align-items: center !important;">
           <mat-icon style="color: #60a5fa !important; margin-right: 10px !important; transform: scale(0.8) !important;">account_balance_wallet</mat-icon>
@@ -21,15 +21,15 @@
 
   <div *ngIf="!isLoading" class="container mx-auto max-w-5xl">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-slate-300 bg-[#1e293b] shadow-xl">
+      <mat-card *ngFor="let campeonato of campeonatosDisponiveis" class="p-0 overflow-hidden border border-slate-300 bg-[#1e293b] shadow-xl hover:shadow-2xl transition-all">
         <div class="p-2.5 bg-[#0f172a] border-b border-white/5">
           <div class="flex flex-col space-y-2">
             <mat-card-title class="text-[8px] font-bold text-slate-400 uppercase tracking-widest truncate">
               {{ campeonato.nome }}
             </mat-card-title>
             <div class="flex items-center justify-between">
-              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-7 h-7 rounded-full border border-white/10">
-              <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-emerald-600 text-white text-[10px] font-black py-1 px-3 rounded uppercase">
+              <img [src]="getCampeonatoLogo(campeonato.nome)" class="w-7 h-7 rounded-full border border-white/10 shadow-sm">
+              <div *ngIf="campeonato.aderidoPeloUsuario" class="bg-emerald-600 text-white text-[10px] font-black py-1 px-3 rounded uppercase shadow-md">
                 JOGANDO!
               </div>
             </div>

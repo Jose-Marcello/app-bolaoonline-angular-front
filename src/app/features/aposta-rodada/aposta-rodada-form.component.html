@@ -2,13 +2,12 @@
   .mat-card, .mat-expansion-panel, .mat-expansion-panel-header {
     box-shadow: none !important;
   }
-  .fonte-subtit { font-family: 'Roboto', sans-serif; }
 </style>
 
-<div class="flex flex-col h-full bg-cover bg-center text-gray-900 rounded-lg shadow-lg p-4 sm:p-6"
-  style="background-image: url('assets/images/fundobolao.png');">
+<div class="flex flex-col h-full bg-cover bg-center bg-fixed text-gray-900 rounded-lg shadow-lg p-4 sm:p-6"
+  style="background-color: #e2e8f0; background-image: linear-gradient(rgba(226, 232, 240, 0.94), rgba(226, 232, 240, 0.94)), url('assets/images/fundobolao.png');">
 
-  <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-400">
+  <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-400">
     <h1 class="font-bold text-slate-800 min-w-0 flex-shrink-0 text-lg sm:text-xl">
       <span class="fonte-subtit">{{ rodadaSelecionada?.campeonato?.nome || 'Carregando...' }}</span>
     </h1>
@@ -18,80 +17,77 @@
     </button>
   </div>
 
-  <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-8">
-    <mat-spinner color="accent"></mat-spinner>
-    <p class="mt-4 text-lg text-gray-600 font-bold">Sincronizando com o Servidor...</p>
-  </div>
-
-  <div *ngIf="!isLoading && !errorMessage" class="flex-grow flex flex-col">
+  <div *ngIf="!isLoading" class="flex-grow flex flex-col">
 
     <h2 class="text-xl font-bold text-slate-800 mb-3 fonte-subtit">1. Selecione a Rodada:</h2>
-    <div *ngIf="rodadasEmAposta.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-      <div class="grid grid-cols-5 gap-2 p-3 border-b border-gray-300 text-gray-600 font-semibold text-xs uppercase">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-slate-300">
+      <div class="grid grid-cols-5 gap-2 p-3 bg-slate-50 border-b border-slate-200 text-slate-500 font-black text-[10px] uppercase">
         <span class="text-center">Status</span>
         <span class="text-center">Rodada</span>
         <span class="text-center">Início</span>
         <span class="text-center">Fim</span>
         <span class="text-center">Custo</span>
       </div>
-      <div class="flex flex-col">
-        <mat-card *ngFor="let rodada of rodadasEmAposta" (click)="onRodadaSelected(rodada.id)"
-          [ngClass]="{'bg-indigo-50 border-l-4 border-indigo-500 shadow-inner': rodadaSelecionada?.id === rodada.id}" 
-          class="rounded-none shadow-none p-3 cursor-pointer border-b border-gray-100 transition duration-200">
-          <div class="grid grid-cols-5 gap-2 items-center text-xs">
-            <div class="flex justify-center">
-              <mat-icon *ngIf="rodadaSelecionada?.id === rodada.id" class="text-indigo-600 scale-75">check_circle</mat-icon>
-            </div>
-            <span class="font-black text-center text-gray-900">{{ rodada.numeroRodada }}</span>
-            <span class="text-center text-gray-700">{{ rodada.dataInic | date:'dd/MM/yy' }}</span>
-            <span class="text-center text-gray-700">{{ rodada.dataFim | date:'dd/MM/yy' }}</span>
-            <span class="text-center font-bold text-green-600">{{ rodada.custoApostaRodada | currency:'BRL' }}</span>
+      <mat-card *ngFor="let rodada of rodadasEmAposta" (click)="onRodadaSelected(rodada.id)"
+        [ngClass]="{'bg-blue-50 border-l-4 border-blue-500': rodadaSelecionada?.id === rodada.id}" 
+        class="rounded-none p-3 cursor-pointer border-b border-slate-100 transition duration-200">
+        <div class="grid grid-cols-5 gap-2 items-center text-xs">
+          <div class="flex justify-center">
+            <mat-icon *ngIf="rodadaSelecionada?.id === rodada.id" class="text-blue-600 scale-75">check_circle</mat-icon>
           </div>
-        </mat-card>
-      </div>
+          <span class="font-black text-center text-slate-900">{{ rodada.numeroRodada }}</span>
+          <span class="text-center text-slate-600">{{ rodada.dataInic | date:'dd/MM/yy' }}</span>
+          <span class="text-center text-slate-600">{{ rodada.dataFim | date:'dd/MM/yy' }}</span>
+          <span class="text-center font-bold text-emerald-600">{{ rodada.custoApostaRodada | currency:'BRL' }}</span>
+        </div>
+      </mat-card>
     </div>
 
     <h2 class="text-xl font-bold text-slate-800 mb-3 fonte-subtit">2. Selecione sua Aposta:</h2>
-    <div *ngIf="apostasUsuarioRodada.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4 border border-slate-300">
+      <div class="grid grid-cols-4 gap-2 p-2 bg-slate-50 border-b border-slate-200 text-[10px] text-slate-500 font-black uppercase">
+        <span class="text-center">Status</span>
+        <span>Identificador</span>
+        <span class="text-center">Tipo</span> <span class="text-right">Custo Pago</span>
+      </div>
       <mat-card *ngFor="let aposta of apostasUsuarioRodada" (click)="onApostaSelected(aposta.id!)" 
-        [ngClass]="{'bg-teal-50 border-l-4 border-teal-500 shadow-inner': apostaAtual?.id === aposta.id}" 
-        class="rounded-none shadow-none p-3 cursor-pointer border-b border-gray-100 transition duration-200">
-        <div class="flex justify-between items-center text-xs sm:text-sm">
-          <div class="flex items-center">
-            <mat-icon *ngIf="apostaAtual?.id === aposta.id" class="text-teal-600 mr-2">stars</mat-icon>
-            <span class="font-black text-gray-900 uppercase">ID: {{ aposta.identificadorAposta }}</span>
+        [ngClass]="{'bg-teal-50 border-l-4 border-teal-500': apostaAtual?.id === aposta.id}" 
+        class="rounded-none p-3 cursor-pointer border-b border-slate-100 transition duration-200">
+        <div class="grid grid-cols-4 gap-2 items-center text-xs">
+          <div class="flex justify-center">
+            <mat-icon *ngIf="apostaAtual?.id === aposta.id" class="text-teal-600 scale-75">stars</mat-icon>
           </div>
-          <span class="font-bold text-green-600">{{ aposta.custoPagoApostaRodada | currency:'BRL' }}</span>
+          <span class="font-black text-slate-900 uppercase">{{ aposta.identificadorAposta }}</span>
+          
+          <span class="text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase"
+                  [ngClass]="aposta.ehApostaCampeonato ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'">
+              {{ aposta.ehApostaCampeonato ? 'Campeonato' : 'Avulsa' }}
+            </span>
+          </span>
+
+          <span class="text-right font-bold text-emerald-600">{{ aposta.custoPagoApostaRodada | currency:'BRL' }}</span>
         </div>
       </mat-card>
     </div>
 
     <button mat-raised-button (click)="onClickCriarNovaAposta()" [disabled]="!apostadorCampeonatoId"
-      class="mb-8 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-black rounded-full shadow-lg transition transform hover:scale-105">
+      class="mb-8 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-full shadow-lg transition">
       <mat-icon>add_circle</mat-icon> Criar Nova Aposta Avulsa
     </button>
 
-    <h2 class="text-xl font-bold text-slate-800 mb-4 fonte-subtit">3. Lance seus Palpites:</h2>
-
-    <div *ngIf="rodadaSelecionada" class="mb-4 bg-[#1e293b] border-2 border-indigo-500 rounded-xl shadow-2xl p-5 overflow-hidden">
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div class="flex items-center">
-          <div class="bg-indigo-600 p-2 rounded-lg mr-4 shadow-lg text-white">
-            <mat-icon>verified_user</mat-icon>
-          </div>
-          <div>
-            <p class="text-[10px] text-indigo-400 font-black uppercase tracking-[0.2em] mb-1">Aposta Selecionada</p>
-            <h2 class="text-white font-black text-sm sm:text-base uppercase leading-tight">
-              Rodada {{ rodadaSelecionada.numeroRodada }} 
-              <span class="text-indigo-500 mx-2">|</span> 
-              {{ apostaAtual ? 'ID: ' + apostaAtual.identificadorAposta : 'AGUARDANDO SELEÇÃO NO PASSO 2' }}
-            </h2>
-          </div>
-        </div>
-        <div class="flex-shrink-0">
-          <span *ngIf="apostaAtual" class="bg-emerald-500 text-white text-[10px] font-black py-2 px-5 rounded-full uppercase shadow-lg animate-pulse">SINCRONIZADO</span>
-          <span *ngIf="!apostaAtual" class="bg-amber-500 text-white text-[10px] font-black py-2 px-5 rounded-full uppercase shadow-lg">BLOQUEADO</span>
-        </div>
+    <div class="flex items-center justify-between mb-4 px-1">
+      <h2 class="text-xl font-bold text-slate-800 fonte-subtit">3. Lance seus Palpites:</h2>
+      
+      <div *ngIf="rodadaSelecionada" 
+           class="flex items-center px-4 py-1.5 rounded-full border shadow-sm transition-all"
+           [ngClass]="apostaAtual ? 'bg-emerald-50 border-emerald-300' : 'bg-amber-50 border-amber-300'">
+        <mat-icon class="scale-75 mr-1" [ngClass]="apostaAtual ? 'text-emerald-600' : 'text-amber-600'">
+          {{ apostaAtual ? 'check_circle' : 'info' }}
+        </mat-icon>
+        <span class="text-[10px] font-black uppercase tracking-tighter" [ngClass]="apostaAtual ? 'text-emerald-700' : 'text-amber-700'">
+          {{ apostaAtual ? 'Editando: ' + apostaAtual.identificadorAposta : 'Selecione uma aposta' }}
+        </span>
       </div>
     </div>
 
@@ -100,29 +96,29 @@
            [ngClass]="{'opacity-30 grayscale pointer-events-none': !apostaAtual}">
         
         <mat-card *ngFor="let palpiteGroup of palpites.controls; let i = index" [formGroupName]="i"
-          class="bg-white rounded-xl shadow-md p-3 flex flex-col justify-between transition-all duration-300">
+          class="bg-white rounded-xl shadow-md p-3 flex flex-col justify-between border border-slate-200">
           
-          <div class="text-center text-gray-500 text-[10px] mb-2 font-black uppercase tracking-tighter">
+          <div class="text-center text-slate-400 text-[9px] mb-2 font-black uppercase tracking-tighter">
             {{ jogosDaApostaAtual[i]?.dataCompleta | date:'dd/MM/yy HH:mm' }}
           </div>
 
           <div class="flex items-center justify-between">
             <div class="flex flex-col items-center w-1/3 text-center">
-              <img [src]="baseUrlImagens + jogosDaApostaAtual[i]?.escudoMandante" class="w-10 h-10 mb-1 rounded-full border shadow-sm">
-              <span class="text-[10px] font-bold text-gray-800 truncate w-full">{{ jogosDaApostaAtual[i]?.equipeMandante }}</span>
+              <img [src]="baseUrlImagens + jogosDaApostaAtual[i]?.escudoMandante" class="w-9 h-9 mb-1 rounded-full border border-slate-100 shadow-sm">
+              <span class="text-[9px] font-bold text-slate-800 truncate w-full">{{ jogosDaApostaAtual[i]?.equipeMandante }}</span>
             </div>
 
             <div class="flex items-center justify-center flex-1">
               <input matInput type="number" formControlName="placarApostaCasa" 
-                     class="w-10 h-10 text-center bg-gray-100 rounded-lg font-black text-lg border-b-2 border-indigo-500 text-indigo-900">
-              <span class="mx-2 font-black text-gray-400 text-xl">X</span>
+                     class="w-9 h-9 text-center bg-slate-50 rounded-lg font-black text-lg border-b-2 border-indigo-500 text-slate-900">
+              <span class="mx-1 font-black text-slate-300">X</span>
               <input matInput type="number" formControlName="placarApostaVisita" 
-                     class="w-10 h-10 text-center bg-gray-100 rounded-lg font-black text-lg border-b-2 border-indigo-500 text-indigo-900">
+                     class="w-9 h-9 text-center bg-slate-50 rounded-lg font-black text-lg border-b-2 border-indigo-500 text-slate-900">
             </div>
 
             <div class="flex flex-col items-center w-1/3 text-center">
-              <img [src]="baseUrlImagens + jogosDaApostaAtual[i]?.escudoVisitante" class="w-10 h-10 mb-1 rounded-full border shadow-sm">
-              <span class="text-[10px] font-bold text-gray-800 truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitante }}</span>
+              <img [src]="baseUrlImagens + jogosDaApostaAtual[i]?.escudoVisitante" class="w-9 h-9 mb-1 rounded-full border border-slate-100 shadow-sm">
+              <span class="text-[9px] font-bold text-slate-800 truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitante }}</span>
             </div>
           </div>
         </mat-card>
@@ -130,8 +126,8 @@
 
       <button type="submit" mat-raised-button color="primary" 
         [disabled]="isSaving || apostaForm.invalid || !apostaAtual"
-        class="w-full mt-10 mb-10 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-full shadow-2xl transition-all uppercase tracking-widest text-base">
-        {{ isSaving ? 'Processando...' : (apostaAtual ? 'Confirmar Todos os Palpites' : 'Selecione a Aposta Acima') }}
+        class="w-full mt-10 mb-10 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-full shadow-2xl transition uppercase tracking-widest">
+        {{ isSaving ? 'Salvando...' : (apostaAtual ? 'Confirmar Todos os Palpites' : 'Aguardando Seleção de Aposta') }}
       </button>
     </form>
   </div>
