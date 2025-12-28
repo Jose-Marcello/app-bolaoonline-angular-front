@@ -61,8 +61,7 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-icon class="text-xl ml-4 mr-2">sports_soccer</mat-icon>
-  <span class="text-xl font-bold">Bolão Online</span>
-  
+   
   <span class="flex-grow"></span> <span class="text-sm mr-4" *ngIf="isAuthenticated">{{ apostadorNome || 'Apostador' }}</span>
   
   <button mat-button (click)="onLogout()" *ngIf="isAuthenticated" class="flex items-center text-red-300 hover:text-red-400">

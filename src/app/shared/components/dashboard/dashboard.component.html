@@ -1,17 +1,12 @@
 <div class="min-h-screen bg-slate-50 flex flex-col font-sans">
 
   <mat-toolbar class="flex justify-between items-center px-4 h-16 bg-white shadow-sm sticky top-0 z-50">
-    <div class="flex items-center gap-2">
-      <img src="assets/images/logo-bolao-small.png" class="h-8 w-auto" alt="Logo Bolão">
-    </div>
+   
 
     <div class="flex items-center gap-2">
       <span class="text-[10px] font-black text-slate-500 truncate max-w-[100px] uppercase">
-        {{ apostador?.apelido || 'Zemarcello' }}
-      </span>
-      <button mat-icon-button (click)="logout()" class="text-slate-400">
-        <mat-icon class="scale-90">logout</mat-icon>
-      </button>
+        {{ apostador?.apelido || 'Usuário' }}
+      </span>      
     </div>
   </mat-toolbar>
 
