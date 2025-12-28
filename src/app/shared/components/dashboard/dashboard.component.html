@@ -1,59 +1,60 @@
-<div class="min-h-screen flex flex-col font-sans dashboard-root">
+<div class="min-h-screen flex flex-col font-sans dashboard-root" style="background-color: #cbd5e1 !important;">
 
   <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
 
-    <div class="card-saldo-final">
-  <div class="flex flex-col justify-center">
-    <span class="label-saldo-topo">Saldo Disponível</span>
-    <span class="valor-saldo-foco">
-      {{ (apostadorSaldo || 0) | currency:'BRL' }}
-    </span>
-  </div>
+    <div class="card-saldo-final" style="background-color: #0f172a !important; border-radius: 16px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+      <div class="flex flex-col">
+        <span style="font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Saldo Disponível</span>
+        <span style="font-size: 1.3rem; font-weight: 900; color: #ffffff !important;">
+          {{ (apostadorSaldo || 0) | currency:'BRL' }}
+        </span>
+      </div>
 
-  <div class="flex gap-2 items-center">
-    <button (click)="navigateToDepositar()" class="btn-acao-saldo btn-pix">+ PIX</button>
-    <button (click)="informarEmDesenvolvimento()" class="btn-acao-saldo btn-sacar">SACAR</button>
-  </div>
-</div>
+      <div class="flex gap-2">
+        <button (click)="navigateToDepositar()" style="background-color: #4f46e5 !important; color: white !important; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; border: none; cursor: pointer;">+ PIX</button>
+        <button (click)="informarEmDesenvolvimento()" style="background-color: #334155 !important; color: white !important; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; border: none; cursor: pointer;">SACAR</button>
+      </div>
+    </div>
 
-    <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container">
+    <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569; display: block; width: 100%;">
       
-      <div class="card-header-dark flex justify-between items-center">
-        <div class="flex items-center gap-2 min-w-0">
-          <img [src]="getCampeonatoLogo(camp.nome)" class="img-logo-camp">
-          <h2 class="titulo-camp-mini">
+      <div class="card-header-dark" style="background-color: #0f172a !important; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="flex items-center gap-2" style="max-width: 80%;">
+          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 22px; height: 22px; object-fit: contain;">
+          <h2 style="color: #f1f5f9 !important; font-weight: 800 !important; font-size: 10px !important; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">
             {{ camp.nome }}
           </h2>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" class="badge-ativo">Ativo</span>
+        <span *ngIf="camp.aderidoPeloUsuario" style="background: #10b981; color: white; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 900; text-transform: uppercase;">Ativo</span>
       </div>
 
-      <div class="p-3 space-y-3">
-        <div>
-          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label-v2 stamp-jogando-v2">JOGANDO !!</span>
-          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label-v2 stamp-vamos-v2">VAMOS JOGAR ?</span>
+      <div class="p-3" style="display: flex; flex-direction: column; gap: 12px;">
+        
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label-final" style="background-color: #22c55e !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">JOGANDO !!</span>
+          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label-final" style="background-color: #f97316 !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">VAMOS JOGAR ?</span>
 
-          <button (click)="navegarParaApostasRodada(camp.id)" class="btn-pastel btn-verde-pastel text-base-bold">
+          <button (click)="navegarParaApostasRodada(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #d1fae5 !important; color: #065f46 !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
             Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
           </button>
         </div>
         
-        <button (click)="verRodadasCorrentes(camp.id)" class="btn-pastel btn-azul-pastel text-base-bold">
+        <button (click)="verRodadasCorrentes(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #dbeafe !important; color: #1e40af !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
           Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
         </button>
 
-        <button (click)="verRodadasFinalizadas(camp.id)" class="btn-pastel btn-cinza-pastel btn-finalizadas-texto">
+        <button (click)="verRodadasFinalizadas(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #f1f5f9 !important; color: #475569 !important; font-size: 11px !important; font-weight: 700 !important; cursor: pointer;">
           Rodadas Finalizadas ({{ camp.rodadasFinalizadas?.length || 0 }})
         </button>
       </div>
     </section>
 
-    <div class="container-logo-parceiro">
-      <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="logo-espaco-mar-img" alt="Espaço Mar">
+    <div style="text-align: center; padding: 5px 0; width: 100%;">
+      <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" style="max-width: 130px; height: auto; margin: 8px auto; display: block;" alt="Espaço Mar">
     </div>
 
-    <div *ngIf="fotoAtual" class="carrossel-moldura">
-      <img [src]="fotoAtual" class="img-carrossel" alt="Parceiro">
+    <div *ngIf="fotoAtual" style="border-radius: 1.5rem; overflow: hidden; background: white; padding: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <img [src]="fotoAtual" style="width: 100%; border-radius: 1rem; display: block;" alt="Parceiro">
     </div>
 
   </main>
