@@ -1,64 +1,50 @@
 <div class="min-h-screen flex flex-col font-sans dashboard-root">
 
-  <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
+  <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-3">
 
-    <div class="card-saldo-principal">
-      <div class="flex items-center gap-4">
-        <div class="icon-container-saldo">
-          <mat-icon style="color: #818cf8;">account_balance_wallet</mat-icon>
+    <div class="card-saldo-compacto">
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-2">
+          <mat-icon style="color: #818cf8; font-size: 18px; width: 18px; height: 18px;">account_balance_wallet</mat-icon>
+          <span class="label-saldo-inline">SALDO:</span>
+          <span class="valor-saldo-compacto">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
         </div>
-        <div class="flex flex-col">
-          <span class="label-saldo-topo">Saldo Disponível</span>
-          <span class="valor-saldo-topo">
-            {{ (apostadorSaldo || 0) | currency:'BRL' }}
-          </span>
+        <div class="flex gap-2">
+          <button (click)="navigateToDepositar()" class="btn-saldo-mini btn-deposito">+ PIX</button>
+          <button (click)="informarEmDesenvolvimento()" class="btn-saldo-mini btn-sacar">SACAR</button>
         </div>
-      </div>
-      <div class="flex gap-2">
-        <button (click)="navigateToDepositar()" class="btn-deposito">+ Depósito</button>
-        <button (click)="informarEmDesenvolvimento()" class="btn-sacar">Sacar</button>
       </div>
     </div>
 
     <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container">
       
       <div class="card-header-dark flex justify-between items-center">
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center gap-2 min-w-0">
           <img [src]="getCampeonatoLogo(camp.nome)" class="img-logo-camp">
-          <h2 class="titulo-camp-uma-linha">
+          <h2 class="titulo-camp-mini">
             {{ camp.nome }}
           </h2>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" class="badge-ativo">
-          Ativo
-        </span>
+        <span *ngIf="camp.aderidoPeloUsuario" class="badge-ativo">Ativo</span>
       </div>
 
-      <div class="p-4 space-y-4">
-        <div class="space-y-1">
-          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label stamp-jogando">
-            JOGANDO !!
-          </span>
-          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label stamp-vamos">
-            VAMOS JOGAR ?
-          </span>
+      <div class="p-3 space-y-3">
+        <div>
+          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label stamp-jogando">JOGANDO !!</span>
+          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label stamp-vamos">VAMOS JOGAR ?</span>
 
-          <button (click)="navegarParaApostasRodada(camp.id)" class="btn-pastel btn-verde-pastel">
+          <button (click)="navegarParaApostasRodada(camp.id)" class="btn-pastel btn-verde-pastel text-base-bold">
             Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
           </button>
         </div>
         
-        <div class="space-y-1">
-          <button (click)="verRodadasCorrentes(camp.id)" class="btn-pastel btn-azul-pastel">
-            Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
-          </button>
-        </div>
+        <button (click)="verRodadasCorrentes(camp.id)" class="btn-pastel btn-azul-pastel text-base-bold">
+          Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
+        </button>
 
-        <div class="pt-2">
-          <button (click)="verRodadasFinalizadas(camp.id)" class="btn-pastel btn-cinza-pastel" style="padding: 14px 0; font-size: 9px;">
-            Rodadas Finalizadas ({{ camp.rodadasFinalizadas?.length || 0 }})
-          </button>
-        </div>
+        <button (click)="verRodadasFinalizadas(camp.id)" class="btn-pastel btn-cinza-pastel btn-finalizadas-texto">
+          Rodadas Finalizadas ({{ camp.rodadasFinalizadas?.length || 0 }})
+        </button>
       </div>
     </section>
 
