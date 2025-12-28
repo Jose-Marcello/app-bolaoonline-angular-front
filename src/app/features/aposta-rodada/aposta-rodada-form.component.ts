@@ -256,26 +256,27 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   }
 
   preencherFormularioComPalpites(): void {
-    this.palpites.clear();
-    this.jogosDaApostaAtual.forEach(jogo => {
-      this.palpites.push(this.fb.group({
-        idJogo: [jogo.idJogo, Validators.required],
-        placarApostaCasa: [jogo.placarApostaCasa, [Validators.required, Validators.min(0)]],
-        placarApostaVisita: [jogo.placarApostaVisita, [Validators.required, Validators.min(0)]]
-      }));
-    });
-  }
+  this.palpites.clear();
+  this.jogosDaApostaAtual.forEach(jogo => {
+    this.palpites.push(this.fb.group({
+      idJogo: [jogo.idJogo, Validators.required],
+      placarApostaCasa: [jogo.placarApostaCasa, [Validators.required, Validators.min(0)]],
+      placarApostaVisita: [jogo.placarApostaVisita, [Validators.required, Validators.min(0)]]
+    }));
+  });
+  this.palpites.enable(); // Garante que o grid saia do modo consulta se houver aposta
+}
 
   montarGridVazio() {
-    this.palpites.clear();
-    this.jogosDaApostaAtual.forEach(jogo => {
-      this.palpites.push(this.fb.group({
-        idJogo: [jogo.id],
-        placarApostaCasa: [{ value: null, disabled: true }], 
-        placarApostaVisita: [{ value: null, disabled: true }]
-      }));
-    });
-  }
+  this.palpites.clear();
+  this.jogosDaApostaAtual.forEach(jogo => {
+    this.palpites.push(this.fb.group({
+      idJogo: [jogo.id || jogo.idJogo],
+      placarApostaCasa: [{ value: null, disabled: true }], 
+      placarApostaVisita: [{ value: null, disabled: true }]
+    }));
+  });
+}
 
   get palpites(): FormArray {
     return this.apostaForm.get('palpites') as FormArray;

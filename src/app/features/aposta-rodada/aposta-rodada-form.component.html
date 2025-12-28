@@ -1,70 +1,96 @@
-<div class="min-h-screen dashboard-root p-2 sm:p-4">
+<div class="min-h-screen dashboard-root p-2 sm:p-4" style="background-color: #cbd5e1 !important;">
   <main class="max-w-lg mx-auto space-y-4">
 
-    <div class="card-campeonato-container">
-      <div class="card-header-dark flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <mat-icon class="text-indigo-400">event_note</mat-icon>
-          <h2 class="titulo-camp-mini">RODADA {{ rodadaSelecionada?.numeroRodada }}</h2>
-        </div>
-        <span class="badge-ativo">ABERTA</span>
+    <div class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569;">
+      <div class="card-header-dark" style="background-color: #0f172a !important; padding: 10px 15px;">
+        <h2 style="color: #f1f5f9 !important; font-weight: 800 !important; font-size: 10px !important; text-transform: uppercase; margin: 0;">
+          1. Selecione a Rodada
+        </h2>
       </div>
-
-      <div class="p-3 bg-[#1e293b] border-b border-slate-700">
-        <span *ngIf="apostadorCampeonatoId" class="stamp-label-final stamp-jogando-final">VOCÊ ESTÁ NO BOLÃO</span>
-        <span *ngIf="!apostadorCampeonatoId" class="stamp-label-final stamp-vamos-final">VISITANTE (AVULSO)</span>
-      </div>
-
-      <div class="p-2 space-y-2 bg-[#334155]">
-        <div *ngFor="let jogo of jogosDaApostaAtual" class="bg-[#0f172a] rounded-xl p-3 border border-slate-700">
-          <div class="grid grid-cols-7 items-center gap-1">
-            
-            <div class="col-span-2 flex flex-col items-center">
-              <img [src]="jogo.escudoMandante" class="w-7 h-7 mb-1">
-              <span class="text-[9px] text-slate-200 font-bold text-center uppercase truncate w-full">
-                {{ jogo.equipeMandante }}
-              </span>
-            </div>
-
-            <div class="col-span-3 flex items-center justify-center gap-2">
-              <input type="number" [(ngModel)]="jogo.placarApostaCasa" [disabled]="isReadOnly"
-                     class="w-10 h-10 bg-slate-100 text-slate-900 text-center font-black rounded-lg border-none text-base">
-              <span class="text-white font-bold">X</span>
-              <input type="number" [(ngModel)]="jogo.placarApostaVisita" [disabled]="isReadOnly"
-                     class="w-10 h-10 bg-slate-100 text-slate-900 text-center font-black rounded-lg border-none text-base">
-            </div>
-
-            <div class="col-span-2 flex flex-col items-center">
-              <img [src]="jogo.escudoVisitante" class="w-7 h-7 mb-1">
-              <span class="text-[9px] text-slate-200 font-bold text-center uppercase truncate w-full">
-                {{ jogo.equipeVisitante }}
-              </span>
-            </div>
-          </div>
-          <div class="text-center mt-2 text-[8px] text-slate-500 font-bold uppercase">
-            {{ jogo.dataJogo }} - {{ jogo.horaJogo }}
-          </div>
-        </div>
-      </div>
-
-      <div class="p-4 bg-[#0f172a]">
-        <button *ngIf="!isReadOnly" (click)="salvarApostas()" 
-                class="btn-pastel btn-verde-pastel text-base-bold w-full py-4">
-          SALVAR MEUS PALPITES
+      <div class="p-3 flex gap-2 overflow-x-auto">
+        <button *ngFor="let rodada of rodadasEmAposta" 
+                (click)="onRodadaSelected(rodada.id!)"
+                [style.background-color]="rodadaSelecionadaId === rodada.id ? '#4f46e5' : '#1e293b'"
+                style="min-width: 65px; height: 45px; border-radius: 12px; border: 1px solid #475569; color: white; font-weight: 900; font-size: 12px; cursor: pointer;">
+          R{{ rodada.numeroRodada }}
         </button>
-
-        <div *ngIf="isReadOnly" class="space-y-3">
-          <p class="text-slate-400 text-[10px] text-center font-bold uppercase">Selecione uma cartela ou crie uma nova para apostar</p>
-          <button (click)="onClickCriarNovaAposta()" 
-                  class="btn-pastel btn-azul-pastel text-base-bold w-full py-4">
-            CRIAR NOVA CARTELA ({{ custoAposta | currency:'BRL' }})
-          </button>
-        </div>
       </div>
     </div>
 
-    <button (click)="goBackToDashboard()" class="w-full text-slate-500 font-black text-[10px] uppercase tracking-widest py-4">
-      < Voltar ao Início
+    <div class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569;">
+      <div class="card-header-dark" style="background-color: #0f172a !important; padding: 10px 15px;">
+        <h2 style="color: #f1f5f9 !important; font-weight: 800 !important; font-size: 10px !important; text-transform: uppercase; margin: 0;">
+          2. Suas Apostas nesta Rodada
+        </h2>
+      </div>
+      <div class="p-3 space-y-2">
+        <div *ngFor="let aposta of apostasUsuarioRodada" 
+             (click)="onApostaSelected(aposta.id!)"
+             [style.border-color]="apostaAtual?.id === aposta.id ? '#22c55e' : '#475569'"
+             style="background-color: #0f172a; padding: 12px; border-radius: 12px; border: 2px solid; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+          <div class="flex flex-col">
+            <span style="color: white; font-weight: 800; font-size: 11px; text-transform: uppercase;">{{ aposta.identificadorAposta }}</span>
+            <span style="color: #94a3b8; font-size: 9px; font-weight: 700;">{{ aposta.ehApostaCampeonato ? 'PLANO CAMPEONATO' : 'AVULSA' }}</span>
+          </div>
+          <mat-icon *ngIf="apostaAtual?.id === aposta.id" style="color: #22c55e;">check_circle</mat-icon>
+        </div>
+
+        <button (click)="onClickCriarNovaAposta()" 
+                style="width: 100%; padding: 12px; border-radius: 12px; border: 2px dashed #6366f1; background: transparent; color: #818cf8; font-weight: 900; font-size: 10px; text-transform: uppercase; cursor: pointer; margin-top: 5px;">
+          + Criar Nova Cartela ({{ custoAposta | currency:'BRL' }})
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="apostaForm" class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569;">
+      <div class="card-header-dark" style="background-color: #0f172a !important; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="color: #f1f5f9 !important; font-weight: 800 !important; font-size: 10px !important; text-transform: uppercase; margin: 0;">
+          3. {{ isReadOnly ? 'Consulta (Sem Cartela)' : 'Preencher Palpites' }}
+        </h2>
+        <span [style.background-color]="isReadOnly ? '#f97316' : '#22c55e'" 
+              style="color: #000; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+          {{ isReadOnly ? 'Consulta' : 'Editável' }}
+        </span>
+      </div>
+
+      <div class="p-3 space-y-3" formArrayName="palpites">
+        <div *ngIf="isLoadingPalpites" class="flex justify-center p-4"><mat-spinner diameter="30"></mat-spinner></div>
+        
+        <div *ngIf="!isLoadingPalpites" class="space-y-3">
+          <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i"
+               style="background-color: #0f172a; padding: 12px; border-radius: 14px; border: 1px solid #1e293b;">
+            
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;">
+              <div style="text-align: center;">
+                <img [src]="jogosDaApostaAtual[i]?.escudoMandante" style="width: 28px; height: 28px; margin: 0 auto 4px;">
+                <div style="color: #e2e8f0; font-weight: 800; font-size: 9px; text-transform: uppercase;">{{ jogosDaApostaAtual[i]?.equipeMandante }}</div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <input type="number" formControlName="placarApostaCasa"
+                       style="width: 42px; height: 42px; background: #f1f5f9; border: none; border-radius: 8px; text-align: center; font-weight: 900; font-size: 18px; color: #0f172a;">
+                <span style="color: white; font-weight: 900;">X</span>
+                <input type="number" formControlName="placarApostaVisita"
+                       style="width: 42px; height: 42px; background: #f1f5f9; border: none; border-radius: 8px; text-align: center; font-weight: 900; font-size: 18px; color: #0f172a;">
+              </div>
+
+              <div style="text-align: center;">
+                <img [src]="jogosDaApostaAtual[i]?.escudoVisitante" style="width: 28px; height: 28px; margin: 0 auto 4px;">
+                <div style="color: #e2e8f0; font-weight: 800; font-size: 9px; text-transform: uppercase;">{{ jogosDaApostaAtual[i]?.equipeVisitante }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button *ngIf="!isReadOnly" (click)="salvarApostas()" [disabled]="isSaving"
+                style="width: 100%; padding: 16px; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #22c55e !important; color: #000 !important; font-size: 14px !important; font-weight: 900 !important; cursor: pointer; margin-top: 10px;">
+          {{ isSaving ? 'Salvando...' : 'Salvar Meus Palpites' }}
+        </button>
+      </div>
+    </form>
+
+    <button (click)="goBackToDashboard()" style="width: 100%; color: #64748b; font-weight: 800; font-size: 10px; text-transform: uppercase; border: none; background: none; padding: 15px; cursor: pointer;">
+      < Voltar ao Dashboard
     </button>
   </main>
 </div>
