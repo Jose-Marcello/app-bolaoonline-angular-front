@@ -2,7 +2,7 @@
 
   <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
 
-    <div style="background-color: #0f172a !important; border-radius: 1.5rem; padding: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 15px;">
+    <div style="background-color: #0f172a !important; border-radius: 2rem; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 16px;">
       <div class="flex items-center gap-4">
         <div style="background-color: rgba(99, 102, 241, 0.2); padding: 10px; border-radius: 1rem;">
           <mat-icon style="color: #818cf8;">account_balance_wallet</mat-icon>
@@ -14,20 +14,20 @@
           </span>
         </div>
       </div>
-
       <div class="flex gap-2">
         <button (click)="navigateToDepositar()" 
-                style="flex: 1; background-color: #4f46e5 !important; color: #ffffff !important; border-radius: 1rem; padding: 12px 0; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
+                style="flex: 1; background-color: #4f46e5 !important; color: #ffffff !important; border-radius: 1rem; padding: 14px 0; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none; cursor: pointer;">
           + Depósito
         </button>
         <button (click)="informarEmDesenvolvimento()" 
-                style="flex: 1; background-color: #334155 !important; color: #ffffff !important; border-radius: 1rem; padding: 12px 0; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
+                style="flex: 1; background-color: #334155 !important; color: #ffffff !important; border-radius: 1rem; padding: 14px 0; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none; cursor: pointer;">
           Sacar
         </button>
       </div>
     </div>
 
-    <section *ngFor="let camp of campeonatosDisponiveis" style="background-color: #ffffff; border-radius: 2rem; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <section *ngFor="let camp of campeonatosDisponiveis" 
+             style="background-color: #ffffff; border-radius: 2rem; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
       
       <div style="background-color: #0f172a !important; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
         <div class="flex items-center gap-3 min-w-0">
@@ -44,7 +44,7 @@
 
       <div class="p-4 space-y-4">
         <div class="space-y-1">
-          <span class="text-[9px] font-black text-slate-400 uppercase ml-2">VAMOS JOGAR !!</span>
+          <p style="font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-left: 8px; margin-bottom: 4px;">VAMOS JOGAR !!</p>
           <button (click)="navegarParaApostasRodada(camp.id)" 
                   style="width: 100%; background-color: #ecfdf5 !important; color: #047857 !important; padding: 18px 0; border-radius: 1.25rem; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
             Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
@@ -52,23 +52,28 @@
         </div>
         
         <div class="space-y-1">
-          <span class="text-[9px] font-black text-slate-400 uppercase ml-2">JOGANDO !!</span>
+          <p style="font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-left: 8px; margin-bottom: 4px;">JOGANDO !!</p>
           <button (click)="verRodadasCorrentes(camp.id)" 
                   style="width: 100%; background-color: #f0f7ff !important; color: #1e40af !important; padding: 18px 0; border-radius: 1.25rem; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
             Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
           </button>
         </div>
+
+        <button (click)="verRodadasFinalizadas(camp.id)" 
+                style="width: 100%; background-color: #f8fafc !important; color: #64748b !important; padding: 14px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: 1px solid #e2e8f0;">
+          Histórico de Rodadas ({{ camp.rodadasFinalizadas?.length || 0 }})
+        </button>
       </div>
     </section>
 
     <div style="width: 100%; border-radius: 2rem; overflow: hidden; background-color: #ffffff; border: 1px solid #e2e8f0; margin-top: 10px;">
       <img src="assets/images/logo-espaco-mar.png" 
            style="width: 100%; height: auto; display: block;" 
-           alt="Espaço Mar"
-           onerror="this.src='assets/images/marketing-espaco-mar.png'"> </div>
+           alt="Espaço Mar">
+    </div>
 
-    <div style="width: 100%; border-radius: 2rem; overflow: hidden; background-color: #ffffff; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-      <img [src]="fotoAtual" style="width: 100%; height: auto; display: block; padding: 15px;" alt="Marketing">
+    <div *ngIf="fotoAtual" style="width: 100%; border-radius: 2rem; overflow: hidden; background-color: #ffffff; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+      <img [src]="fotoAtual" style="width: 100%; height: auto; display: block; padding: 15px;" alt="Parceiro">
     </div>
 
   </main>
