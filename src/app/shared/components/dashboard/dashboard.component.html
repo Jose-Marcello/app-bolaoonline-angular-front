@@ -2,12 +2,11 @@
 
   <mat-toolbar class="flex justify-between items-center px-4 h-16 bg-white shadow-sm sticky top-0 z-50">
     <div class="flex items-center gap-2">
-      <mat-icon class="text-indigo-600 scale-110">sports_soccer</mat-icon>
-      <span class="font-black text-indigo-900 uppercase tracking-tighter text-sm">Bolão Online</span>
+      <img src="assets/images/logo-bolao-small.png" class="h-7 w-auto" alt="Logo">
     </div>
 
     <div class="flex items-center gap-2">
-      <span class="text-[10px] font-black text-slate-500 truncate max-w-[80px] uppercase">
+      <span class="text-[10px] font-black text-slate-500 truncate max-w-[100px] uppercase">
         {{ apostador?.apelido || 'Usuário' }}
       </span>
       <button mat-icon-button (click)="logout()" class="text-slate-400">
@@ -56,17 +55,17 @@
 
       <div class="p-4 space-y-3">
         <button (click)="navegarParaApostasRodada(camp.id)" 
-                class="w-full bg-emerald-50 text-emerald-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest active:bg-emerald-100 transition-colors">
+                class="w-full bg-emerald-50 text-emerald-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
           Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
         </button>
         
         <button (click)="verRodadasCorrentes(camp.id)" 
-                class="w-full bg-indigo-50 text-indigo-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest active:bg-indigo-100 transition-colors">
+                class="w-full bg-indigo-50 text-indigo-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
           Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
         </button>
 
         <button (click)="verRodadasFinalizadas(camp.id)"
-                class="w-full bg-slate-50 text-slate-400 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest active:bg-slate-100 transition-colors">
+                class="w-full bg-slate-50 text-slate-400 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
           Histórico de Rodadas ({{ camp.rodadasFinalizadas?.length || 0 }})
         </button>
       </div>
