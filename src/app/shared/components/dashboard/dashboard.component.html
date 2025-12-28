@@ -25,7 +25,7 @@
       <div class="card-header-dark flex justify-between items-center">
         <div class="flex items-center gap-3 min-w-0">
           <img [src]="getCampeonatoLogo(camp.nome)" class="img-logo-camp">
-          <h2 class="titulo-camp-card">
+          <h2 class="titulo-camp-uma-linha">
             {{ camp.nome }}
           </h2>
         </div>
@@ -36,14 +36,19 @@
 
       <div class="p-4 space-y-4">
         <div class="space-y-1">
-          <p class="stamp-label stamp-vamos">VAMOS JOGAR !!</p>
+          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label stamp-jogando">
+            JOGANDO !!
+          </span>
+          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label stamp-vamos">
+            VAMOS JOGAR ?
+          </span>
+
           <button (click)="navegarParaApostasRodada(camp.id)" class="btn-pastel btn-verde-pastel">
             Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
           </button>
         </div>
         
         <div class="space-y-1">
-          <p class="stamp-label stamp-jogando">JOGANDO !!</p>
           <button (click)="verRodadasCorrentes(camp.id)" class="btn-pastel btn-azul-pastel">
             Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
           </button>
@@ -58,7 +63,7 @@
     </section>
 
     <div class="container-logo-parceiro">
-      <img src="assets/marketing/parceiros/logo-espaco-mar.png" class="logo-espaco-mar-img" alt="Espaço Mar">
+      <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="logo-espaco-mar-img" alt="Espaço Mar">
     </div>
 
     <div *ngIf="fotoAtual" class="carrossel-moldura">
