@@ -1,68 +1,74 @@
 <div class="min-h-screen flex flex-col font-sans" style="background-color: #f1f5f9 !important; padding: 12px 0;">
 
-  <main class="flex-1 p-3 max-w-lg mx-auto w-full" style="display: flex; flex-direction: column; gap: 16px;">
+  <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
 
-    <div style="background-color: #0f172a !important; border-radius: 1.5rem; padding: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <div style="background-color: rgba(99, 102, 241, 0.2); padding: 8px; border-radius: 0.75rem;">
-          <mat-icon style="color: #818cf8; font-size: 20px; width: 20px; height: 20px;">account_balance_wallet</mat-icon>
+    <div style="background-color: #0f172a !important; border-radius: 1.5rem; padding: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 15px;">
+      <div class="flex items-center gap-4">
+        <div style="background-color: rgba(99, 102, 241, 0.2); padding: 10px; border-radius: 1rem;">
+          <mat-icon style="color: #818cf8;">account_balance_wallet</mat-icon>
         </div>
-        <div style="display: flex; flex-direction: column;">
-          <span style="font-size: 8px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">Saldo Disponível</span>
-          <span style="font-size: 1.25rem; font-weight: 900; color: #ffffff !important; line-height: 1;">
+        <div class="flex flex-col">
+          <span style="font-size: 8px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.1em;">Saldo Disponível</span>
+          <span style="font-size: 1.5rem; font-weight: 900; color: #ffffff !important;">
             {{ (apostadorSaldo || 0) | currency:'BRL' }}
           </span>
         </div>
       </div>
-      <div style="display: flex; gap: 8px;">
+
+      <div class="flex gap-2">
         <button (click)="navigateToDepositar()" 
-                style="background-color: #4f46e5 !important; color: #ffffff !important; border-radius: 0.75rem; padding: 8px 14px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
-          DEPÓSITO
+                style="flex: 1; background-color: #4f46e5 !important; color: #ffffff !important; border-radius: 1rem; padding: 12px 0; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
+          + Depósito
         </button>
         <button (click)="informarEmDesenvolvimento()" 
-                style="background-color: #334155 !important; color: #ffffff !important; border-radius: 0.75rem; padding: 8px 14px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
-          SACAR
+                style="flex: 1; background-color: #334155 !important; color: #ffffff !important; border-radius: 1rem; padding: 12px 0; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
+          Sacar
         </button>
       </div>
     </div>
 
-    <section *ngFor="let camp of campeonatosDisponiveis" 
-             style="background-color: #ffffff !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <section *ngFor="let camp of campeonatosDisponiveis" style="background-color: #ffffff; border-radius: 2rem; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
       
-      <div style="background-color: #0f172a !important; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
-          <h2 style="color: #ffffff !important; font-weight: 900; text-transform: uppercase; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; margin: 0;">
+      <div style="background-color: #0f172a !important; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="flex items-center gap-3 min-w-0">
+          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 28px; height: 28px; object-fit: contain;">
+          <h2 style="color: #ffffff !important; font-weight: 900; text-transform: uppercase; font-size: 10px; margin: 0; truncate; max-width: 140px;">
             {{ camp.nome }}
           </h2>
         </div>
         <span *ngIf="camp.aderidoPeloUsuario" 
-              style="background-color: #10b981 !important; color: #ffffff !important; font-size: 7px; font-weight: 900; padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">
+              style="background-color: #10b981 !important; color: #ffffff !important; font-size: 8px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase;">
           Ativo
         </span>
       </div>
 
-      <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-        <button (click)="navegarParaApostasRodada(camp.id)" 
-                style="width: 100%; background-color: #ecfdf5 !important; color: #047857 !important; padding: 16px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none; cursor: pointer;">
-          VAMOS JOGAR !! ({{ camp.rodadasEmAposta?.length || 0 }})
-        </button>
-        <button (click)="verRodadasCorrentes(camp.id)" 
-                style="width: 100%; background-color: #f0f7ff !important; color: #1e40af !important; padding: 16px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none; cursor: pointer;">
-          JOGANDO !! ({{ camp.rodadasCorrentes?.length || 0 }})
-        </button>
+      <div class="p-4 space-y-4">
+        <div class="space-y-1">
+          <span class="text-[9px] font-black text-slate-400 uppercase ml-2">VAMOS JOGAR !!</span>
+          <button (click)="navegarParaApostasRodada(camp.id)" 
+                  style="width: 100%; background-color: #ecfdf5 !important; color: #047857 !important; padding: 18px 0; border-radius: 1.25rem; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
+            Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
+          </button>
+        </div>
+        
+        <div class="space-y-1">
+          <span class="text-[9px] font-black text-slate-400 uppercase ml-2">JOGANDO !!</span>
+          <button (click)="verRodadasCorrentes(camp.id)" 
+                  style="width: 100%; background-color: #f0f7ff !important; color: #1e40af !important; padding: 18px 0; border-radius: 1.25rem; font-weight: 900; text-transform: uppercase; font-size: 10px; border: none;">
+            Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
+          </button>
+        </div>
       </div>
     </section>
 
-    <div style="width: 100%; border-radius: 1.5rem; overflow: hidden; background-color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-top: 8px;">
+    <div style="width: 100%; border-radius: 2rem; overflow: hidden; background-color: #ffffff; border: 1px solid #e2e8f0; margin-top: 10px;">
       <img src="assets/images/logo-espaco-mar.png" 
            style="width: 100%; height: auto; display: block;" 
            alt="Espaço Mar"
-           onerror="this.src='https://placehold.co/600x200?text=Logo+Espaço+Mar'">
-    </div>
+           onerror="this.src='assets/images/marketing-espaco-mar.png'"> </div>
 
-    <div style="width: 100%; border-radius: 1.5rem; overflow: hidden; background-color: #ffffff !important; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-      <img [src]="fotoAtual" style="width: 100%; height: auto; display: block; padding: 12px;" alt="Marketing">
+    <div style="width: 100%; border-radius: 2rem; overflow: hidden; background-color: #ffffff; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+      <img [src]="fotoAtual" style="width: 100%; height: auto; display: block; padding: 15px;" alt="Marketing">
     </div>
 
   </main>
