@@ -1,73 +1,65 @@
-<div class="min-h-screen bg-slate-50 flex flex-col font-sans" style="background-color: #f8fafc;">
+<div class="min-h-screen flex flex-col font-sans" style="background-color: #f1f5f9 !important; padding-top: 10px;">
 
-  <main class="flex-1 p-3 max-w-lg mx-auto w-full" style="display: flex; flex-direction: column; gap: 16px;">
+  <main class="flex-1 p-3 max-w-lg mx-auto w-full" style="display: flex; flex-direction: column; gap: 12px;">
 
-    <div style="background-color: #020617; border-radius: 1.5rem; padding: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-      
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="background-color: rgba(99, 102, 241, 0.2); padding: 8px; border-radius: 0.75rem;">
-          <mat-icon style="color: #818cf8; font-size: 20px; width: 20px; height: 20px;">account_balance_wallet</mat-icon>
+    <div style="background-color: #0f172a !important; border-radius: 1.25rem; padding: 12px 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="background-color: rgba(99, 102, 241, 0.2); padding: 6px; border-radius: 0.75rem;">
+          <mat-icon style="color: #818cf8; font-size: 18px; width: 18px; height: 18px;">account_balance_wallet</mat-icon>
         </div>
         <div style="display: flex; flex-direction: column;">
-          <span style="font-size: 8px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.1em;">Saldo</span>
-          <span style="font-size: 1.25rem; font-weight: 900; color: #ffffff; line-height: 1;">
+          <span style="font-size: 8px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">Saldo</span>
+          <span style="font-size: 1.1rem; font-weight: 900; color: #ffffff; line-height: 1;">
             {{ (apostadorSaldo || 0) | currency:'BRL' }}
           </span>
         </div>
       </div>
-
-      <div style="display: flex; gap: 8px;">
+      <div style="display: flex; gap: 6px;">
         <button (click)="navigateToDepositar()" 
-                style="background-color: #4f46e5; color: #ffffff; border-radius: 0.75rem; padding: 8px 12px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
-          + DEPÓSITO
+                style="background-color: #4f46e5; color: #ffffff; border-radius: 0.75rem; padding: 6px 12px; font-weight: 900; text-transform: uppercase; font-size: 8px; border: none; cursor: pointer;">
+          DEPÓSITO
         </button>
         <button (click)="informarEmDesenvolvimento()" 
-                style="background-color: #334155; color: #ffffff; border-radius: 0.75rem; padding: 8px 12px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+                style="background-color: #334155; color: #ffffff; border-radius: 0.75rem; padding: 6px 12px; font-weight: 900; text-transform: uppercase; font-size: 8px; border: none; cursor: pointer;">
           SACAR
         </button>
       </div>
     </div>
 
-    <div style="width: 100%; border-radius: 1.5rem; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-      <img src="assets/images/marketing-espaco-mar.png" 
-           style="width: 100%; height: auto; display: block;" 
-           alt="Espaço Mar"
-           onerror="this.src='https://placehold.co/600x200?text=Espaço+Mar+Marketing'">
-    </div>
-
     <section *ngFor="let camp of campeonatosDisponiveis" 
-             style="background-color: #ffffff; border-radius: 1.5rem; overflow: hidden; border: 1px solid #f1f5f9; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+             style="background-color: #ffffff; border-radius: 1.25rem; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
       
-      <div style="background-color: #020617; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
-          <h2 style="color: #ffffff; font-weight: 900; text-transform: uppercase; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; margin: 0;">
+      <div style="background-color: #0f172a !important; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 22px; height: 22px; object-fit: contain; flex-shrink: 0;">
+          <h2 style="color: #ffffff !important; font-weight: 900; text-transform: uppercase; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; margin: 0;">
             {{ camp.nome }}
           </h2>
         </div>
         <span *ngIf="camp.aderidoPeloUsuario" 
-              style="background-color: #10b981; color: #ffffff; font-size: 7px; font-weight: 900; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+              style="background-color: #10b981; color: #ffffff; font-size: 7px; font-weight: 900; padding: 3px 6px; border-radius: 4px; text-transform: uppercase;">
           Ativo
         </span>
       </div>
 
-      <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="padding: 10px; display: flex; flex-direction: column; gap: 6px;">
         <button (click)="navegarParaApostasRodada(camp.id)" 
-                style="width: 100%; background-color: #ecfdf5; color: #047857; padding: 14px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+                style="width: 100%; background-color: #ecfdf5; color: #047857; padding: 12px 0; border-radius: 0.8rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none;">
           Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
         </button>
-        
         <button (click)="verRodadasCorrentes(camp.id)" 
-                style="width: 100%; background-color: #eef2ff; color: #4338ca; padding: 14px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+                style="width: 100%; background-color: #f0f7ff; color: #1e40af; padding: 12px 0; border-radius: 0.8rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none;">
           Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
         </button>
       </div>
     </section>
 
-    <div style="width: 100%; border-radius: 1.5rem; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px;">
-      <img [src]="fotoAtual" 
-           style="width: 100%; height: auto; display: block; padding: 12px;" 
-           alt="Marketing Final">
+    <div style="width: 100%; border-radius: 1.25rem; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; margin-top: 8px;">
+      <img src="assets/images/marketing-espaco-mar.png" style="width: 100%; height: auto; display: block;" alt="Espaço Mar Marketing">
+    </div>
+
+    <div style="width: 100%; border-radius: 1.25rem; overflow: hidden; background-color: #ffffff; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+      <img [src]="fotoAtual" style="width: 100%; height: auto; display: block; padding: 10px;" alt="Marketing Final">
     </div>
 
   </main>
