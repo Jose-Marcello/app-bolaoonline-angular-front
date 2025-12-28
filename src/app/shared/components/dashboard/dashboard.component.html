@@ -1,84 +1,74 @@
-<div class="min-h-screen bg-slate-50 flex flex-col font-sans">
+<div class="min-h-screen bg-slate-50 flex flex-col font-sans" style="background-color: #f8fafc;">
 
-  <mat-toolbar class="flex justify-between items-center px-4 h-16 bg-white shadow-sm sticky top-0 z-50">
-   
+  <main class="flex-1 p-3 max-w-lg mx-auto w-full" style="display: flex; flex-direction: column; gap: 16px;">
 
-    <div class="flex items-center gap-2">
-      <span class="text-[10px] font-black text-slate-500 truncate max-w-[100px] uppercase">
-        {{ apostador?.apelido || 'Usuário' }}
-      </span>      
-    </div>
-  </mat-toolbar>
-
-  <main class="flex-1 p-4 max-w-lg mx-auto w-full space-y-6">
-
-    <div class="rounded-[2.5rem] p-6 shadow-2xl flex flex-col gap-5" 
-         style="background-color: #0f172a !important;">
-      <div class="flex items-center gap-4">
-        <div class="bg-indigo-500/20 p-3 rounded-2xl">
-          <mat-icon style="color: #818cf8 !important;">account_balance_wallet</mat-icon>
+    <div style="background-color: #020617; border-radius: 1.5rem; padding: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="background-color: rgba(99, 102, 241, 0.2); padding: 8px; border-radius: 0.75rem;">
+          <mat-icon style="color: #818cf8; font-size: 20px; width: 20px; height: 20px;">account_balance_wallet</mat-icon>
         </div>
-        <div class="flex flex-col">
-          <span class="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Saldo Disponível</span>
-          <span class="text-3xl font-black text-white leading-none">
-            {{ (apostadorSaldo || 260) | currency:'BRL' }}
+        <div style="display: flex; flex-direction: column;">
+          <span style="font-size: 8px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.1em;">Saldo</span>
+          <span style="font-size: 1.25rem; font-weight: 900; color: #ffffff; line-height: 1;">
+            {{ (apostadorSaldo || 0) | currency:'BRL' }}
           </span>
         </div>
       </div>
 
-      <div class="flex gap-2">
+      <div style="display: flex; gap: 8px;">
         <button (click)="navigateToDepositar()" 
-                class="flex-1 bg-indigo-600 text-white rounded-2xl py-4 font-black uppercase text-[10px] tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-900/20">
-          + Depósito
+                style="background-color: #4f46e5; color: #ffffff; border-radius: 0.75rem; padding: 8px 12px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+          + DEPÓSITO
         </button>
         <button (click)="informarEmDesenvolvimento()" 
-                class="flex-1 bg-slate-700 text-white rounded-2xl py-4 font-black uppercase text-[10px] tracking-widest active:scale-95 transition-transform">
-          Sacar
+                style="background-color: #334155; color: #ffffff; border-radius: 0.75rem; padding: 8px 12px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+          SACAR
         </button>
       </div>
     </div>
 
-    <div class="w-full rounded-[2rem] overflow-hidden shadow-lg border border-slate-200 bg-white">
+    <div style="width: 100%; border-radius: 1.5rem; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
       <img src="assets/images/marketing-espaco-mar.png" 
-           class="w-full h-auto object-cover block" 
+           style="width: 100%; height: auto; display: block;" 
            alt="Espaço Mar"
-           onerror="this.src='https://placehold.co/600x300?text=Espaço+Mar+Marketing'">
+           onerror="this.src='https://placehold.co/600x200?text=Espaço+Mar+Marketing'">
     </div>
 
-    <section *ngFor="let camp of campeonatosDisponiveis" class="bg-white rounded-[2.5rem] overflow-hidden shadow-md border border-slate-100">
-      <div class="bg-indigo-950 p-5 flex justify-between items-center">
-        <div class="flex items-center gap-3 min-w-0">
-          <img [src]="getCampeonatoLogo(camp.nome)" class="w-8 h-8 object-contain flex-shrink-0">
-          <h2 class="text-white font-black uppercase text-[10px] tracking-tight truncate max-w-[140px]">
+    <section *ngFor="let camp of campeonatosDisponiveis" 
+             style="background-color: #ffffff; border-radius: 1.5rem; overflow: hidden; border: 1px solid #f1f5f9; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+      
+      <div style="background-color: #020617; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 24px; height: 24px; object-fit: contain; flex-shrink: 0;">
+          <h2 style="color: #ffffff; font-weight: 900; text-transform: uppercase; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; margin: 0;">
             {{ camp.nome }}
           </h2>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" class="bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-widest">
+        <span *ngIf="camp.aderidoPeloUsuario" 
+              style="background-color: #10b981; color: #ffffff; font-size: 7px; font-weight: 900; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
           Ativo
         </span>
       </div>
 
-      <div class="p-5 space-y-3">
+      <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
         <button (click)="navegarParaApostasRodada(camp.id)" 
-                class="w-full bg-emerald-50 text-emerald-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex justify-between px-6">
-          <span>Rodadas em Aposta</span>
-          <span class="opacity-50">({{ camp.rodadasEmAposta?.length || 1 }})</span>
+                style="width: 100%; background-color: #ecfdf5; color: #047857; padding: 14px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+          Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
         </button>
         
         <button (click)="verRodadasCorrentes(camp.id)" 
-                class="w-full bg-indigo-50 text-indigo-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex justify-between px-6">
-          <span>Rodadas Correntes</span>
-          <span class="opacity-50">({{ camp.rodadasCorrentes?.length || 1 }})</span>
-        </button>
-
-        <button (click)="verRodadasFinalizadas(camp.id)"
-                class="w-full bg-slate-50 text-slate-400 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex justify-between px-6">
-          <span>Histórico</span>
-          <span class="opacity-50">({{ camp.rodadasFinalizadas?.length || 0 }})</span>
+                style="width: 100%; background-color: #eef2ff; color: #4338ca; padding: 14px 0; border-radius: 1rem; font-weight: 900; text-transform: uppercase; font-size: 9px; border: none; cursor: pointer;">
+          Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
         </button>
       </div>
     </section>
 
-    <div class="h-10"></div>
+    <div style="width: 100%; border-radius: 1.5rem; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px;">
+      <img [src]="fotoAtual" 
+           style="width: 100%; height: auto; display: block; padding: 12px;" 
+           alt="Marketing Final">
+    </div>
+
   </main>
 </div>
