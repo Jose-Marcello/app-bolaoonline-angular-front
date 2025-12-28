@@ -185,23 +185,28 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   }
 
   onRodadaSelected(rodadaId: string) {
-    this.rodadaSelecionadaId = rodadaId;
-    this.rodadaId = rodadaId;
-    this.apostaAtual = null; 
-    this.isReadOnly = true; 
+  this.rodadaSelecionadaId = rodadaId;
+  this.rodadaId = rodadaId;
+  this.apostaAtual = null; 
+  this.isReadOnly = true; // Força modo consulta até selecionar uma cartela
 
-    this.isLoadingPalpites = true;
-    this.rodadaService.getJogosByRodada(rodadaId).subscribe({
-      next: (res: any) => {
-        const data = res.data;
-        this.jogosDaApostaAtual = data ? (data['$values'] || data) : res;
-        this.montarGridVazio();
-        this.isLoadingPalpites = false;
-        this.recarregarApostasDaRodada(rodadaId);
-      },
-      error: () => this.isLoadingPalpites = false
-    });
-  }
+  this.isLoadingPalpites = true;
+  this.rodadaService.getJogosByRodada(rodadaId).subscribe({
+    next: (res: any) => {
+      const data = res.data;
+      this.jogosDaApostaAtual = data ? (data['$values'] || data) : res;
+      
+      // Carrega o grid bloqueado para o usuário ver os jogos
+      this.montarGridVazio(); 
+      this.isLoadingPalpites = false;
+      
+      // Tenta buscar se o usuário já tem apostas para esta nova rodada
+      this.recarregarApostasDaRodada(rodadaId);
+    },
+    error: () => this.isLoadingPalpites = false
+  });
+}
+
 
   private recarregarApostasDaRodada(rodadaId: string) {
     if(!this.apostadorCampeonatoId) return;
