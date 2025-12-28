@@ -1,50 +1,82 @@
 <div class="min-h-screen dashboard-root p-2 sm:p-4" style="background-color: #cbd5e1 !important;">
   <main class="max-w-lg mx-auto space-y-4">
 
-    <div class="flex justify-start px-1">
-      <button (click)="goBackToDashboard()" class="flex items-center gap-1 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:text-indigo-600 transition-colors">
+    <div class="flex justify-between items-center px-1">
+      <div class="flex flex-col min-w-0">
+        <span class="text-[9px] font-black uppercase text-slate-500">Campeonato</span>
+        <h1 class="text-sm font-black text-slate-800 truncate uppercase">
+          {{ rodadaSelecionada?.campeonato?.nome || 'Bolão Online' }}
+        </h1>
+      </div>
+      <button (click)="goBackToDashboard()" class="btn-voltar-estilo-resultado">
         <mat-icon style="font-size: 16px; width: 16px; height: 16px;">arrow_back</mat-icon>
-        Voltar ao Dashboard
+        Voltar
       </button>
     </div>
 
-    <div class="card-campeonato-container shadow-xl">
-      <div class="card-header-dark flex justify-between items-center p-3">
-        <h2 class="titulo-camp-mini">1. Selecione a Rodada</h2>
-        <span class="text-[9px] font-black text-slate-500">{{ rodadasEmAposta.length }} Disponíveis</span>
+    <div class="card-campeonato-container shadow-lg">
+      <div class="card-header-dark p-3">
+        <h2 class="titulo-camp-mini">1. Rodadas em Aposta</h2>
       </div>
-      <div class="p-3 flex gap-2 overflow-x-auto scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
-        <button *ngFor="let rodada of rodadasEmAposta" 
-                (click)="onRodadaSelected(rodada.id!)"
-                [ngClass]="rodadaSelecionadaId === rodada.id ? 'btn-rodada-ativa' : 'btn-rodada-inativa'">
-          R{{ rodada.numeroRodada }}
-        </button>
+      <div class="grid grid-cols-4 gap-2 p-2 text-[9px] font-black text-slate-400 uppercase border-b border-slate-700 bg-[#0f172a]">
+        <span class="text-center">Ação</span>
+        <span class="text-center">Rodada</span>
+        <span class="text-center">Início</span>
+        <span class="text-center">Fim</span>
+      </div>
+      <div class="p-1">
+        <div *ngFor="let rodada of rodadasEmAposta" 
+             (click)="onRodadaSelected(rodada.id!)"
+             [ngClass]="rodadaSelecionadaId === rodada.id ? 'linha-tabela-ativa' : 'linha-tabela-off'"
+             class="grid grid-cols-4 gap-2 items-center p-3 cursor-pointer transition-all border-b border-slate-700/50">
+          <div class="flex justify-center">
+            <mat-icon [style.color]="rodadaSelecionadaId === rodada.id ? '#10b981' : '#475569'" style="font-size: 20px;">
+              {{ rodadaSelecionadaId === rodada.id ? 'play_circle_filled' : 'radio_button_unchecked' }}
+            </mat-icon>
+          </div>
+          <span class="font-black text-center text-sm" [style.color]="rodadaSelecionadaId === rodada.id ? '#fff' : '#cbd5e1'">
+            {{ rodada.numeroRodada }}
+          </span>
+          <span class="text-center text-[10px] text-slate-400">{{ rodada.dataInic | date:'dd/MM' }}</span>
+          <span class="text-center text-[10px] text-slate-400">{{ rodada.dataFim | date:'dd/MM' }}</span>
+        </div>
       </div>
     </div>
 
-    <div class="card-campeonato-container shadow-xl">
+    <div class="card-campeonato-container shadow-lg">
       <div class="card-header-dark p-3">
-        <h2 class="titulo-camp-mini">2. Suas Cartelas na Rodada</h2>
+        <h2 class="titulo-camp-mini">2. Minhas Cartelas nesta Rodada</h2>
       </div>
-      <div class="p-3 space-y-2">
+      <div class="grid grid-cols-5 gap-1 p-2 text-[9px] font-black text-slate-400 uppercase border-b border-slate-700 bg-[#0f172a]">
+        <span class="text-center">Sel.</span>
+        <span class="col-span-2">Identificação</span>
+        <span class="text-center">Envio</span>
+        <span class="text-center">Tipo</span>
+      </div>
+      <div class="p-1">
         <div *ngFor="let aposta of apostasUsuarioRodada" 
-             (click)="onApostaSelected(aposta.id!)" 
-             [ngClass]="{'cartela-selecionada': apostaAtual?.id === aposta.id}" 
-             class="cartela-container-base">
-          <div class="flex items-center gap-3">
-             <mat-icon [style.color]="apostaAtual?.id === aposta.id ? '#10b981' : '#475569'">
-                {{ apostaAtual?.id === aposta.id ? 'stars' : 'radio_button_unchecked' }}
-             </mat-icon>
-             <div class="flex flex-col">
-               <span class="font-black text-[11px] text-white uppercase">{{ aposta.identificadorAposta }}</span>
-               <span class="text-[8px] font-bold text-slate-400 uppercase">{{ aposta.ehApostaCampeonato ? 'Campeonato' : 'Avulsa' }}</span>
-             </div>
+             (click)="onApostaSelected(aposta.id!)"
+             [ngClass]="apostaAtual?.id === aposta.id ? 'linha-tabela-ativa-cartela' : 'linha-tabela-off'"
+             class="grid grid-cols-5 gap-1 items-center p-3 cursor-pointer transition-all border-b border-slate-700/50">
+          <div class="flex justify-center">
+            <mat-icon [style.color]="apostaAtual?.id === aposta.id ? '#10b981' : '#475569'" style="font-size: 20px;">
+              {{ apostaAtual?.id === aposta.id ? 'stars' : 'radio_button_unchecked' }}
+            </mat-icon>
           </div>
-          <span class="text-[10px] font-black text-emerald-400">{{ aposta.custoPagoApostaRodada | currency:'BRL' }}</span>
+          <span class="col-span-2 font-black text-[10px] uppercase truncate" [style.color]="apostaAtual?.id === aposta.id ? '#fff' : '#cbd5e1'">
+            {{ aposta.identificadorAposta }}
+          </span>
+          <span class="text-center text-[9px] text-slate-400">{{ aposta.dataHoraSubmissao | date:'dd/MM' }}</span>
+          <span class="text-center">
+            <span [ngClass]="aposta.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'" 
+                  class="text-[7px] px-1.5 py-0.5 rounded font-black text-white uppercase">
+              {{ aposta.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
+            </span>
+          </span>
         </div>
-
-        <button (click)="onClickCriarNovaAposta()" class="btn-nova-avulsa-styled">
-          <mat-icon style="font-size: 16px; width: 16px; height: 16px;">add_circle_outline</mat-icon>
+        
+        <button (click)="onClickCriarNovaAposta()" class="btn-nova-cartela-avulsa">
+          <mat-icon style="font-size: 16px; width: 16px; height: 16px;">add_circle</mat-icon>
           Nova Cartela Avulsa
         </button>
       </div>
@@ -52,47 +84,42 @@
 
     <div class="card-campeonato-container shadow-2xl" [formGroup]="apostaForm">
       <div class="card-header-dark p-3 flex justify-between items-center">
-        <h2 class="titulo-camp-mini">3. {{ isReadOnly ? 'Modo Consulta' : 'Preencher Palpites' }}</h2>
+        <h2 class="titulo-camp-mini">3. {{ isReadOnly ? 'Visualização' : 'Preencher Palpites' }}</h2>
         <span class="stamp-label-final" [style.background-color]="isReadOnly ? '#f97316' : '#22c55e'">
           {{ isReadOnly ? 'CONSULTA' : 'EDITÁVEL' }}
         </span>
       </div>
 
       <div class="p-3 space-y-3" formArrayName="palpites">
-        <div *ngIf="isLoadingPalpites" class="flex justify-center p-6"><mat-spinner diameter="30"></mat-spinner></div>
-        
-        <div *ngIf="!isLoadingPalpites" class="space-y-3">
-          <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" class="card-jogo-item">
-            <div class="grid grid-cols-7 items-center gap-2">
-              
-              <div class="col-span-2 text-center">
-                <img [src]="jogosDaApostaAtual[i]?.escudoMandante" 
-                     (error)="$any($event.target).src = 'assets/images/logo-bola.png'"
-                     class="w-8 h-8 mx-auto mb-1 object-contain">
-                <div class="time-label-aposta">{{ jogosDaApostaAtual[i]?.equipeMandante }}</div>
-              </div>
+        <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" class="card-jogo-aposta">
+          <div class="grid grid-cols-7 items-center gap-2">
+            <div class="col-span-2 flex flex-col items-center">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoMandante" 
+                   (error)="$any($event.target).src = 'assets/images/logo-bola.png'"
+                   class="w-10 h-10 object-contain mb-1">
+              <span class="text-[9px] font-black text-white text-center uppercase">{{ jogosDaApostaAtual[i]?.equipeMandante }}</span>
+            </div>
 
-              <div class="col-span-3 flex justify-center gap-2">
-                <input type="number" formControlName="placarApostaCasa" class="input-placar-final">
-                <span class="text-white/40 font-black flex items-center">X</span>
-                <input type="number" formControlName="placarApostaVisita" class="input-placar-final">
-              </div>
+            <div class="col-span-3 flex items-center justify-center gap-2">
+              <input type="number" formControlName="placarApostaCasa" class="input-placar-edit">
+              <span class="text-white font-black">X</span>
+              <input type="number" formControlName="placarApostaVisita" class="input-placar-edit">
+            </div>
 
-              <div class="col-span-2 text-center">
-                <img [src]="jogosDaApostaAtual[i]?.escudoVisitante" 
-                     (error)="$any($event.target).src = 'assets/images/logo-bola.png'"
-                     class="w-8 h-8 mx-auto mb-1 object-contain">
-                <div class="time-label-aposta">{{ jogosDaApostaAtual[i]?.equipeVisitante }}</div>
-              </div>
+            <div class="col-span-2 flex flex-col items-center">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoVisitante" 
+                   (error)="$any($event.target).src = 'assets/images/logo-bola.png'"
+                   class="w-10 h-10 object-contain mb-1">
+              <span class="text-[9px] font-black text-white text-center uppercase">{{ jogosDaApostaAtual[i]?.equipeVisitante }}</span>
             </div>
           </div>
         </div>
 
-        <button *ngIf="!isReadOnly" (click)="salvarApostas()" [disabled]="isSaving" class="btn-pastel btn-verde-pastel w-full py-4 mt-2 font-black text-xs uppercase tracking-widest">
-          {{ isSaving ? 'Salvando...' : 'Confirmar Meus Palpites' }}
+        <button *ngIf="!isReadOnly" (click)="salvarApostas()" [disabled]="isSaving" class="btn-salvar-palpites-final">
+          {{ isSaving ? 'SALVANDO...' : 'CONFIRMAR PALPITES' }}
         </button>
       </div>
     </div>
 
-  </main> 
+  </main>
 </div>
