@@ -44,11 +44,12 @@
 
     <section *ngFor="let camp of campeonatosDisponiveis" class="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100">
       <div class="bg-indigo-950 p-5 flex justify-between items-center">
-        <div class="flex items-center gap-3 truncate">
-          <img [src]="getCampeonatoLogo(camp.nome)" class="w-8 h-8 object-contain">
-          <h2 class="text-white font-black uppercase text-[10px] tracking-tight truncate">{{ camp.nome }}</h2>
+        <div class="flex items-center gap-3 min-w-0"> <img [src]="getCampeonatoLogo(camp.nome)" class="w-8 h-8 object-contain flex-shrink-0">
+          <h2 class="text-white font-black uppercase text-[10px] tracking-tight truncate max-w-[150px] leading-tight">
+            {{ camp.nome }}
+          </h2>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" class="bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-widest">
+        <span *ngIf="camp.aderidoPeloUsuario" class="bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-widest flex-shrink-0">
           Ativo
         </span>
       </div>
