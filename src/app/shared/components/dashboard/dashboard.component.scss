@@ -1,173 +1,66 @@
-/* 1. FUNDO GERAL (Cinza Azulado) */
-.dashboard-root {
-  background-color: #cbd5e1 !important; /* Slate 300 */
-}
-
-/* CARD DE SALDO (Grafite Escuro) */
-.card-saldo-principal {
-  background-color: #0f172a !important;
-  border-radius: 2rem;
-  padding: 24px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.label-saldo-topo {
-  font-size: 8px;
-  font-weight: 900;
+/* 1. NOME DO CAMPEONATO (Clara, Bold, Pequena) */
+.titulo-camp-mini {
+  color: #f8fafc !important; /* Branco azulado claro */
+  font-weight: 800 !important;
+  font-size: 10px !important;
   text-transform: uppercase;
-  color: #94a3b8;
-  letter-spacing: 0.1em;
-}
-
-.valor-saldo-topo {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: #ffffff !important;
-}
-
-.icon-container-saldo {
-  background-color: rgba(99, 102, 241, 0.2);
-  padding: 10px;
-  border-radius: 1rem;
-}
-
-/* BOTÕES DE SALDO */
-.btn-deposito {
-  flex: 1; background-color: #4f46e5 !important; color: #ffffff !important; 
-  border-radius: 1rem; padding: 14px 0; font-weight: 900; text-transform: uppercase; 
-  font-size: 10px; border: none; cursor: pointer;
-}
-
-.btn-sacar {
-  flex: 1; background-color: #334155 !important; color: #ffffff !important; 
-  border-radius: 1rem; padding: 14px 0; font-weight: 900; text-transform: uppercase; 
-  font-size: 10px; border: none; cursor: pointer;
-}
-
-/* 2. CARDS DE CAMPEONATO (Grafite Claro) */
-.card-campeonato-container {
-  background-color: #334155 !important; /* Grafite Claro */
-  border-radius: 2rem !important;
-  overflow: hidden;
-  border: 1px solid #475569 !important;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-}
-
-.card-header-dark {
-  background-color: #0f172a !important; /* Grafite Escuro */
-  padding: 15px 20px;
-}
-
-.titulo-camp-card {
-  color: #ffffff !important;
-  font-weight: 900;
-  text-transform: uppercase;
-  font-size: 10px;
-  margin: 0;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 140px;
+  max-width: 175px;
 }
 
-.img-logo-camp {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-.badge-ativo {
-  background-color: #10b981 !important;
-  color: #ffffff !important;
-  font-size: 8px;
-  font-weight: 900;
-  padding: 4px 8px;
-  border-radius: 6px;
-  text-transform: uppercase;
-}
-
-/* 3. RÓTULOS ESTILO CARIMBO */
-.stamp-label {
+/* 2. RÓTULOS (Fundo Forte, Letra Preta) */
+.stamp-label-v2 {
   display: inline-block;
   font-size: 10px;
   font-weight: 900;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 4px;
-  border: 2px solid;
-  transform: rotate(-3deg);
-  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transform: rotate(-2deg);
   margin-bottom: 8px;
-  background-color: rgba(0,0,0,0.1);
-}
-
-.stamp-vamos {
-  color: #fcd34d !important;
-  border-color: #fcd34d !important;
-}
-
-.stamp-jogando {
-  color: #60a5fa !important;
-  border-color: #60a5fa !important;
-}
-
-/* 4. BOTÕES PASTEL */
-.btn-pastel {
-  width: 100%;
-  padding: 18px 0;
-  border-radius: 1.25rem;
-  font-weight: 900;
+  margin-left: 5px;
   text-transform: uppercase;
-  font-size: 10px;
-  border: none;
-  cursor: pointer;
+  color: #000000 !important; /* Letra Preta */
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
 }
 
-.btn-verde-pastel {
-  background-color: #d1fae5 !important; /* Pastel Green */
-  color: #065f46 !important;
+.stamp-jogando-v2 {
+  background-color: #22c55e !important; /* Fundo Verde Forte */
 }
 
-.btn-azul-pastel {
-  background-color: #dbeafe !important; /* Pastel Blue */
-  color: #1e40af !important;
+.stamp-vamos-v2 {
+  background-color: #f97316 !important; /* Fundo Laranja Forte */
 }
 
-.btn-cinza-pastel {
-  background-color: #f1f5f9 !important; /* Pastel Gray */
-  color: #475569 !important;
+/* 4. CARD DE SALDO (Ajuste para não ser "esmagado") */
+.card-saldo-compacto {
+  background-color: #0f172a !important;
+  border-radius: 12px;
+  padding: 10px 14px; /* Aumentado levemente */
+  border: 1px solid #1e293b;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-/* 5. MARKETING E CARROSSEL */
-.container-logo-parceiro {
-  width: 100%;
-  text-align: center;
-  padding: 10px 0;
+.valor-saldo-compacto {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #ffffff !important;
 }
 
-.logo-espaco-mar-img {
-  max-width: 180px;
-  height: auto;
-  margin: 0 auto;
-}
-
-.carrossel-moldura {
-  width: 100%;
-  border-radius: 2rem;
-  overflow: hidden;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-}
-
-.img-carrossel {
-  width: 100%;
-  height: auto;
-  display: block;
-  padding: 10px;
+/* --- ESTILOS REFORÇADOS --- */
+.dashboard-root { background-color: #cbd5e1 !important; }
+.card-campeonato-container {
+  background-color: #334155 !important;
   border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #475569;
 }
+.card-header-dark { background-color: #0f172a !important; padding: 10px 15px; }
+.img-logo-camp { width: 22px; height: 22px; object-fit: contain; }
+.text-base-bold { font-size: 13px !important; font-weight: 800 !important; }
+.btn-pastel { width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; }
+.btn-verde-pastel { background-color: #d1fae5 !important; color: #065f46 !important; }
+.btn-azul-pastel { background-color: #dbeafe !important; color: #1e40af !important; }
+.btn-cinza-pastel { background-color: #f1f5f9 !important; color: #475569 !important; }
+.logo-espaco-mar-img { max-width: 140px; height: auto; margin: 10px auto; display: block; }
