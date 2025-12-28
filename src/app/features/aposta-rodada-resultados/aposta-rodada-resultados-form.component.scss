@@ -1,122 +1,73 @@
-/* Localização: src/app/aposta-rodada/aposta-rodada-form/aposta-rodada-form.component.scss */
+/* REGRAS GLOBAIS DA TELA */
+.dashboard-root { background-color: #cbd5e1 !important; }
 
-/* Estilos existentes */
-.cards-container-wrapper {
-  background-color: rgba(245, 245, 245, 0.068) !important;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(179, 177, 177, 0.925);
-  width: 100%;
-  max-width: 96rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+.card-campeonato-container {
+  background-color: #334155 !important;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #475569;
 }
 
-.cor_fundo_placar_final {
-  background-color: rgba(58, 7, 243, 0.068) !important;
+.card-header-dark {
+  background-color: #0f172a !important;
 }
 
-mat-card.mat-mdc-card {
-  background-color: #e0e0e0f3 !important;
-  border: 1px solid #04188d !important;
+.titulo-camp-mini {
+  color: #f1f5f9 !important;
+  font-weight: 800 !important;
+  font-size: 10px !important;
+  text-transform: uppercase;
+  margin: 0;
 }
 
-.fonte-subtit {
-  color: #92bbeb !important;
+/* 1. RODADAS */
+.btn-rodada-ativa {
+  background: #4f46e5 !important; border: 1px solid #818cf8 !important;
+  min-width: 65px; height: 50px; border-radius: 12px; color: white; font-weight: 900;
+}
+.btn-rodada-inativa {
+  background: #1e293b !important; border: 1px solid #475569 !important;
+  min-width: 65px; height: 50px; border-radius: 12px; color: #94a3b8; font-weight: 900;
 }
 
-.cor-statusjogo {
-  color: #130270 !important;
+/* 2. CARTELAS */
+.cartela-container-base {
+  background: #0f172a; padding: 12px; border-radius: 14px; border: 2px solid #1e293b;
+  display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+  transition: all 0.2s ease;
+  &.cartela-selecionada { border-color: #10b981; background: #1e293b; }
 }
 
-.dashboard-button {
-  width: 100%;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
-  padding: 0.75rem 1rem;
-  height: auto;
-  line-height: normal;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-size: 0.875rem;
+.btn-nova-avulsa-styled {
+  width: 100%; padding: 14px; border-radius: 12px; border: 2px dashed #475569;
+  background: transparent; color: #818cf8; font-weight: 900; font-size: 10px;
+  text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 
-.jogo-card {
-  background-color: #f5f5f5 !important;
-  border: 1px solid #ccc !important;
-  transition: transform 0.2s ease-in-out;
- 
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  }
-
-  mat-card-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .flex.items-center.justify-between {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-
-  .mat-form-field {
-    width: 100px;
-  }
+/* 3. JOGOS */
+.card-jogo-item {
+  background-color: #0f172a; padding: 15px; border-radius: 16px; border: 1px solid #1e293b;
 }
 
-mat-form-field {
-  .mat-mdc-form-field-wrapper {
-    padding-bottom: 0 !important;
-  }
-  .mat-mdc-form-field-subscript-wrapper {
-    display: none;
-  }
+.time-label-aposta {
+  color: #f1f5f9; font-weight: 800; font-size: 9px; text-transform: uppercase; line-height: 1.1;
 }
 
-/* ==========================================================================
-   NOVOS ESTILOS - Melhorias com seletores mais específicos e ng-deep
-   ========================================================================== */
-
-/* Usamos ::ng-deep para garantir que o estilo se aplique a componentes filhos */
-/* Padronização da cor da fonte para todos os dados das tabelas */
-::ng-deep .mat-row .mat-cell {
-  color: #333333 !important;
+.input-placar-final {
+  width: 42px; height: 42px; background: #f8fafc; border: none; border-radius: 10px;
+  text-align: center; font-weight: 900; font-size: 18px; color: #0f172a;
+  &:disabled { background: #64748b; color: #1e293b; opacity: 0.6; }
 }
 
-/* Padronização do cabeçalho do grid de apostas */
-/* Garante que o texto do cabeçalho seja capitalizado e com cor padronizada */
-::ng-deep .mat-header-cell {
-  text-transform: capitalize !important;
-  font-weight: 500 !important;
-  color: #1a202c !important;
+/* AUXILIARES */
+.stamp-label-final {
+  color: #000; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
 }
 
-/* Sugestão para o ícone de seleção:
- * Esta abordagem usa o seletor ::ng-deep para forçar a aplicação do estilo
- * em componentes aninhados, que é útil para componentes do Angular Material.
- * O seletor .select-icon será uma classe que você vai adicionar manualmente no HTML.
- */
-::ng-deep .select-icon {
-  // Esconde o ícone atual, que geralmente é um material icon 'done'
-  .mat-icon {
-    display: none;
-  }
+.btn-pastel { width: 100%; border: none; border-radius: 1rem; cursor: pointer; }
+.btn-verde-pastel { background-color: #d1fae5 !important; color: #065f46 !important; }
 
-  // Adiciona a seta como um pseudo-elemento
-  &::before {
-    content: '→'; /* Ícone de seta */
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #04188d; /* Cor da seta, combinando com a borda do card */
-    display: block;
-  }
+.scrollbar-hide {
+  -ms-overflow-style: none; scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
