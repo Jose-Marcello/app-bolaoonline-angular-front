@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
 
 // Angular Material Imports
 import { MatCardModule } from '@angular/material/card';
@@ -39,9 +39,9 @@ import { ConfirmacaoApostaModalComponent } from '../../shared/components/confirm
   selector: 'app-aposta-rodada-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule, 
+    CommonModule, FormsModule, ReactiveFormsModule, MatCardModule, MatButtonModule, 
     MatIconModule, MatProgressSpinnerModule, MatSnackBarModule, 
-    MatFormFieldModule, MatInputModule, DatePipe, CurrencyPipe, MatDialogModule
+    MatFormFieldModule, MatInputModule, DatePipe, CurrencyPipe, MatDialogModule //
   ],
   templateUrl: './aposta-rodada-form.component.html',
   styleUrls: ['./aposta-rodada-form.component.scss']
@@ -320,7 +320,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  private criarNovaApostaAvulsa(): void {
+  criarNovaApostaAvulsa(): void {
     const request: CriarApostaAvulsaRequestDto = {
       campeonatoId: this.campeonatoId!,
       rodadaId: this.rodadaId!,
