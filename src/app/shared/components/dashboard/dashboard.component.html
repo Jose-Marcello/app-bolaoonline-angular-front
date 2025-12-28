@@ -2,20 +2,19 @@
 
   <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
 
-    <div class="moldura-saldo-container">
-      <span class="titulo-moldura">SALDO DISPONÍVEL</span>
-      
-      <div class="flex items-center justify-between w-full mt-1">
-        <span class="valor-saldo-foco">
-          {{ (apostadorSaldo || 0) | currency:'BRL' }}
-        </span>
+    <div class="card-saldo-final">
+  <div class="flex flex-col justify-center">
+    <span class="label-saldo-topo">Saldo Disponível</span>
+    <span class="valor-saldo-foco">
+      {{ (apostadorSaldo || 0) | currency:'BRL' }}
+    </span>
+  </div>
 
-        <div class="flex gap-2">
-          <button (click)="navigateToDepositar()" class="btn-pix-mini">+ PIX</button>
-          <button (click)="informarEmDesenvolvimento()" class="btn-sacar-mini">SACAR</button>
-        </div>
-      </div>
-    </div>
+  <div class="flex gap-2 items-center">
+    <button (click)="navigateToDepositar()" class="btn-acao-saldo btn-pix">+ PIX</button>
+    <button (click)="informarEmDesenvolvimento()" class="btn-acao-saldo btn-sacar">SACAR</button>
+  </div>
+</div>
 
     <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container">
       

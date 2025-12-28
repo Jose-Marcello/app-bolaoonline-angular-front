@@ -1,126 +1,37 @@
-/* Localização: src/app/aposta-rodada/aposta-rodada-form/aposta-rodada-form.component.scss */
-
-.fundo-grafite-contraste {
-  background-color: #1e293b; 
-  background-image: linear-gradient(rgba(30, 41, 59, 0.85), rgba(30, 41, 59, 0.85)), url('/assets/images/fundobolao.png');
-  background-attachment: fixed;
-  min-height: 100vh;
-}
-
-/* Remove a sombra dos cards do Material para manter o visual limpo */
-::ng-deep .mat-mdc-card {
-  box-shadow: none !important;
-}
-
-/* Estilos existentes */
-.cards-container-wrapper {
-  background-color: rgba(245, 245, 245, 0.068) !important;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(179, 177, 177, 0.925);
-  width: 100%;
-  max-width: 96rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-mat-card.mat-mdc-card {
-  background-color: #e0e0e0f3 !important;
-  border: 1px solid #04188d !important;
-}
-
-.fonte-subtit {
-  color: #92bbeb !important;
-}
-
-.dashboard-button {
-  width: 100%;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
-  padding: 0.75rem 1rem;
-  height: auto;
-  line-height: normal;
+.card-saldo-final {
+  background-color: #0f172a !important; /* Grafite Escuro */
+  border-radius: 16px;
+  padding: 12px 16px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  font-size: 0.875rem;
+  border: 1px solid #1e293b;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  margin-bottom: 8px;
 }
 
-.jogo-card {
-  background-color: #f5f5f5 !important;
-  border: 1px solid #ccc !important;
-  transition: transform 0.2s ease-in-out;
- 
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  }
-
-  mat-card-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .flex.items-center.justify-between {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-
-  .mat-form-field {
-    width: 100px;
-  }
+.label-saldo-topo {
+  font-size: 9px;
+  font-weight: 900;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: -2px;
 }
 
-mat-form-field {
-  .mat-mdc-form-field-wrapper {
-    padding-bottom: 0 !important;
-  }
-  .mat-mdc-form-field-subscript-wrapper {
-    display: none;
-  }
+.valor-saldo-foco {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff !important;
 }
 
-/* ==========================================================================
-   NOVOS ESTILOS - Melhorias com seletores mais específicos e ng-deep
-   ========================================================================== */
-
-/* Usamos ::ng-deep para garantir que o estilo se aplique a componentes filhos */
-/* Padronização da cor da fonte para todos os dados das tabelas */
-::ng-deep .mat-row .mat-cell {
-  color: #333333 !important;
+.btn-acao-saldo {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 900;
+  border: none;
+  cursor: pointer;
 }
 
-/* Padronização do cabeçalho do grid de apostas */
-/* Garante que o texto do cabeçalho seja capitalizado e com cor padronizada */
-::ng-deep .mat-header-cell {
-  text-transform: capitalize !important;
-  font-weight: 500 !important;
-  color: #1a202c !important;
-}
-
-/* Sugestão para o ícone de seleção:
- * Esta abordagem usa o seletor ::ng-deep para forçar a aplicação do estilo
- * em componentes aninhados, que é útil para componentes do Angular Material.
- * O seletor .select-icon será uma classe que você vai adicionar manualmente no HTML.
- */
-::ng-deep .select-icon {
-  // Esconde o ícone atual, que geralmente é um material icon 'done'
-  .mat-icon {
-    display: none;
-  }
-
-  // Adiciona a seta como um pseudo-elemento
-  &::before {
-    content: '→'; /* Ícone de seta */
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #04188d; /* Cor da seta, combinando com a borda do card */
-    display: block;
-  }
-}
+.btn-pix { background-color: #4f46e5 !important; color: white !important; }
+.btn-sacar { background-color: #334155 !important; color: white !important; }
