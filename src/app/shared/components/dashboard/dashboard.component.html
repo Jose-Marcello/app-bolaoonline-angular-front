@@ -2,12 +2,12 @@
 
   <mat-toolbar class="flex justify-between items-center px-4 h-16 bg-white shadow-sm sticky top-0 z-50">
     <div class="flex items-center gap-2">
-      <img src="assets/images/logo-bolao-small.png" class="h-7 w-auto" alt="Logo">
+      <img src="assets/images/logo-bolao-small.png" class="h-8 w-auto" alt="Logo Bolão">
     </div>
 
     <div class="flex items-center gap-2">
       <span class="text-[10px] font-black text-slate-500 truncate max-w-[100px] uppercase">
-        {{ apostador?.apelido || 'Usuário' }}
+        {{ apostador?.apelido || 'Zemarcello' }}
       </span>
       <button mat-icon-button (click)="logout()" class="text-slate-400">
         <mat-icon class="scale-90">logout</mat-icon>
@@ -15,24 +15,25 @@
     </div>
   </mat-toolbar>
 
-  <main class="flex-1 p-3 sm:p-6 max-w-lg mx-auto w-full space-y-5">
+  <main class="flex-1 p-4 max-w-lg mx-auto w-full space-y-6">
 
-    <div class="bg-slate-900 rounded-[2.5rem] p-6 shadow-xl flex flex-col gap-5">
+    <div class="rounded-[2.5rem] p-6 shadow-2xl flex flex-col gap-5" 
+         style="background-color: #0f172a !important;">
       <div class="flex items-center gap-4">
         <div class="bg-indigo-500/20 p-3 rounded-2xl">
-          <mat-icon class="text-indigo-400">account_balance_wallet</mat-icon>
+          <mat-icon style="color: #818cf8 !important;">account_balance_wallet</mat-icon>
         </div>
         <div class="flex flex-col">
-          <span class="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em]">Saldo Disponível</span>
-          <span class="text-2xl font-black text-white leading-none">
-            {{ (apostadorSaldo || 0) | currency:'BRL' }}
+          <span class="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Saldo Disponível</span>
+          <span class="text-3xl font-black text-white leading-none">
+            {{ (apostadorSaldo || 260) | currency:'BRL' }}
           </span>
         </div>
       </div>
 
       <div class="flex gap-2">
         <button (click)="navigateToDepositar()" 
-                class="flex-1 bg-indigo-600 text-white rounded-2xl py-4 font-black uppercase text-[10px] tracking-widest active:scale-95 transition-transform">
+                class="flex-1 bg-indigo-600 text-white rounded-2xl py-4 font-black uppercase text-[10px] tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-900/20">
           + Depósito
         </button>
         <button (click)="informarEmDesenvolvimento()" 
@@ -42,46 +43,47 @@
       </div>
     </div>
 
-    <section *ngFor="let camp of campeonatosDisponiveis" class="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100">
+    <div class="w-full rounded-[2rem] overflow-hidden shadow-lg border border-slate-200 bg-white">
+      <img src="assets/images/marketing-espaco-mar.png" 
+           class="w-full h-auto object-cover block" 
+           alt="Espaço Mar"
+           onerror="this.src='https://placehold.co/600x300?text=Espaço+Mar+Marketing'">
+    </div>
+
+    <section *ngFor="let camp of campeonatosDisponiveis" class="bg-white rounded-[2.5rem] overflow-hidden shadow-md border border-slate-100">
       <div class="bg-indigo-950 p-5 flex justify-between items-center">
-        <div class="flex items-center gap-3 min-w-0"> <img [src]="getCampeonatoLogo(camp.nome)" class="w-8 h-8 object-contain flex-shrink-0">
-          <h2 class="text-white font-black uppercase text-[10px] tracking-tight truncate max-w-[150px] leading-tight">
+        <div class="flex items-center gap-3 min-w-0">
+          <img [src]="getCampeonatoLogo(camp.nome)" class="w-8 h-8 object-contain flex-shrink-0">
+          <h2 class="text-white font-black uppercase text-[10px] tracking-tight truncate max-w-[140px]">
             {{ camp.nome }}
           </h2>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" class="bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-widest flex-shrink-0">
+        <span *ngIf="camp.aderidoPeloUsuario" class="bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-widest">
           Ativo
         </span>
       </div>
 
-      <div class="p-4 space-y-3">
+      <div class="p-5 space-y-3">
         <button (click)="navegarParaApostasRodada(camp.id)" 
-                class="w-full bg-emerald-50 text-emerald-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
-          Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
+                class="w-full bg-emerald-50 text-emerald-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex justify-between px-6">
+          <span>Rodadas em Aposta</span>
+          <span class="opacity-50">({{ camp.rodadasEmAposta?.length || 1 }})</span>
         </button>
         
         <button (click)="verRodadasCorrentes(camp.id)" 
-                class="w-full bg-indigo-50 text-indigo-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
-          Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
+                class="w-full bg-indigo-50 text-indigo-700 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex justify-between px-6">
+          <span>Rodadas Correntes</span>
+          <span class="opacity-50">({{ camp.rodadasCorrentes?.length || 1 }})</span>
         </button>
 
         <button (click)="verRodadasFinalizadas(camp.id)"
-                class="w-full bg-slate-50 text-slate-400 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest">
-          Histórico de Rodadas ({{ camp.rodadasFinalizadas?.length || 0 }})
+                class="w-full bg-slate-50 text-slate-400 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex justify-between px-6">
+          <span>Histórico</span>
+          <span class="opacity-50">({{ camp.rodadasFinalizadas?.length || 0 }})</span>
         </button>
       </div>
     </section>
 
-    <div class="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100 aspect-video relative group">
-      <img [src]="fotoAtual" 
-           class="w-full h-full object-contain p-6 transition-opacity duration-700">
-      <div class="absolute bottom-4 left-0 right-0 text-center">
-        <span class="bg-slate-900/80 text-white px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-[0.2em] backdrop-blur-sm italic">
-          Parceiro Oficial
-        </span>
-      </div>
-    </div>
-
-    <div class="h-8"></div>
+    <div class="h-10"></div>
   </main>
 </div>
