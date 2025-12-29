@@ -171,7 +171,7 @@ private loadJogosSemPalpites(): void {
         idJogo: j.id,
         // Blindagem de escudos que já testamos e funcionou
         escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
-        escudoVisitante: j.escudoVisitante || j.equipeVisitaEscudoUrl || j.escudoVisitante,
+        escudoVisitante: j.escudoVisitante || j.equipeVisitanteEscudoUrl || j.escudoVisitante,
         placarApostaCasa: null,
         placarApostaVisita: null
       }));
