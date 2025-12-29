@@ -186,16 +186,23 @@ private loadAllIntegratedData(): Observable<any> {
 
   // --- CERTIFIQUE-SE QUE ESTE MÉTODO ESTÁ MAPEANDO JOGOSDAAPOSTAATUAL ---
 onApostaSelected(apostaId: string): void {
-  const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
-  if (aposta) {
-    this.apostaAtual = aposta;
-    this.apostaSelecionadaId = apostaId;
-    this.isReadOnly = false;
+  // 1. Localiza a cartela selecionada
+  const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
+  
+  if (apostaSelecionada) {
+    this.apostaAtual = apostaSelecionada; 
+    this.apostaSelecionadaId = apostaId; // Garante a pintura Teal
+    
+    // 2. Limpa o formulário anterior para não duplicar campos
     this.palpites.clear();
 
-    const lista = (aposta.palpites as any)?.$values || [];
-    if (lista.length > 0) {
-      lista.forEach((p: any) => {
+    // 3. Extrai a coleção de palpites tratando o $values do .NET
+    const pCollection = apostaSelecionada.palpites as any;
+    const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
+
+    if (listaPalpites.length > 0) {
+      // 4. Preenche o FormArray (Lógica de Edição)
+      listaPalpites.forEach((p: any) => {
         this.palpites.push(this.fb.group({
           idJogo: [p.jogoId],
           placarApostaCasa: [p.placarApostaCasa],
@@ -203,17 +210,25 @@ onApostaSelected(apostaId: string): void {
         }));
       });
 
-      // ESTA LINHA É O QUE FAZ O GRID APARECER:
-      // Ela vincula os palpites aos dados dos times (escudos e nomes)
-      this.jogosDaApostaAtual = lista.map((p: any) => ({
-        ...p.jogo, 
-        idJogo: p.jogoId, 
-        placarApostaCasa: p.placarApostaCasa, 
+      // 5. ATUALIZA A VARIÁVEL VISUAL (O que faltava para o grid aparecer!)
+      // Mapeamos os dados do 'jogo' que vêm dentro do PalpiteDto para o array do HTML
+      this.jogosDaApostaAtual = listaPalpites.map((p: any) => ({
+        ...p.jogo, // Pega escudoMandante, equipeMandante, etc.
+        idJogo: p.jogoId,
+        placarApostaCasa: p.placarApostaCasa,
         placarApostaVisita: p.placarApostaVisita
       }));
+
+    } else {
+      // Se a cartela estiver vazia, monta o grid baseado nos jogos da rodada
+      this.loadJogosSecos();
     }
+    
+    this.isReadOnly = false;
+    this.apostaForm.markAsPristine();
   }
 }
+
 
 criarNovaApostaAvulsa(): void {
   // Monta o objeto de requisição conforme o modelo CriarApostaAvulsaRequestDto
