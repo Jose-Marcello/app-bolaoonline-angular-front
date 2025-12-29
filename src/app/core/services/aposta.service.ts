@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError,tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 import { ApiResponse } from '../../shared/models/api-response.model';
@@ -27,14 +27,18 @@ export class ApostaService {
 
   // CORREÇÃO DO SALVAR: Use a apiUrl correta (ApostaRodada)
   // No aposta.service.ts
-salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
-    // Tente usar a rota relativa se a apiUrl já contiver o domínio
-    const url = `${this.apiUrl}/SalvarApostas`; 
+// No aposta.service.ts
+    salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
+       // Tente remover o domínio fixo e usar apenas a rota relativa se o seu baseHref estiver configurado
+       // Ou garanta que a barra entre o controller e o método está correta
+       const url = `${this.apiUrl}/SalvarApostas`; 
     
-    console.log('[ApostaService] Enviando POST para:', url);
-    return this.http.post<ApiResponse<any>>(url, apostaRequest)
-      .pipe(catchError(this.handleError));
-}
+      return this.http.post<ApiResponse<any>>(url, apostaRequest)
+        .pipe(
+          tap(res => console.log('Resposta do Servidor:', res)),
+          catchError(this.handleError)
+        );
+   }
 
   // CORREÇÃO DO GET BY ID (Para a seleção de outras apostas)
   getApostaById(id: string): Observable<any> {
