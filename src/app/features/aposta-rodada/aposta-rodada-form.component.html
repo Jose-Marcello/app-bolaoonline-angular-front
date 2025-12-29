@@ -58,7 +58,13 @@
         </span>
         <span class="text-[8px] font-black text-emerald-400 uppercase">EDITÁVEL</span>
     </div>
-      <div class="card-header-dark p-3"><h2 class="titulo-camp-mini text-white">3. Preencher Palpites</h2></div>
+      
+    <div class="flex items-center justify-between mb-4">
+       <h3 class="text-xl font-bold">
+          3. <span *ngIf="isReadOnly">CONSULTA AOS JOGOS DA RODADA {{ rodadaSelecionada?.numeroRodada || '2' }}</span>
+             <span *ngIf="!isReadOnly">Preencher Palpites</span>
+      </h3>
+     </div>    
       
       <div class="p-3 space-y-3" formArrayName="palpites">
         <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" class="card-jogo-item-preto">
@@ -78,7 +84,13 @@
             </div>
           </div>
         </div>
-        <button (click)="salvarApostas()" [disabled]="isSaving" class="btn-salvar-aposta-final">CONFIRMAR PALPITES</button>
+
+        <button *ngIf="!isReadOnly" 
+             (click)="salvarApostas()" 
+             class="mt-6 w-full py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-all shadow-lg">
+                 Confirmar palpites
+        </button>
+
       </div>
     </div>
   </main>

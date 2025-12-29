@@ -41,11 +41,18 @@ import { CriarApostaAvulsaRequestDto } from '../../features/aposta-rodada/models
   styleUrls: ['./aposta-rodada-form.component.scss']
 })
 export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
-  isLoading = true;
-  isSaving = false;
+  isLoading = true; 
   isLoadingPalpites = false;
   isReadOnly = true;
-  errorMessage: string | null = null;
+  errorMessage: string | null = null;  
+  isLoadingCartelas: boolean = false; 
+  cartelasDaRodada: any[] = [];
+  // Correção para o erro no método salvarApostas
+  isSaving: boolean = false; 
+  
+  // Variáveis de controle de IDs (certifique-se que estão aqui)
+  //rodadaId: string = '';
+  //apostadorCampeonatoId: string = '';
 
   campeonatoId: string | null = null;
   rodadaId: string | null = null;
@@ -319,26 +326,75 @@ onClickCriarNovaAposta(): void {
 }
 
   salvarApostas(): void {
-    if (this.apostaForm.invalid || !this.apostaAtual) return;
-    this.isSaving = true;
-    const values = this.palpites.getRawValue();
-    const request = {
-      id: this.apostaAtual.id,
-      campeonatoId: this.campeonatoId,
-      rodadaId: this.rodadaId,
-      apostadorCampeonatoId: this.apostadorCampeonatoId,
-      palpites: values.map((v: any) => ({
-        jogoId: v.idJogo, placarApostaCasa: v.placarApostaCasa, placarApostaVisita: v.placarApostaVisita
-      }))
-    };
-    this.apostaService.salvarApostas(request as any).pipe(finalize(() => this.isSaving = false)).subscribe(res => {
+  // Validações de segurança antes de enviar
+  if (this.apostaForm.invalid || !this.apostaAtual) return;
+  
+  this.isSaving = true;
+  const values = this.palpites.getRawValue();
+  
+  const request = {
+    id: this.apostaAtual.id,
+    campeonatoId: this.campeonatoId,
+    rodadaId: this.rodadaId,
+    apostadorCampeonatoId: this.apostadorCampeonatoId,
+    palpites: values.map((v: any) => ({
+      jogoId: v.idJogo, 
+      placarApostaCasa: v.placarApostaCasa, 
+      placarApostaVisita: v.placarApostaVisita
+    }))
+  };
+
+  this.apostaService.salvarApostas(request as any)
+    .pipe(finalize(() => this.isSaving = false))
+    .subscribe(res => {
       if (res.success) {
         this.showSnackBar('Salvo com sucesso!', 'OK', 'success');
+        
+        // 1. Atualiza a data de envio para mudar a cor da cartela no Grid 2
         this.apostaAtual.dataHoraSubmissao = new Date().toISOString();
+        
+        // 2. Trava os campos novamente (Volta para o Modo Consulta)
+        this.isReadOnly = true;
         this.apostaForm.markAsPristine();
+        
+        // 3. Opcional: Recarregar cartelas para garantir sincronia total
+        this.loadCartelasDaRodada();
       }
     });
-  }
+}
+
+
+private loadCartelasDaRodada(): void {
+  if (!this.rodadaId || !this.apostadorCampeonatoId) return;
+
+  this.isLoadingCartelas = true;
+  
+  // Chamada ao serviço para buscar as apostas do utilizador nesta rodada
+  this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId, this.apostadorCampeonatoId)
+    .pipe(finalize(() => this.isLoadingCartelas = false))
+    .subscribe({
+      next: (res) => {
+        // Extração dos dados tratando a coleção preservada ($values)
+        //this.cartelasDaRodada = res.data?.$values || res.data || [];
+        this.cartelasDaRodada = (res.data as any)?.$values || res.data || [];
+
+        if (this.cartelasDaRodada.length > 0) {
+          // Se houver cartelas, seleciona a primeira por padrão
+          this.onApostaSelected(this.cartelasDaRodada[0]);
+        } else {
+          // Se não houver, entra no Modo Consulta
+          this.apostaAtual = null;
+          this.isReadOnly = true;
+          this.loadJogosSemPalpites(); 
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao carregar cartelas:', err);
+        this.showSnackBar('Erro ao carregar as suas apostas.', 'Fechar', 'error');
+      }
+    });
+}
+
 
   goBackToDashboard() { this.router.navigate(['/dashboard']); }
   private showSnackBar(m: string, a: string, t: string) {
