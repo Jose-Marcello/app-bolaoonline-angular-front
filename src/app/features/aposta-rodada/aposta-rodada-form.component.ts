@@ -106,9 +106,9 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
 
-  // No seu aposta-rodada-form.component.ts
+// No seu aposta-rodada-form.component.ts
 private loadAllIntegratedData(): Observable<any> {
-  // Blindagem contra IDs nulos que geram Erro 404
+  // Blindagem contra IDs nulos
   if (!this.campeonatoId || !this.rodadaId) {
     this.showSnackBar('Erro: Parâmetros de rota ausentes.', 'Fechar', 'error');
     return of(null);
@@ -116,7 +116,6 @@ private loadAllIntegratedData(): Observable<any> {
 
   this.isLoading = true;
 
-  // Carregamento paralelo para ganhar velocidade
   return forkJoin({
     rodadas: this.rodadaService.getRodadasEmAposta(this.campeonatoId).pipe(
       map(res => (res.data as any)?.$values || res.data || []),
@@ -144,24 +143,52 @@ private loadAllIntegratedData(): Observable<any> {
 
       this.apostasUsuarioRodada = apostas;
 
-      // Lógica de seleção automática para abrir o Grid 3
+      // Lógica de seleção: se houver apostas, carrega a edição. Se não, modo consulta.
       if (this.apostasUsuarioRodada.length > 0) {
+        this.isReadOnly = false;
         const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
         this.onApostaSelected(inicial.id);
       } else {
-        this.loadJogosSecos(); // Mostra apenas os jogos sem campos de aposta
+        this.isReadOnly = true; // Força modo leitura
+        this.loadJogosSemPalpites(); 
       }
     }),
     finalize(() => this.isLoading = false)
   );
 }
 
-  private loadJogosSecos() {
-    this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe(res => {
-      this.jogosDaApostaAtual = (res as any).data?.$values || (res as any).data || [];
-      this.montarGridVazio();
-    });
-  }
+private loadJogosSemPalpites(): void {
+  this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe(res => {
+    const dadosBrutos = (res as any).data?.$values || (res as any).data || [];
+    
+    // Mapeamento importante: garante que as imagens e nomes apareçam no Grid 3
+    this.jogosDaApostaAtual = dadosBrutos.map((j: any) => ({
+      ...j,
+      idJogo: j.id,
+      // Blindagem de escudos idêntica à da seleção de aposta
+      escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
+      escudoVisitante: j.escudoVisitante || j.equipeVisitaEscudoUrl || j.escudoVisitante,
+      placarApostaCasa: null,
+      placarApostaVisita: null
+    }));
+    
+    this.montarGridVazio();
+  });
+}
+
+montarGridVazio(): void {
+  this.palpites.clear();
+  this.jogosDaApostaAtual.forEach(j => {
+    this.palpites.push(this.fb.group({
+      idJogo: [j.id || j.idJogo],
+      // No Modo Consulta/Sem Aposta, os campos nascem desabilitados
+      placarApostaCasa: [{ value: null, disabled: true }],
+      placarApostaVisita: [{ value: null, disabled: true }]
+    }));
+  });
+  console.log('[Modo Consulta] Grid vazio montado com ' + this.jogosDaApostaAtual.length + ' jogos.');
+}
+
 
   onRodadaSelected(rodadaId: string) {
     this.rodadaSelecionadaId = rodadaId;
@@ -170,7 +197,7 @@ private loadAllIntegratedData(): Observable<any> {
     this.apostaSelecionadaId = null;
     this.isReadOnly = true;
     this.isLoadingPalpites = true;
-    this.loadJogosSecos();
+    this.loadJogosSemPalpites();
     this.recarregarApostasDaRodada(rodadaId);
   }
 
@@ -228,7 +255,7 @@ onApostaSelected(apostaId: string): void {
 
     } else {
       // Se a cartela estiver vazia, monta o grid baseado nos jogos da rodada
-      this.loadJogosSecos();
+      this.loadJogosSemPalpites();
     }
     
     this.isReadOnly = false;
@@ -280,18 +307,6 @@ onClickCriarNovaAposta(): void {
     }
   })
 }
-
-
-  montarGridVazio() {
-    this.palpites.clear();
-    this.jogosDaApostaAtual.forEach(j => {
-      this.palpites.push(this.fb.group({
-        idJogo: [j.id || j.idJogo],
-        placarApostaCasa: [{ value: null, disabled: true }],
-        placarApostaVisita: [{ value: null, disabled: true }]
-      }));
-    });
-  }
 
   salvarApostas(): void {
     if (this.apostaForm.invalid || !this.apostaAtual) return;
