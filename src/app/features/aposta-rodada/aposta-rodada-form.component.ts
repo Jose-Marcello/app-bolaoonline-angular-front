@@ -137,7 +137,7 @@ private loadAllIntegratedData(): Observable<any> {
       this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
       
       if (apostador) {
-        this.userId = apostador.id;
+        this.userId = apostador.id; 
         this.apostadorSaldo = apostador.saldo?.valor || 0;
       }
 
@@ -171,7 +171,7 @@ private loadJogosSemPalpites(): void {
         idJogo: j.id,
         // Blindagem de escudos que já testamos e funcionou
         escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
-        escudoVisitante: j.escudoVisitante || j.equipeVisitanteEscudoUrl || j.escudoVisitante,
+        escudoVisitante: j.escudoVisitante || j.equipeVisitanteEscudoUrl || j.escudoVisita,
         placarApostaCasa: null,
         placarApostaVisita: null
       }));
