@@ -91,45 +91,61 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboardData(): void {
-    this.isLoading = true;
-    this.apostadorService.getDadosApostador().pipe(
-      catchError(() => of({ success: true, data: null })),
-      tap(response => {
-        if (response?.success && response.data) {
-          const data = isPreservedCollection<ApostadorDto>(response.data) 
-                      ? response.data.$values[0] : response.data as ApostadorDto;
-          if (data) {
-            this.apostador = data;
-            this.apostadorSaldo = data.saldo?.valor || 0;
-          }
-        }
-      }),
-      switchMap(() => this.campeonatoService.getAvailableCampeonatos(this.apostador?.usuarioId || '')),
-      map(response => unwrap<CampeonatoDto[]>(response.data) || []),
-      switchMap(campeonatos => {
-        this.campeonatosDisponiveis = campeonatos;
-        if (campeonatos.length === 0) return of([]);
+  this.isLoading = true;
 
-        const detalhamentoTarefas = campeonatos.map(camp => 
-          forkJoin({
-            emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({data: []}))),
-            correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({data: []}))),
-            finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({data: []}))),
-            totais: this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({data: null})))
-          }).pipe(
-            tap(res => {
-              camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta.data) || [];
-              camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes.data) || [];
-              camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas.data) || [];
-              if (res.totais.data) this.campeonatoTotais[camp.id] = res.totais.data;
-            })
-          )
-        );
-        return forkJoin(detalhamentoTarefas);
-      }),
-      finalize(() => this.isLoading = false)
-    ).subscribe();
-  }
+  this.apostadorService.getDadosApostador().pipe(
+    // Tratamento de erro inicial para evitar o alerta de "desconectado" indevido
+    catchError(() => of({ success: false, data: null })),
+    tap(response => {
+      if (response?.success && response.data) {
+        const data = isPreservedCollection<ApostadorDto>(response.data) 
+                    ? response.data.$values[0] : response.data as ApostadorDto;
+        if (data) {
+          this.apostador = data;
+          this.apostadorSaldo = data.saldo?.valor || 0;
+        }
+      }
+    }),
+    // Busca campeonatos baseados no ID do apostador carregado acima
+    switchMap(() => this.campeonatoService.getAvailableCampeonatos(this.apostador?.usuarioId || '')),
+    map(response => unwrap<CampeonatoDto[]>(response.data) || []),
+    switchMap(campeonatos => {
+      this.campeonatosDisponiveis = campeonatos;
+      if (campeonatos.length === 0) return of([]);
+
+      // Cria a bateria de chamadas paralelas para cada campeonato
+      const detalhamentoTarefas = campeonatos.map(camp => 
+        forkJoin({
+          emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
+          correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
+          finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
+          totais: this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({ success: false, data: null })))
+        }).pipe(
+          tap(res => {
+            // Sincronização e Blindagem das Rodadas
+            camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta?.data) || [];
+            camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes?.data) || [];
+            camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas?.data) || [];
+            
+            if (res.totais?.data) {
+              this.campeonatoTotais[camp.id] = res.totais.data;
+            }
+          })
+        )
+      );
+      return forkJoin(detalhamentoTarefas);
+    }),
+    // O FINALIZE entra aqui, após todos os switchMaps
+    finalize(() => {
+      this.isLoading = false;
+    })
+  ).subscribe({
+    error: (err) => {
+      console.error('Erro crítico no Dashboard:', err);
+      this.isLoading = false;
+    }
+  });
+}
 
   // ✅ NAVEGAÇÃO LIBERADA (REMOVIDO IF !VINCULO)
   navegarParaApostasRodada(campeonatoId: string): void {

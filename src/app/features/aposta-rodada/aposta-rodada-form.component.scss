@@ -21,3 +21,22 @@
   color: #0f172a !important; border: 2px solid #334155; border-radius: 10px; 
   text-align: center; font-weight: 900; font-size: 22px; 
 }
+
+.card-grafite-setor {
+  background-color: #334155 !important; // Cor grafite
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #475569;
+  margin-bottom: 1rem;
+}
+
+.card-jogo-item-preto {
+  background-color: #0f172a !important; // Fundo preto para o card de jogo
+  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid #1e293b;
+}
+
+.linha-ativa-indigo { background-color: #4f46e5 !important; color: white !important; }
+.linha-ativa-teal { background-color: #0d9488 !important; color: white !important; border-left: 4px solid #10b981 !important; }
+.linha-off { background-color: transparent; color: #cbd5e1; }
