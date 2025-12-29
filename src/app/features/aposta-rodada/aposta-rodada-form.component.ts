@@ -13,7 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { Subscription, combineLatest, of, Observable } from 'rxjs';
+import { Subscription, combineLatest, of, Observable, forkJoin } from 'rxjs';
 import { switchMap, finalize, catchError, filter, tap, map } from 'rxjs/operators';
 
 // Services & Models
@@ -106,40 +106,55 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
 
-  private loadAllIntegratedData(): Observable<any> {
-    this.isLoading = true;
-    const rodadas$ = this.rodadaService.getRodadasEmAposta(this.campeonatoId!).pipe(
-      map(res => (res.data as any)?.$values || res.data || [])
-    );
-    const apostador$ = this.apostadorService.getDadosApostador().pipe(map(res => res.data as ApostadorDto));
-    const apostas$ = this.apostadorCampeonatoId 
-      ? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId!, this.apostadorCampeonatoId!)
-        .pipe(map(res => (res.data as any)?.$values || res.data || []), catchError(() => of([])))
-      : of([]);
-
-    return combineLatest([rodadas$, apostador$, apostas$]).pipe(
-      tap(([rodadas, apostador, apostas]) => {
-        this.rodadasEmAposta = rodadas;
-        this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
-        if (this.rodadaSelecionada) this.custoAposta = this.rodadaSelecionada.custoApostaRodada;
-        
-        if (apostador) {
-          this.userId = apostador.id;
-          this.apostadorSaldo = apostador.saldo?.valor || 0;
-        }
-
-        this.apostasUsuarioRodada = apostas;
-        if (this.apostasUsuarioRodada.length > 0) {
-          const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
-          this.onApostaSelected(inicial.id);
-        } else {
-          this.isReadOnly = true;
-          this.apostaAtual = null;
-          this.loadJogosSecos();
-        }
-      })
-    );
+  // No seu aposta-rodada-form.component.ts
+private loadAllIntegratedData(): Observable<any> {
+  // Blindagem contra IDs nulos que geram Erro 404
+  if (!this.campeonatoId || !this.rodadaId) {
+    this.showSnackBar('Erro: Parâmetros de rota ausentes.', 'Fechar', 'error');
+    return of(null);
   }
+
+  this.isLoading = true;
+
+  // Carregamento paralelo para ganhar velocidade
+  return forkJoin({
+    rodadas: this.rodadaService.getRodadasEmAposta(this.campeonatoId).pipe(
+      map(res => (res.data as any)?.$values || res.data || []),
+      catchError(() => of([]))
+    ),
+    apostador: this.apostadorService.getDadosApostador().pipe(
+      map(res => res.data as ApostadorDto),
+      catchError(() => of(null))
+    ),
+    apostas: this.apostadorCampeonatoId 
+      ? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId, this.apostadorCampeonatoId).pipe(
+          map(res => (res.data as any)?.$values || res.data || []),
+          catchError(() => of([]))
+        )
+      : of([])
+  }).pipe(
+    tap(({ rodadas, apostador, apostas }) => {
+      this.rodadasEmAposta = rodadas;
+      this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
+      
+      if (apostador) {
+        this.userId = apostador.id;
+        this.apostadorSaldo = apostador.saldo?.valor || 0;
+      }
+
+      this.apostasUsuarioRodada = apostas;
+
+      // Lógica de seleção automática para abrir o Grid 3
+      if (this.apostasUsuarioRodada.length > 0) {
+        const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
+        this.onApostaSelected(inicial.id);
+      } else {
+        this.loadJogosSecos(); // Mostra apenas os jogos sem campos de aposta
+      }
+    }),
+    finalize(() => this.isLoading = false)
+  );
+}
 
   private loadJogosSecos() {
     this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe(res => {
