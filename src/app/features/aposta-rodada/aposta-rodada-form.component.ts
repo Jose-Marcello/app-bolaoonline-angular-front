@@ -22,6 +22,7 @@ import { ApostaService } from '../../core/services/aposta.service';
 import { ApostadorService } from '../../core/services/apostador.service';
 import { RodadaDto } from '../../features/rodada/model/rodada-dto.model';
 import { ApostaRodadaDto } from '../../features/aposta-rodada/models/aposta-rodada-dto.model';
+import { SalvarApostaRequestDto } from '../../features/aposta-rodada/models/salvar-aposta-request-dto.model';
 import { ApostadorDto } from '../../features/apostador/models/apostador-dto.model';
 import { environment } from '../../../environments/environment';
 import { ConfirmacaoApostaModalComponent } from '../../shared/components/confirmacao-modal/confirmacao-apostaModal.Component';
@@ -325,44 +326,50 @@ onClickCriarNovaAposta(): void {
   })
 }
 
-  salvarApostas(): void {
-  // Validações de segurança antes de enviar
-  if (this.apostaForm.invalid || !this.apostaAtual) return;
-  
+  salvarApostas() {
+  if (!this.apostaAtual || this.apostaForm.invalid) return;
+
   this.isSaving = true;
-  const values = this.palpites.getRawValue();
-  
-  const request = {
+
+  // Captura os valores do FormArray garantindo que o jogoId esteja presente
+  const valoresForm = this.palpites.getRawValue(); 
+
+  // Montagem conforme o SalvarApostaRequestDto
+  const request: SalvarApostaRequestDto = {
     id: this.apostaAtual.id,
-    campeonatoId: this.campeonatoId,
-    rodadaId: this.rodadaId,
-    apostadorCampeonatoId: this.apostadorCampeonatoId,
-    palpites: values.map((v: any) => ({
-      jogoId: v.idJogo, 
-      placarApostaCasa: v.placarApostaCasa, 
-      placarApostaVisita: v.placarApostaVisita
+    campeonatoId: this.campeonatoId!,
+    rodadaId: this.rodadaId!,
+    apostadorCampeonatoId: this.apostadorCampeonatoId!,
+    ehApostaIsolada: !this.apostaAtual.ehApostaCampeonato,
+    identificadorAposta: this.apostaAtual.identificadorAposta || 'AVULSA',
+    ehCampeonato: this.apostaAtual.ehApostaCampeonato || false,
+    
+    // IMPORTANTE: O nome da propriedade deve ser apostasJogos
+    apostasJogos: valoresForm.map((p: any) => ({
+      jogoId: p.jogoId,
+      placarCasa: p.placarApostaCasa, // Mapeie para o nome do DTO: placarCasa
+      placarVisitante: p.placarApostaVisita // Mapeie para: placarVisitante
     }))
   };
 
-  this.apostaService.salvarApostas(request as any)
+  console.log('[Aposta] Enviando para o Servidor:', request);
+
+  this.apostaService.salvarApostas(request)
     .pipe(finalize(() => this.isSaving = false))
-    .subscribe(res => {
-      if (res.success) {
-        this.showSnackBar('Salvo com sucesso!', 'OK', 'success');
-        
-        // 1. Atualiza a data de envio para mudar a cor da cartela no Grid 2
-        this.apostaAtual.dataHoraSubmissao = new Date().toISOString();
-        
-        // 2. Trava os campos novamente (Volta para o Modo Consulta)
-        this.isReadOnly = true;
-        this.apostaForm.markAsPristine();
-        
-        // 3. Opcional: Recarregar cartelas para garantir sincronia total
-        this.loadCartelasDaRodada();
+    .subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.showSnackBar('Aposta salva com sucesso!', 'Fechar', 'success');
+          this.isReadOnly = true;
+          this.loadCartelasDaRodada(); // Atualiza a Data de Envio no Grid 2
+        }
+      },
+      error: (err) => {
+        console.error('Erro no salvamento:', err);
+        this.showSnackBar('Erro ao processar salvamento.', 'Fechar', 'error');
       }
     });
 }
-
 
 private loadCartelasDaRodada(): void {
   if (!this.rodadaId || !this.apostadorCampeonatoId) return;
