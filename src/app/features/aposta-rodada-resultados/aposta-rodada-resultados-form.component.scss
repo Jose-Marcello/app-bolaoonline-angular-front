@@ -1,73 +1,106 @@
-/* REGRAS GLOBAIS DA TELA */
-.dashboard-root { background-color: #cbd5e1 !important; }
+/* REPRODUÇÃO DO PADRÃO VISUAL DASHBOARD DARK */
 
-.card-campeonato-container {
-  background-color: #334155 !important;
-  border-radius: 1.5rem;
+.card-grafite-setor {
+  background-color: #1e293b; // slate-800
+  border: 1px solid #334155; // slate-700
+  border-radius: 0.75rem;
   overflow: hidden;
-  border: 1px solid #475569;
+  margin-bottom: 1rem;
 }
 
 .card-header-dark {
-  background-color: #0f172a !important;
+  background-color: #0f172a; // slate-900
+  border-bottom: 1px solid #334155;
+  
+  .titulo-camp-mini {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 }
 
-.titulo-camp-mini {
-  color: #f1f5f9 !important;
-  font-weight: 800 !important;
-  font-size: 10px !important;
-  text-transform: uppercase;
-  margin: 0;
-}
-
-/* 1. RODADAS */
-.btn-rodada-ativa {
-  background: #4f46e5 !important; border: 1px solid #818cf8 !important;
-  min-width: 65px; height: 50px; border-radius: 12px; color: white; font-weight: 900;
-}
-.btn-rodada-inativa {
-  background: #1e293b !important; border: 1px solid #475569 !important;
-  min-width: 65px; height: 50px; border-radius: 12px; color: #94a3b8; font-weight: 900;
-}
-
-/* 2. CARTELAS */
-.cartela-container-base {
-  background: #0f172a; padding: 12px; border-radius: 14px; border: 2px solid #1e293b;
-  display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+.card-jogo-item-preto {
+  background-color: #0f172a; // Fundo preto para destacar os escudos
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   transition: all 0.2s ease;
-  &.cartela-selecionada { border-color: #10b981; background: #1e293b; }
 }
 
-.btn-nova-avulsa-styled {
-  width: 100%; padding: 14px; border-radius: 12px; border: 2px dashed #475569;
-  background: transparent; color: #818cf8; font-weight: 900; font-size: 10px;
-  text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+/* ESTADOS DE LINHA ATIVA */
+.linha-ativa-indigo {
+  background-color: rgba(79, 70, 229, 0.2) !important; // indigo-600 com transparência
+  border-left: 4px solid #4f46e5 !important;
 }
 
-/* 3. JOGOS */
-.card-jogo-item {
-  background-color: #0f172a; padding: 15px; border-radius: 16px; border: 1px solid #1e293b;
+.linha-ativa-teal {
+  background-color: rgba(20, 184, 166, 0.1) !important; // teal-500 com transparência
+  border-left: 4px solid #14b8a6 !important;
 }
 
-.time-label-aposta {
-  color: #f1f5f9; font-weight: 800; font-size: 9px; text-transform: uppercase; line-height: 1.1;
+.linha-off {
+  background-color: transparent;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
 }
 
-.input-placar-final {
-  width: 42px; height: 42px; background: #f8fafc; border: none; border-radius: 10px;
-  text-align: center; font-weight: 900; font-size: 18px; color: #0f172a;
-  &:disabled { background: #64748b; color: #1e293b; opacity: 0.6; }
+/* BOTÕES PERSONALIZADOS */
+.btn-voltar-topo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #334155;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    background: #475569;
+  }
 }
 
-/* AUXILIARES */
-.stamp-label-final {
-  color: #000; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+.btn-nova-cartela-dash {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #4f46e5; // Indigo fixo para rankings e ações
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 800;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.1s active;
+
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
-.btn-pastel { width: 100%; border: none; border-radius: 1rem; cursor: pointer; }
-.btn-verde-pastel { background-color: #d1fae5 !important; color: #065f46 !important; }
-
-.scrollbar-hide {
-  -ms-overflow-style: none; scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+/* PONTUAÇÃO CIRCULAR (CONFORME SEU PRINT) */
+.pontos-circle {
+  width: 2rem;
+  height: 2rem;
+  background-color: #10b981; // emerald-500
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
