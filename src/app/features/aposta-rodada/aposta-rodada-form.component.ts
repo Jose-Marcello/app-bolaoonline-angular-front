@@ -213,11 +213,18 @@ onApostaSelected(apostaId: string): void {
       // 5. ATUALIZA A VARIÁVEL VISUAL (O que faltava para o grid aparecer!)
       // Mapeamos os dados do 'jogo' que vêm dentro do PalpiteDto para o array do HTML
       this.jogosDaApostaAtual = listaPalpites.map((p: any) => ({
-        ...p.jogo, // Pega escudoMandante, equipeMandante, etc.
-        idJogo: p.jogoId,
-        placarApostaCasa: p.placarApostaCasa,
-        placarApostaVisita: p.placarApostaVisita
-      }));
+        // Espalhamos o objeto jogo que vem do backend
+       ...p.jogo, 
+       idJogo: p.jogoId,
+       placarApostaCasa: p.placarApostaCasa,
+       placarApostaVisita: p.placarApostaVisita,
+       // Forçamos o mapeamento se o backend usar nomes diferentes:
+       escudoMandante: p.jogo.escudoMandante || p.jogo.escudoCasa || p.jogo.equipeCasaEscudoUrl,
+       escudoVisitante: p.jogo.escudoVisitante || p.jogo.escudoFora || p.jogo.equipeVisitanteEscudoUrl,
+       equipeMandante: p.jogo.equipeMandante || p.jogo.nomeEquipeCasa,
+       equipeVisitante: p.jogo.equipeVisitante || p.jogo.nomeEquipeVisitante
+  }));
+
 
     } else {
       // Se a cartela estiver vazia, monta o grid baseado nos jogos da rodada
