@@ -188,7 +188,8 @@ onApostaSelected(apostaId: string): void {
         }));
       });
 
-      // ESSA LINHA TRAZ OS PALPITES E ESCUDOS PARA A TELA
+      // ESTA LINHA É O QUE FAZ O GRID APARECER:
+      // Ela vincula os palpites aos dados dos times (escudos e nomes)
       this.jogosDaApostaAtual = lista.map((p: any) => ({
         ...p.jogo, 
         idJogo: p.jogoId, 
@@ -196,7 +197,6 @@ onApostaSelected(apostaId: string): void {
         placarApostaVisita: p.placarApostaVisita
       }));
     }
-    this.apostaForm.markAsPristine();
   }
 }
 

@@ -16,6 +16,23 @@
   font-weight: 900; font-size: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 
+/* Estilo para o Botão de Nova Cartela (Cor Diferente) */
+.btn-nova-cartela-avulsa {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: 2px dashed #6366f1; // Cor indigo para destacar
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  font-weight: 900;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  &:hover { background: rgba(99, 102, 241, 0.2); }
+}
+
 .input-placar-dash { 
   width: 46px; height: 46px; background-color: #ffffff !important; 
   color: #0f172a !important; border: 2px solid #334155; border-radius: 10px; 

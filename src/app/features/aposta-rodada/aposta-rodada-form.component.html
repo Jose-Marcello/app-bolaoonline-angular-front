@@ -52,10 +52,12 @@
     </div>
 
     <div class="card-grafite-setor shadow-2xl" [formGroup]="apostaForm">
-      <div *ngIf="apostaAtual" class="bg-slate-700 p-2 px-4 flex justify-between items-center border-b border-slate-600">
-        <span class="text-[10px] font-black text-white uppercase">CARTELA: <span class="text-teal-300">{{ apostaAtual.identificadorAposta || 'AVULSA' }}</span></span>
-        <span class="text-[8px] font-black text-emerald-400 uppercase">ATIVO</span>
-      </div>
+      <div *ngIf="apostaAtual" class="bg-slate-700 p-2 px-4 flex justify-between items-center border-b border-slate-600 rounded-t-xl">
+        <span class="text-[10px] font-black text-white uppercase tracking-widest">
+             CARTELA: <span class="text-teal-400">{{ apostaAtual.identificadorAposta || 'AVULSA' }}</span>
+        </span>
+        <span class="text-[8px] font-black text-emerald-400 uppercase">EDITÁVEL</span>
+    </div>
       <div class="card-header-dark p-3"><h2 class="titulo-camp-mini text-white">3. Preencher Palpites</h2></div>
       
       <div class="p-3 space-y-3" formArrayName="palpites">
