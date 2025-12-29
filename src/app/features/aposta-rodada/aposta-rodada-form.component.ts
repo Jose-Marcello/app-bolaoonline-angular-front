@@ -26,6 +26,9 @@ import { ApostadorDto } from '../../features/apostador/models/apostador-dto.mode
 import { environment } from '../../../environments/environment';
 import { ConfirmacaoApostaModalComponent } from '../../shared/components/confirmacao-modal/confirmacao-apostaModal.Component';
 
+import { CriarApostaAvulsaRequestDto } from '../../features/aposta-rodada/models/criar-aposta-avulsa-request.Dto.model'
+
+
 @Component({
   selector: 'app-aposta-rodada-form',
   standalone: true,
@@ -166,33 +169,81 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
       });
   }
 
-  onApostaSelected(apostaId: string): void {
-    const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
-    if (aposta) {
-      this.apostaAtual = aposta; // Fachada
-      this.apostaSelecionadaId = apostaId; // Pintura
-      this.isReadOnly = false;
-      this.palpites.clear();
+  // --- CERTIFIQUE-SE QUE ESTE MÉTODO ESTÁ MAPEANDO JOGOSDAAPOSTAATUAL ---
+onApostaSelected(apostaId: string): void {
+  const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
+  if (aposta) {
+    this.apostaAtual = aposta;
+    this.apostaSelecionadaId = apostaId;
+    this.isReadOnly = false;
+    this.palpites.clear();
 
-      const lista = (aposta.palpites as any)?.$values || []; // Modelo .NET
-      if (lista.length > 0) {
-        lista.forEach((p: any) => {
-          this.palpites.push(this.fb.group({
-            idJogo: [p.jogoId],
-            placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
-            placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
-          }));
-        });
-        // Sincroniza visual com dados do JogoDto
-        this.jogosDaApostaAtual = lista.map((p: any) => ({
-          ...p.jogo, idJogo: p.jogoId, placarApostaCasa: p.placarApostaCasa, placarApostaVisita: p.placarApostaVisita
+    const lista = (aposta.palpites as any)?.$values || [];
+    if (lista.length > 0) {
+      lista.forEach((p: any) => {
+        this.palpites.push(this.fb.group({
+          idJogo: [p.jogoId],
+          placarApostaCasa: [p.placarApostaCasa],
+          placarApostaVisita: [p.placarApostaVisita]
         }));
-      } else {
-        this.montarGridVazio();
-      }
-      this.apostaForm.markAsPristine();
+      });
+
+      // ESSA LINHA TRAZ OS PALPITES E ESCUDOS PARA A TELA
+      this.jogosDaApostaAtual = lista.map((p: any) => ({
+        ...p.jogo, 
+        idJogo: p.jogoId, 
+        placarApostaCasa: p.placarApostaCasa, 
+        placarApostaVisita: p.placarApostaVisita
+      }));
     }
+    this.apostaForm.markAsPristine();
   }
+}
+
+criarNovaApostaAvulsa(): void {
+  // Monta o objeto de requisição conforme o modelo CriarApostaAvulsaRequestDto
+  const request: CriarApostaAvulsaRequestDto = {
+    campeonatoId: this.campeonatoId!,
+    rodadaId: this.rodadaId!,
+    apostadorId: this.userId!,
+    custoAposta: this.custoAposta
+  };
+
+  this.isSaving = true; // Ativa o spinner de carregamento
+
+  this.apostaService.criarNovaApostaAvulsa(request).pipe(
+    finalize(() => this.isSaving = false)
+  ).subscribe({
+    next: (res) => {
+      if (res.success) {
+        this.showSnackBar('Nova aposta avulsa criada com sucesso!', 'Fechar', 'success');
+        
+        // RECARREGA A TELA: Chama o método principal para atualizar a lista de apostas
+        // e selecionar a nova cartela automaticamente
+        this.loadAllIntegratedData().subscribe();
+      }
+    },
+    error: (err) => {
+      console.error('Erro ao criar aposta:', err);
+      this.showSnackBar('Erro ao criar nova cartela. Verifique seu saldo.', 'Fechar', 'error');
+    }
+  });
+}
+
+// --- ADICIONE ESTE MÉTODO PARA RESOLVER O ERRO NG9 ---
+onClickCriarNovaAposta(): void {
+  this.dialog.open(ConfirmacaoApostaModalComponent, {
+    data: { 
+      mensagem: `Deseja criar uma nova aposta avulsa?`, 
+      valorAposta: this.custoAposta 
+    }
+  }).afterClosed().subscribe(result => {
+    if (result) {
+      this.criarNovaApostaAvulsa();
+    }
+  })
+}
+
 
   montarGridVazio() {
     this.palpites.clear();
