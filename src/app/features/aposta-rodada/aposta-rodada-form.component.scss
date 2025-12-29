@@ -33,6 +33,22 @@
   &:hover { background: rgba(99, 102, 241, 0.2); }
 }
 
+
+.btn-nova-cartela-dash {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px dashed #6366f1; /* Indigo pontilhado para destacar */
+  background: rgba(99, 102, 241, 0.05);
+  color: #818cf8;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .input-placar-dash { 
   width: 46px; height: 46px; background-color: #ffffff !important; 
   color: #0f172a !important; border: 2px solid #334155; border-radius: 10px; 
