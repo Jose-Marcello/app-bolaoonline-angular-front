@@ -1,63 +1,118 @@
 <div class="flex flex-col items-center justify-center w-full py-6">
-  <div class="px-6 py-1 bg-slate-400/20 border border-slate-500/30 rounded-full">
+  <div class="px-6 py-1 bg-slate-400/20 border border-slate-500/30 rounded-full shadow-sm">
     <h1 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-950">
-      {{ rodadaSelecionada?.campeonato?.nome || 'BRASILEIRO 2025' }}
+      {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO BRASILEIRO 2025' }}
     </h1>
   </div>
-  <div class="w-16 h-[1px] bg-slate-500/40 mt-3"></div>
+  <div class="w-16 h-[1px] bg-slate-500/40 mt-3 shadow-sm"></div>
 </div>
 
 <div class="container-dashboard p-4 space-y-6">
-  
-  <div class="bg-slate-800/40 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl">
+
+  <div class="bg-slate-800/40 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+    <div class="p-4 border-b border-slate-700 bg-slate-900/50">
+      <h3 class="text-xs font-black text-white uppercase tracking-widest">1. Rodadas em Aposta</h3>
+    </div>
+    <div class="p-4 overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="text-[10px] uppercase text-slate-500 font-black border-b border-slate-700">
+            <th class="pb-3 text-center">Ação</th>
+            <th class="pb-3 text-center">Rodada</th>
+            <th class="pb-3 text-center">Início</th>
+            <th class="pb-3 text-center">Fim</th>
+          </tr>
+        </thead>
+        <tbody class="text-[11px] font-bold text-slate-300">
+          <tr *ngFor="let r of rodadasDisponiveis" 
+              [class.bg-indigo-500]="r.id === rodadaId"
+              class="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
+            <td class="py-3 text-center">
+              <button (click)="selecionarRodada(r.id)" class="text-indigo-400 hover:text-white transition-colors">
+                <mat-icon class="scale-90">play_circle_filled</mat-icon>
+              </button>
+            </td>
+            <td class="py-3 text-center text-white">{{ r.numeroRodada }}</td>
+            <td class="py-3 text-center">{{ r.dataInicio | date:'dd/MM' }}</td>
+            <td class="py-3 text-center">{{ r.dataFim | date:'dd/MM' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bg-slate-800/40 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+    <div class="p-4 border-b border-slate-700 bg-slate-900/50">
+      <h3 class="text-xs font-black text-white uppercase tracking-widest">2. Minhas Cartelas nesta Rodada</h3>
+    </div>
+    <div class="p-4">
+      <div class="grid grid-cols-5 text-[9px] uppercase text-slate-500 font-black border-b border-slate-700 pb-2 mb-2">
+        <span class="text-center">Sel.</span>
+        <span class="col-span-2">Identificação</span>
+        <span class="text-center">Envio</span>
+        <span class="text-center">Tipo</span>
+      </div>
+      <div *ngFor="let a of apostasUsuarioRodada" 
+           (click)="selecionarAposta(a)"
+           [ngClass]="apostaAtual?.id === a.id ? 'bg-emerald-500/20 border-emerald-500/50' : 'bg-slate-900/40 border-transparent'"
+           class="grid grid-cols-5 items-center p-3 mb-2 rounded-lg border cursor-pointer transition-all hover:border-slate-500">
+        <div class="text-center">
+          <mat-icon [class.text-emerald-400]="apostaAtual?.id === a.id" class="scale-75">
+            {{ apostaAtual?.id === a.id ? 'check_circle' : 'radio_button_unchecked' }}
+          </mat-icon>
+        </div>
+        <div class="col-span-2 flex flex-col">
+          <span class="text-[10px] font-black text-white uppercase">{{ a.identificadorAposta }}</span>
+          <span class="text-[8px] text-slate-500">{{ a.id | uppercase }}</span>
+        </div>
+        <div class="text-center text-[9px] font-black" [ngClass]="a.dataHoraSubmissao ? 'text-emerald-400' : 'text-slate-600'">
+          {{ a.dataHoraSubmissao ? (a.dataHoraSubmissao | date:'dd/MM') : 'PENDENTE' }}
+        </div>
+        <div class="text-center">
+          <span [class]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'" 
+                class="text-[8px] font-black px-1.5 py-0.5 rounded text-white">
+            {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="apostaAtual" class="bg-slate-800/40 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl">
     <div class="p-4 border-b border-slate-700 bg-slate-900/50 flex justify-between items-center">
-      <h3 class="text-xs font-black text-white uppercase tracking-widest">
-        3. Palpites da Rodada
-      </h3>
-      <span class="text-[9px] font-bold text-slate-400 bg-slate-700/50 px-2 py-1 rounded">
-        ORDEM: DATA + HORA
-      </span>
+      <h3 class="text-xs font-black text-white uppercase tracking-widest">3. Palpites da Rodada</h3>
+      <div class="px-2 py-1 bg-slate-700 rounded text-[9px] font-black text-slate-400 uppercase">Ordem: Data + Hora</div>
     </div>
 
     <form [formGroup]="apostaForm">
       <div class="p-3 space-y-3" formArrayName="palpites">
-        
-        <div *ngFor="let ctrl of palpites.controls; let i = index" 
-             [formGroupName]="i" 
-             class="card-jogo-item-preto !flex-col !gap-0 animate-fade-in">
+        <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
+             class="bg-slate-900/60 rounded-xl p-4 border border-slate-700/50 flex flex-col">
           
           <div class="w-full text-center border-b border-slate-700/30 pb-2 mb-3">
-            <p class="text-[8px] font-black text-slate-500 uppercase tracking-tighter">
-              {{ jogosDaApostaAtual[i]?.estadioNome || 'Local não informado' }}
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+              {{ jogosDaApostaAtual[i]?.dataJogo | date:'EEEE, dd/MM' | uppercase }} às {{ jogosDaApostaAtual[i]?.horaJogo }}
             </p>
-            <p class="text-[10px] font-bold text-indigo-400">
-              {{ jogosDaApostaAtual[i]?.dataJogo | date:'dd/MM - EEEE' | uppercase }} às {{ jogosDaApostaAtual[i]?.horaJogo }}
-            </p>
+            <p class="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{{ jogosDaApostaAtual[i]?.estadioNome }}</p>
           </div>
 
-          <div class="grid grid-cols-7 items-center gap-2 w-full">
+          <div class="grid grid-cols-7 items-center gap-2">
             <div class="col-span-2 flex flex-col items-center">
-              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoMandante" 
-                   onerror="this.src='assets/images/logo-bola.png'" 
-                   class="w-10 h-10 mb-1 object-contain drop-shadow-lg">
-              <span class="text-[9px] font-black text-white text-center uppercase truncate w-full">
-                {{ jogosDaApostaAtual[i]?.equipeMandante }}
-              </span>
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoMandante" class="w-10 h-10 mb-1 object-contain">
+              <span class="text-[9px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeMandante }}</span>
             </div>
 
             <div class="col-span-3 flex items-center justify-center gap-2">
-              <input type="number" formControlName="placarApostaCasa" [readonly]="isReadOnly" class="input-placar-dash">
-              <span class="text-white font-black text-lg opacity-40">X</span>
-              <input type="number" formControlName="placarApostaVisita" [readonly]="isReadOnly" class="input-placar-dash">
+              <input type="number" formControlName="placarApostaCasa" [readonly]="isReadOnly" 
+                     class="w-12 h-10 bg-white text-slate-900 text-center font-black text-lg rounded-lg border-none focus:ring-2 focus:ring-emerald-500">
+              <span class="text-white font-black opacity-30">X</span>
+              <input type="number" formControlName="placarApostaVisita" [readonly]="isReadOnly" 
+                     class="w-12 h-10 bg-white text-slate-900 text-center font-black text-lg rounded-lg border-none focus:ring-2 focus:ring-emerald-500">
             </div>
 
             <div class="col-span-2 flex flex-col items-center">
-              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoVisitante" 
-                   onerror="this.src='assets/images/logo-bola.png'" 
-                   class="w-10 h-10 mb-1 object-contain drop-shadow-lg">
-              <span class="text-[9px] font-black text-white text-center uppercase truncate w-full">
-                {{ jogosDaApostaAtual[i]?.equipeVisitante }}
-              </span>
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoVisitante" class="w-10 h-10 mb-1 object-contain">
+              <span class="text-[9px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitante }}</span>
             </div>
           </div>
         </div>
@@ -65,20 +120,13 @@
     </form>
 
     <div class="p-4 bg-slate-900/90 border-t border-slate-700 flex items-center justify-between">
-      
       <div class="flex flex-col">
-        <span class="text-[9px] uppercase text-slate-500 font-black tracking-widest mb-1">
-          Última Atualização
-        </span>
+        <span class="text-[9px] uppercase text-slate-500 font-black tracking-widest mb-1">Última Atualização</span>
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 rounded-full shadow-[0_0_8px]" 
-               [ngClass]="apostaAtual?.dataHoraSubmissao ? 'bg-emerald-500 shadow-emerald-500/50' : 'bg-amber-500 animate-pulse'">
-          </div>
-          <span class="text-[11px] font-black" 
-                [ngClass]="apostaAtual?.dataHoraSubmissao ? 'text-emerald-400' : 'text-slate-400'">
-            {{ apostaAtual?.dataHoraSubmissao 
-               ? (apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm:ss') 
-               : 'Palpites ainda não enviados' }}
+               [ngClass]="apostaAtual?.dataHoraSubmissao ? 'bg-emerald-500 shadow-emerald-500' : 'bg-amber-500 animate-pulse'"></div>
+          <span class="text-[11px] font-black" [ngClass]="apostaAtual?.dataHoraSubmissao ? 'text-emerald-400' : 'text-slate-400'">
+            {{ apostaAtual?.dataHoraSubmissao ? (apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm:ss') : 'PENDENTE DE ENVIO' }}
           </span>
         </div>
       </div>
@@ -86,12 +134,10 @@
       <button mat-raised-button 
               [disabled]="isSaving || apostaForm.invalid"
               (click)="salvarApostas()"
-              class="btn-confirmar-final">
-        <mat-icon *ngIf="!isSaving" class="scale-75">cloud_done</mat-icon>
-        <mat-spinner *ngIf="isSaving" diameter="18" class="mr-2"></mat-spinner>
-        <span class="ml-1 text-[11px] font-black uppercase tracking-widest">
-          {{ isSaving ? 'Salvando...' : 'Confirmar Palpites' }}
-        </span>
+              class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-lg active:scale-95">
+        <mat-icon *ngIf="!isSaving" class="scale-90">check_circle</mat-icon>
+        <mat-spinner *ngIf="isSaving" diameter="18" color="accent"></mat-spinner>
+        <span class="text-[10px] font-black uppercase tracking-widest">{{ isSaving ? 'Salvando...' : 'Confirmar Palpites' }}</span>
       </button>
     </div>
   </div>

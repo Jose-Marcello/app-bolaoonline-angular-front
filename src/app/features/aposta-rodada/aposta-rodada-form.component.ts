@@ -47,9 +47,12 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   isReadOnly = true;
   errorMessage: string | null = null;  
   isLoadingCartelas: boolean = false; 
+  isLoadingJogos:boolean = false;
+
   cartelasDaRodada: any[] = [];
   // Correção para o erro no método salvarApostas
   isSaving: boolean = false; 
+  isLoadingApostas: boolean = false; 
   
   // Variáveis de controle de IDs (certifique-se que estão aqui)
   //rodadaId: string = '';
@@ -65,6 +68,8 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   apostadorSaldo: number | null = null;
   custoAposta = 0;
   
+  rodadasDisponiveis: any[] = []; // A lista que alimenta o Grid 1
+
   rodadasEmAposta: RodadaDto[] = [];
   rodadaSelecionada: RodadaDto | null = null;
   apostasUsuarioRodada: ApostaRodadaDto[] = []; 
@@ -312,6 +317,38 @@ criarNovaApostaAvulsa(): void {
   });
 }
 
+selecionarRodada(id: string) {
+  // 1. Atualiza o estado do componente
+  this.rodadaId = id;
+  this.apostaAtual = null; // Limpa a cartela selecionada anteriormente
+  this.jogosDaApostaAtual = []; // Limpa os jogos do Grid 3
+  this.palpites.clear(); // Limpa o formulário de palpites
+  
+  // Encontra o objeto da rodada para mostrar o nome/número se precisar
+  this.rodadaSelecionada = this.rodadasDisponiveis.find(r => r.id === id);
+
+  console.log(`[Rodada] Alterando para rodada: ${this.rodadaSelecionada?.numeroRodada}`);
+
+  // 2. Carrega as cartelas (Grid 2) desta rodada específica
+  // Este método você provavelmente já tem, ele preenche 'apostasUsuarioRodada'
+  this.carregarApostasDaRodada(id);
+}
+
+carregarApostasDaRodada(id: string) {
+  this.isLoadingApostas = true;
+  this.apostaService.obterApostasPorRodada(id).subscribe({
+    next: (res: any) => {
+      this.apostasUsuarioRodada = res.data?.$values || res.data || [];
+      this.isLoadingApostas = false;
+    },
+    error: (err) => {
+      this.isLoadingApostas = false;
+      this.showSnackBar('Erro ao carregar suas cartelas.', 'Fechar', 'error');
+    }
+  });
+}
+
+
 // --- ADICIONE ESTE MÉTODO PARA RESOLVER O ERRO NG9 ---
 onClickCriarNovaAposta(): void {
   this.dialog.open(ConfirmacaoApostaModalComponent, {
@@ -401,6 +438,87 @@ private loadCartelasDaRodada(): void {
       }
     });
 }
+
+// Adicione no seu componente
+
+selecionarAposta(aposta: any) {
+  // 1. Marca qual cartela o usuário clicou para destacar no Grid 2
+  this.apostaAtual = aposta;
+  this.isReadOnly = true; 
+  this.isLoadingJogos = true;
+
+  // 2. Busca os jogos e palpites ordenados via Backend (Melhor Performance)
+  this.apostaService.obterJogosComPalpites(aposta.id, this.rodadaId).subscribe({
+    next: (res: any) => {
+      // O Backend já entrega ordenado por Data e Hora!
+      this.jogosDaApostaAtual = res.data?.$values || res.data || [];
+
+      // 3. Limpa e reconstrói o formulário de palpites
+      this.palpites.clear();
+      this.jogosDaApostaAtual.forEach((jogo: any) => {
+        this.palpites.push(this.fb.group({
+          // jogoId é fundamental para o backend não dar falso positivo
+          jogoId: [jogo.id || jogo.jogoId], 
+          placarApostaCasa: [jogo.placarApostaCasa],
+          placarApostaVisita: [jogo.placarApostaVisita]
+        }));
+      });
+
+      this.isLoadingJogos = false;
+      console.log(`[Aposta] Cartela ${aposta.identificadorAposta} carregada com sucesso.`);
+    },
+    error: (err) => {
+      this.isLoadingJogos = false;
+      this.showSnackBar('Erro ao carregar jogos da cartela.', 'Fechar', 'error');
+    }
+  });
+}
+
+// Chame este método após o sucesso do salvamento para atualizar o rodapé
+atualizarStatusAposta() {
+  this.loadAllIntegratedData().subscribe(() => {
+    // Ao recarregar tudo, a propriedade dataHoraSubmissao virá atualizada do banco
+    console.log('Status de envio atualizado no rodapé.');
+  });
+}
+
+loadJogosComPalpites(apostaId: string) {
+  this.isLoadingJogos = true;
+  
+  this.apostaService.obterJogosComPalpites(apostaId,this.rodadaId).subscribe({
+    next: (res: any) => {
+      // 1. Recebe os jogos e aplica a ORDENAÇÃO POR DATA E HORA
+      const jogosBrutos = res.data?.$values || res.data || [];
+      
+      this.jogosDaApostaAtual = jogosBrutos.sort((a: any, b: any) => {
+        const dataA = new Date(`${a.dataJogo}T${a.horaJogo}`).getTime();
+        const dataB = new Date(`${b.dataJogo}T${b.horaJogo}`).getTime();
+        return dataA - dataB;
+      });
+
+      // 2. Limpa o formulário anterior
+      this.palpites.clear();
+
+      // 3. Preenche o FormArray com os novos jogos e palpites
+      this.jogosDaApostaAtual.forEach((jogo: any) => {
+        this.palpites.push(this.fb.group({
+          jogoId: [jogo.id], // Campo oculto essencial para o salvamento
+          placarApostaCasa: [jogo.placarApostaCasa],
+          placarApostaVisita: [jogo.placarApostaVisita]
+        }));
+      });
+
+      this.isLoadingJogos = false;
+      console.log(`[Aposta] ${this.jogosDaApostaAtual.length} jogos carregados e ordenados.`);
+    },
+    error: (err) => {
+      console.error('Erro ao carregar jogos da aposta:', err);
+      this.isLoadingJogos = false;
+      this.showSnackBar('Erro ao carregar os jogos.', 'Fechar', 'error');
+    }
+  });
+}
+
 
 
   goBackToDashboard() { this.router.navigate(['/dashboard']); }

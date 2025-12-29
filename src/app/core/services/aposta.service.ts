@@ -59,6 +59,16 @@ export class ApostaService {
       );
   }
 
+ obterApostasPorRodada(rodadaId: string): Observable<ApiResponse<any>> {
+  // Esta rota deve existir no seu Controller de Apostas ou ApostaRodada
+  const url = `${this.apiUrl}/obter-apostas-rodada/${rodadaId}`;
+  
+  return this.http.get<ApiResponse<any>>(url).pipe(
+    catchError(this.handleError)
+  );
+  
+}
+
   getApostasParaEdicao(rodadaId: string, apostaRodadaId: string): Observable<ApiResponse<ApostaJogoEdicaoDto[]>> {
     const url = `${environment.apiUrl}/api/ApostaRodada/ParaEdicao`;
     const params = new HttpParams()
@@ -131,7 +141,18 @@ export class ApostaService {
       );
   }
 
- 
+  // Altere o método para receber os dois IDs necessários
+  obterJogosComPalpites(apostaId: string, rodadaId: string): Observable<ApiResponse<any>> {
+    // A URL deve refletir a nova rota do Controller
+    const url = `${this.apiUrl}/ObterJogosComPalpites/${apostaId}/${rodadaId}`;
+  
+    return this.http.get<ApiResponse<any>>(url).pipe(
+    catchError(this.handleError)
+
+  );
+}
+  
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('[ApostaService] Erro na requisição HTTP:', error);
     return throwError(() => error);
