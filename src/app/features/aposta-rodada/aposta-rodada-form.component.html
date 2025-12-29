@@ -8,16 +8,21 @@
         </button>
       </div>
 
-      <div class="px-4 py-3 bg-gray-900/40 border-b border-gray-800">
-  
-        <div class="inline-flex items-center bg-indigo-600/20 border border-indigo-500/30 rounded-full px-4 py-1">
-          <span class="text-[10px] uppercase tracking-widest font-bold text-indigo-400 mr-2">Campeonato</span>
-            <h1 class="text-xs font-black uppercase tracking-tight text-white truncate max-w-[200px]">
-                Brasileiro 2025 - 1º Turno
-            </h1>
-        </div>
+      <div class="flex flex-col items-center justify-center w-full py-4">
+        <span class="text-[9px] uppercase tracking-[0.3em] font-black text-indigo-600 mb-1">
+          CAMPEONATO
+        </span>
+        <h1 class="text-xs font-bold uppercase tracking-tight text-gray-800 text-center">
+          Brasileiro 2025 - 1º Turno
+        </h1>
+        
+        <div class="w-16 h-[1px] bg-indigo-400/30 mt-3"></div>
+        
+        <h2 class="text-[10px] font-black text-slate-500 mt-4 uppercase tracking-widest text-center">
+          <span *ngIf="isReadOnly">CONSULTA JOGOS DA RODADA {{ rodadaSelecionada?.numeroRodada || '2' }}</span>
+          <span *ngIf="!isReadOnly" class="text-indigo-600">Preencher Palpites</span>
+        </h2>
       </div>
-      
     </div>
 
     <div class="card-grafite-setor shadow-lg">
@@ -62,17 +67,10 @@
     <div class="card-grafite-setor shadow-2xl" [formGroup]="apostaForm">
       <div *ngIf="apostaAtual" class="bg-slate-700 p-2 px-4 flex justify-between items-center border-b border-slate-600 rounded-t-xl">
         <span class="text-[10px] font-black text-white uppercase tracking-widest">
-             CARTELA: <span class="text-teal-400">{{ apostaAtual.identificadorAposta || 'AVULSA' }}</span>
+          CARTELA: <span class="text-teal-400">{{ apostaAtual.identificadorAposta || 'AVULSA' }}</span>
         </span>
         <span class="text-[8px] font-black text-emerald-400 uppercase">EDITÁVEL</span>
-    </div>
-      
-    <div class="flex items-center justify-between mb-4">
-       <h3 class="text-xl font-bold">
-          3. <span *ngIf="isReadOnly">CONSULTA AOS JOGOS DA RODADA {{ rodadaSelecionada?.numeroRodada || '2' }}</span>
-             <span *ngIf="!isReadOnly">Preencher Palpites</span>
-      </h3>
-     </div>    
+      </div>
       
       <div class="p-3 space-y-3" formArrayName="palpites">
         <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" class="card-jogo-item-preto">
@@ -82,9 +80,9 @@
               <span class="text-[9px] font-black text-white text-center uppercase">{{ jogosDaApostaAtual[i]?.equipeMandante }}</span>
             </div>
             <div class="col-span-3 flex items-center justify-center gap-2">
-              <input type="number" formControlName="placarApostaCasa" class="input-placar-dash">
+              <input type="number" formControlName="placarApostaCasa" [readonly]="isReadOnly" class="input-placar-dash">
               <span class="text-white font-black text-lg">X</span>
-              <input type="number" formControlName="placarApostaVisita" class="input-placar-dash">
+              <input type="number" formControlName="placarApostaVisita" [readonly]="isReadOnly" class="input-placar-dash">
             </div>
             <div class="col-span-2 flex flex-col items-center">
               <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.escudoVisitante" onerror="this.src='assets/images/logo-bola.png'" class="w-10 h-10 mb-1 object-contain">
@@ -94,9 +92,9 @@
         </div>
 
         <button *ngIf="!isReadOnly" 
-             (click)="salvarApostas()" 
-             class="mt-6 w-full py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-all shadow-lg">
-                 Confirmar palpites
+                (click)="salvarApostas()" 
+                class="mt-6 w-full py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-all shadow-lg text-white uppercase text-xs tracking-widest">
+          Confirmar palpites
         </button>
 
       </div>
