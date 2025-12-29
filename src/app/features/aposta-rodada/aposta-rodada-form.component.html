@@ -89,11 +89,37 @@
           </div>
         </div>
 
-        <button *ngIf="!isReadOnly" 
-                (click)="salvarApostas()" 
-                class="mt-6 w-full py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-all shadow-lg text-white uppercase text-xs tracking-widest">
-          Confirmar palpites
-        </button>
+       <div class="flex items-center justify-between mt-4 p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+  
+  <div *ngIf="apostaAtual?.dataHoraSubmissao" class="flex flex-col">
+    <span class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Última Atualização</span>
+    <span class="text-xs font-black text-emerald-400">
+      {{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm:ss' }}
+    </span>
+  </div>
+
+  <div *ngIf="!apostaAtual?.dataHoraSubmissao" class="text-[10px] text-slate-500 italic">
+    Palpites ainda não enviados
+  </div>
+
+  <div class="flex gap-2">
+    <button mat-button class="btn-voltar-topo" (click)="isReadOnly = !isReadOnly">
+      <mat-icon class="text-sm">{{ isReadOnly ? 'edit' : 'close' }}</mat-icon>
+      {{ isReadOnly ? 'EDITAR' : 'CANCELAR' }}
+    </button>
+
+    <button *ngIf="!isReadOnly" 
+            mat-raised-button 
+            color="primary" 
+            [disabled]="isSaving || apostaForm.invalid"
+            (click)="salvarApostas()"
+            class="btn-confirmar-palpites">
+      <mat-icon *ngIf="!isSaving">check_circle</mat-icon>
+      <mat-spinner *ngIf="isSaving" diameter="20" class="mr-2"></mat-spinner>
+      CONFIRMAR PALPITES
+    </button>
+  </div>
+        </div>
       </div>
     </div>
   </main>

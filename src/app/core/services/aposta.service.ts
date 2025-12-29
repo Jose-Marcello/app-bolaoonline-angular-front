@@ -26,15 +26,15 @@ export class ApostaService {
   constructor(private http: HttpClient) { }
 
   // CORREÇÃO DO SALVAR: Use a apiUrl correta (ApostaRodada)
-  salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
-    // A rota correta para salvar palpites é no controlador de ApostaRodada
-    // Se o backend espera /api/ApostaRodada/Salvar, adicione o sufixo abaixo:
+  // No aposta.service.ts
+salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
+    // Tente usar a rota relativa se a apiUrl já contiver o domínio
     const url = `${this.apiUrl}/SalvarApostas`; 
-    console.log('[ApostaService] Chamando salvarApostas com URL:', url);
     
+    console.log('[ApostaService] Enviando POST para:', url);
     return this.http.post<ApiResponse<any>>(url, apostaRequest)
       .pipe(catchError(this.handleError));
-  }
+}
 
   // CORREÇÃO DO GET BY ID (Para a seleção de outras apostas)
   getApostaById(id: string): Observable<any> {
