@@ -66,21 +66,18 @@ export class RodadaService {
   }
 
   getJogosByRodada(rodadaId: string): Observable<any> {
-  // 🛑 ERRO ANTERIOR: return this.http.get<any[]>(`${this.apiUrlRodada}/rodadas/${rodadaId}/jogos`);
-  
-  // ✅ CORREÇÃO: Usar a rota que o seu Backend reconhece
-  const url = `${this.apiUrlRodada}/ListarJogosPorRodada/${rodadaId}`;
-  
-  console.log('[RodadaService] Buscando jogos para o grid com URL:', url);
-  
-  return this.http.get<any>(url).pipe(
-    catchError(this.handleError)
-  );
-}
+    // A URL agora é otimizada para buscar apenas os confrontos
+    const url = `${this.apiUrlRodada}/ListarJogosPorRodada/${rodadaId}`;
+    console.log('[RodadaService] Chamando endpoint otimizado:', url);
+    return this.http.get<any>(url).pipe(
+       catchError(this.handleError)
+    );
+  }
+ 
 
-obterDadosPlanilhaConferencia(rodadaId: string): Observable<PreservedCollection<ConferenciaPalpiteDto>> {
-  return this.http.get<PreservedCollection<ConferenciaPalpiteDto>>(`${this.apiUrlRodada}/conferencia/${rodadaId}`);
-}
+  obterDadosPlanilhaConferencia(rodadaId: string): Observable<PreservedCollection<ConferenciaPalpiteDto>> {
+    return this.http.get<PreservedCollection<ConferenciaPalpiteDto>>(`${this.apiUrlRodada}/conferencia/${rodadaId}`);
+  }
 
   /**
    * Obtém todos os jogos de uma rodada específica.
@@ -88,7 +85,7 @@ obterDadosPlanilhaConferencia(rodadaId: string): Observable<PreservedCollection<
    * @param rodadaId O ID da rodada.
    * @returns Um Observable com a resposta da API contendo uma coleção de JogoDto.
    */
-  
+  /*
   getJogosPorRodada(rodadaId: string): Observable<ApiResponse<PreservedCollection<JogoDto>>> {
     const url = `${this.apiUrlRodada}/ListarJogosPorRodada/${rodadaId}`;
     console.log('[RodadaService] Chamando getJogosPorRodada com URL:', url);
@@ -97,6 +94,7 @@ obterDadosPlanilhaConferencia(rodadaId: string): Observable<PreservedCollection<
         catchError(this.handleError)
       );
   }
+   */
 
   /**
    * Manipulador de erros HTTP genérico para o RodadaService.

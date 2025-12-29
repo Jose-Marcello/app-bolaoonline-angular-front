@@ -157,22 +157,32 @@ private loadAllIntegratedData(): Observable<any> {
   );
 }
 
+// aposta-rodada-form.component.ts
+
 private loadJogosSemPalpites(): void {
-  this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe(res => {
-    const dadosBrutos = (res as any).data?.$values || (res as any).data || [];
-    
-    // Mapeamento importante: garante que as imagens e nomes apareçam no Grid 3
-    this.jogosDaApostaAtual = dadosBrutos.map((j: any) => ({
-      ...j,
-      idJogo: j.id,
-      // Blindagem de escudos idêntica à da seleção de aposta
-      escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
-      escudoVisitante: j.escudoVisitante || j.equipeVisitaEscudoUrl || j.escudoVisitante,
-      placarApostaCasa: null,
-      placarApostaVisita: null
-    }));
-    
-    this.montarGridVazio();
+  this.isLoading = true;
+  this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe({
+    next: (res) => {
+      // Extração robusta dos dados vindos do novo endpoint
+      const jogosBrutos = res.data?.$values || res.data || [];
+      
+      this.jogosDaApostaAtual = jogosBrutos.map((j: any) => ({
+        ...j,
+        idJogo: j.id,
+        // Blindagem de escudos que já testamos e funcionou
+        escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
+        escudoVisitante: j.escudoVisitante || j.equipeVisitaEscudoUrl || j.escudoVisitante,
+        placarApostaCasa: null,
+        placarApostaVisita: null
+      }));
+
+      this.montarGridVazio();
+      this.isLoading = false;
+    },
+    error: (err) => {
+      this.isLoading = false;
+      this.showSnackBar('Erro ao carregar confrontos da rodada.', 'Fechar', 'error');
+    }
   });
 }
 
