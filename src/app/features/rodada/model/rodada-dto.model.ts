@@ -15,7 +15,7 @@
       nome?: string; // Propriedade 'nome' confirmada
       numeroRodada: number;
       // <<-- CORRIGIDO: dataInicio e dataFechamento para DataInic e DataFim como string -->>
-      dataInic: string; // Data de início da rodada (string ISO 8601 do backend)
+      dataInicio: string; // Data de início da rodada (string ISO 8601 do backend)
       dataFim: string; // Data de fim da rodada (string ISO 8601 do backend)
       status: StatusRodada;
       jogos?: JogoDto[]; // Referencia o JogoDto atualizado
