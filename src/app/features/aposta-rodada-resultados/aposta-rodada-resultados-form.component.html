@@ -32,7 +32,7 @@
             <mat-icon [style.color]="rodadaSelecionada?.id === r.id ? '#fff' : '#4f46e5'">play_circle_filled</mat-icon>
           </div>
           <span class="font-black text-center text-xs text-white">{{ r.numeroRodada }}</span>
-          <span class="text-center text-[10px] text-slate-300">{{ r.dataInic | date:'dd/MM' }}</span>
+          <span class="text-center text-[10px] text-slate-300">{{ r.dataInicio | date:'dd/MM' }}</span>
           <span class="text-center text-[10px] text-slate-300">{{ r.dataFim | date:'dd/MM' }}</span>
         </div>
       </div>
