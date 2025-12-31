@@ -250,31 +250,41 @@ montarGridVazio(): void {
   }
 
 onApostaSelected(apostaId: string): void {
+  // 1. Atualiza IMEDIATAMENTE o ID da cartela para o backend
+  this.apostaSelecionadaId = apostaId; 
+
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    // 1. Limpeza total para evitar "fantasma" da cartela anterior
+    // 2. RESET TOTAL: Limpa tudo para não misturar com a cartela anterior
     this.palpites.clear();
     this.jogosDaApostaAtual = [];
     this.apostaAtual = undefined;
 
+    // 3. Aguarda 10ms para o DOM limpar e reconstrói na ordem correta
     setTimeout(() => {
       this.apostaAtual = apostaSelecionada;
+      
       const pCollection = apostaSelecionada.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-      // 2. Mapeamento Sincronizado: FormArray e Lista Visual seguem a mesma ordem
+      // 4. Mapeamento Sincronizado: Garante que o palpite X pertença ao jogo X
       this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
-        // Alimenta o formulário
         this.palpites.push(this.fb.group({
           idJogo: [p.jogoId],
           placarApostaCasa: [p.placarApostaCasa],
           placarApostaVisita: [p.placarApostaVisita]
         }));
-
-        // Retorna o objeto Jogo com os campos que você mapeou no C#
-        return p.jogo; 
+        
+        // Inclui o estádio que estava sumindo
+        return {
+          ...p.jogo,
+          diaSemana: p.jogo.diaSemana,
+          horaJogo: p.jogo.horaJogo,
+          estadioNome: p.jogo.estadioNome
+        };
       });
+      this.apostaForm.markAsPristine();
     }, 10);
   }
 }
