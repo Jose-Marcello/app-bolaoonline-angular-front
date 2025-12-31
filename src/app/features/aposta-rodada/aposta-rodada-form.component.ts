@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Location } from '@angular/common'; 
 
 // Angular Material 
 import { MatCardModule } from '@angular/material/card';
@@ -81,6 +82,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   constructor(
+    private location: Location,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -299,6 +301,9 @@ onApostaSelected(apostaId: string): void {
   }
 }
 
+voltar(): void {
+  this.location.back();
+}
 
 criarNovaApostaAvulsa(): void {
   // Monta o objeto de requisição conforme o modelo CriarApostaAvulsaRequestDto
