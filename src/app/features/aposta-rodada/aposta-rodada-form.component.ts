@@ -268,23 +268,27 @@ validarRegraMinima(): boolean {
 }
 
 // TROCA DE CARTELA (RESET DEFINITIVO)
+// MÉTODO DE SELEÇÃO DE CARTELA (ESTABILIZADO)
 onApostaSelected(apostaId: string): void {
-  this.apostaSelecionadaId = apostaId;
+  // 1. Vincula o ID que o backend espera
+  this.apostaSelecionadaId = apostaId; 
+
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    // 1. Limpeza total antes de carregar
-    this.apostaAtual = undefined;
-    this.palpites.clear();
+    // 2. PASSO ATRÁS: Reset total de variáveis para "limpar o terreno"
+    this.apostaAtual = undefined; 
+    this.palpites.clear(); 
     this.jogosDaApostaAtual = [];
 
-    // 2. Delay de 150ms para o Angular reconstruir o DOM
+    // 3. Delay de segurança para o Angular processar a limpeza do HTML antigo
     setTimeout(() => {
       this.apostaAtual = apostaSelecionada;
       
       const pCollection = apostaSelecionada.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
+      // 4. Reconstrói o formulário garantindo que os placares fiquem atrelados aos jogos certos
       listaPalpites.forEach((p: any) => {
         this.palpites.push(this.fb.group({
           id: [p.id],
@@ -292,10 +296,11 @@ onApostaSelected(apostaId: string): void {
           placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
           placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
         }));
-        this.jogosDaApostaAtual.push(p.jogo);
+        this.jogosDaApostaAtual.push(p.jogo); // Mantém o objeto jogo original do backend
       });
       
       this.apostaForm.markAsPristine();
+      console.log('Troca concluída com sucesso para:', this.apostaSelecionadaId);
     }, 150); 
   }
 }

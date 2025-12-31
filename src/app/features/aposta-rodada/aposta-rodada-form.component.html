@@ -1,8 +1,10 @@
 <div class="w-full px-4 pt-4 bg-slate-950 flex flex-col gap-3">
-  <button (click)="voltar()" class="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 border border-emerald-500 rounded text-white shadow-lg w-fit active:scale-95 transition-all">
-    <mat-icon class="scale-75">arrow_back</mat-icon>
-    <span class="text-[10px] font-black uppercase">Voltar</span>
-  </button>
+  <div class="flex justify-between items-center">
+    <button (click)="voltar()" class="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 border border-emerald-500 rounded text-white shadow-lg w-fit active:scale-95 transition-all">
+      <mat-icon class="scale-75">arrow_back</mat-icon>
+      <span class="text-[10px] font-black uppercase">Voltar</span>
+    </button>
+  </div>
 
   <div class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-full w-full text-center">
     <h1 class="text-[7px] font-black uppercase tracking-tighter text-slate-400 truncate leading-none">
@@ -22,9 +24,9 @@
         <tbody class="divide-y divide-slate-900">
           <tr *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)"
               [ngClass]="{'bg-indigo-500 text-white': r.id === rodadaId}" 
-              class="cursor-pointer transition-all">
+              class="cursor-pointer transition-all hover:bg-white/5">
             <td class="py-3 px-2 text-center"><mat-icon class="scale-75">play_arrow</mat-icon></td>
-            <td class="py-3 px-1 uppercase font-black">Rodada {{ r.numeroRodada }}</td>
+            <td class="py-3 px-1 uppercase font-black text-[9px]">Rodada {{ r.numeroRodada }}</td>
             <td class="py-3 px-1 text-center italic">{{ r.dataInicio | date:'dd/MM' }} a {{ r.dataFim | date:'dd/MM' }}</td>
           </tr>
         </tbody>
@@ -40,16 +42,16 @@
       <div class="p-2 space-y-1.5">
         <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id)"
              [ngClass]="apostaSelecionadaId === a.id ? 'bg-indigo-600/30 border-indigo-500' : 'bg-slate-900/50 border-slate-800'"
-             class="grid grid-cols-6 items-center p-2 rounded-lg border cursor-pointer transition-all">
+             class="grid grid-cols-6 items-center p-2 rounded-lg border cursor-pointer transition-all duration-200">
           <div class="text-center">
-            <mat-icon [class.text-indigo-400]="apostaSelecionadaId === a.id" class="text-slate-600 scale-90">
+            <mat-icon [class.text-indigo-400]="apostaSelecionadaId === a.id" class="text-slate-600 scale-90 transition-transform">
               {{ apostaSelecionadaId === a.id ? 'check_circle' : 'radio_button_unchecked' }}
             </mat-icon>
           </div>
-          <div class="col-span-3 px-2 text-[10px] font-black text-white uppercase truncate">{{ a.identificadorAposta }}</div>
+          <div class="col-span-3 px-2 text-[10px] font-black text-white uppercase truncate tracking-tight">{{ a.identificadorAposta }}</div>
           <div class="text-center text-[8px] font-bold text-slate-500 italic">{{ a.dataHoraSubmissao | date:'dd/MM' }}</div>
           <div class="flex justify-end pr-1">
-             <span class="text-[7px] font-black px-1.5 py-0.5 rounded text-white uppercase" [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'">
+             <span class="text-[7px] font-black px-1.5 py-0.5 rounded text-white uppercase shadow-sm" [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'">
                {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
              </span>
           </div>
@@ -66,35 +68,68 @@
 
   <div *ngIf="apostaAtual" class="flex flex-col items-center mt-6 animate__animated animate__fadeInUp">
     
-    <div class="w-[85%] p-3 border-b-4 border-amber-600 bg-amber-500 rounded-t-2xl shadow-xl z-10">
-      <p class="text-[8px] font-black text-amber-900 uppercase tracking-widest text-center">Aposta selecionada -></p>
-      <h2 class="text-base font-black text-white uppercase italic tracking-tighter text-center leading-tight">
+    <div class="w-[88%] p-3 bg-amber-500 border-b-4 border-amber-600 rounded-t-2xl shadow-xl z-20">
+      <p class="text-[8px] font-black text-amber-900 uppercase text-center tracking-widest">APOSTA SELECIONADA -></p>
+      <h2 class="text-base font-black text-white uppercase italic text-center tracking-tighter leading-tight">
         {{ apostaAtual.identificadorAposta }}
       </h2>
     </div>
 
     <div class="w-full bg-slate-950 border border-slate-800 rounded-xl shadow-2xl overflow-hidden -mt-2">
       <form [formGroup]="apostaForm" class="p-2 pt-6">
-        <div formArrayName="palpites" class="space-y-3">
-           <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
-                class="bg-black/30 rounded-lg p-3 border border-slate-900 flex flex-col mb-2 shadow-inner">
-                </div>
+        <div formArrayName="palpites" class="space-y-4">
+          <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
+               class="bg-black/40 rounded-lg p-3 border border-slate-900 shadow-inner flex flex-col gap-3">
+               
+            <div class="w-full text-center border-b border-slate-900/50 pb-2">
+              <p class="text-[10px] font-black text-indigo-400 uppercase tracking-tight">
+                {{ jogosDaApostaAtual[i]?.diaSemana | uppercase }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
+              </p>
+              <p class="text-[8px] font-bold text-slate-500 uppercase mt-1 italic">{{ jogosDaApostaAtual[i]?.estadioNome }}</p>
+            </div>
+
+            <div class="grid grid-cols-7 items-center gap-1">
+              <div class="col-span-2 flex flex-col items-center">
+                <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" class="w-10 h-10 object-contain mb-1">
+                <span class="text-[8px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
+              </div>
+              <div class="col-span-3 flex items-center justify-center gap-1.5">
+                <input type="number" formControlName="placarApostaCasa" class="w-11 h-9 bg-white text-slate-900 text-center font-black text-sm rounded border-none shadow-md"> 
+                <span class="text-white font-black opacity-20 text-xs">X</span> 
+                <input type="number" formControlName="placarApostaVisita" class="w-11 h-9 bg-white text-slate-900 text-center font-black text-sm rounded border-none shadow-md">
+              </div>
+              <div class="col-span-2 flex flex-col items-center">
+                <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" class="w-10 h-10 object-contain mb-1">
+                <span class="text-[8px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </form>
-      
-      <div class="p-4 bg-black/60 border-t border-slate-900 flex flex-col gap-3">
+
+      <div class="p-4 bg-black/60 border-t border-slate-900 flex flex-col gap-4">
         <div class="flex justify-between items-center px-1">
-          <span class="text-[9px] font-black uppercase italic" [ngClass]="validarRegraMinima() ? 'text-emerald-400' : 'text-rose-500'">
-            {{ validarRegraMinima() ? 'REGRAS DE VALIDAÇÃO OK' : 'MÍNIMO: 3 EMPATES OU VISITANTES' }}
-          </span>
+          <div class="flex flex-col">
+            <span class="text-[8px] uppercase text-slate-400 font-black italic">Data do Envio da Aposta</span>
+            <span class="text-[9px] font-black uppercase text-emerald-400" *ngIf="apostaAtual?.dataHoraSubmissao">
+              {{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+            <span class="text-[9px] font-black uppercase text-slate-600 italic" *ngIf="!apostaAtual?.dataHoraSubmissao">Pendente</span>
+          </div>
+          
+          <div class="text-right">
+            <span class="text-[9px] font-black uppercase italic" [ngClass]="validarRegraMinima() ? 'text-emerald-400' : 'text-rose-500'">
+              {{ validarRegraMinima() ? 'VALIDAÇÃO OK' : 'MÍN. 3 EMPATES/VISIT.' }}
+            </span>
+          </div>
         </div>
 
         <button (click)="salvarApostas()" 
                 [disabled]="!apostaForm.valid || !validarRegraMinima()"
-                [ngClass]="(!apostaForm.valid || !validarRegraMinima()) ? 'bg-slate-800 text-slate-600 border-slate-700' : 'bg-emerald-500 text-white border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]'"
-                class="w-full py-3 rounded-xl flex items-center justify-center gap-2 border-b-4 active:scale-95 transition-all">
+                [ngClass]="(!apostaForm.valid || !validarRegraMinima()) ? 'bg-slate-800 text-slate-600 border-slate-700' : 'bg-emerald-500 text-white border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] shadow-lg'"
+                class="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 border-b-4 font-black uppercase text-xs active:scale-95 transition-all">
           <mat-icon class="font-bold">check_circle</mat-icon>
-          <span class="text-xs font-black uppercase tracking-widest">Confirmar Palpites</span>
+          Confirmar Palpites
         </button>
       </div>
     </div>
