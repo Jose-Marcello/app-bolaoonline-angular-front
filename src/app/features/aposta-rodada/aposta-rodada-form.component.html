@@ -64,15 +64,14 @@
       <mat-icon class="scale-90">add_circle</mat-icon>
       <span class="text-[11px] font-black uppercase tracking-widest">Criar Nova Aposta Avulsa</span>
     </button>
-  </div>
-
-  <div *ngIf="apostaAtual" class="flex flex-col items-center mt-6 animate__animated animate__fadeInUp">
-    
-    <div class="w-[88%] p-3 bg-amber-500 border-b-4 border-amber-600 rounded-t-2xl shadow-xl z-20">
-      <p class="text-[8px] font-black text-amber-900 uppercase text-center tracking-widest">APOSTA SELECIONADA -></p>
-      <h2 class="text-base font-black text-white uppercase italic text-center tracking-tighter leading-tight">
-        {{ apostaAtual.identificadorAposta }}
-      </h2>
+  
+    <div *ngIf="apostaAtual" class="w-full flex justify-center -mb-1 z-20">
+     <div class="w-[92%] py-1.5 bg-amber-500 border-b-2 border-amber-600 rounded-t-xl shadow-lg flex items-center justify-center gap-3">
+        <span class="text-[8px] font-black text-amber-900 uppercase italic">Aposta Selecionada -></span>
+        <h2 class="text-xs font-black text-white uppercase italic tracking-tighter leading-none">
+           {{ apostaAtual.identificadorAposta }}
+        </h2>
+      </div>
     </div>
 
     <div class="w-full bg-slate-950 border border-slate-800 rounded-xl shadow-2xl overflow-hidden -mt-2">

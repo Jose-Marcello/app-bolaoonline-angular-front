@@ -270,40 +270,34 @@ validarRegraMinima(): boolean {
 // TROCA DE CARTELA (RESET DEFINITIVO)
 // MÉTODO DE SELEÇÃO DE CARTELA (ESTABILIZADO)
 onApostaSelected(apostaId: string): void {
-  // 1. Vincula o ID que o backend espera
-  this.apostaSelecionadaId = apostaId; 
-
+  this.apostaSelecionadaId = apostaId;
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    // 2. PASSO ATRÁS: Reset total de variáveis para "limpar o terreno"
+    // 1. LIMPEZA SÍNCRONA: O grid de palpites some do DOM imediatamente
     this.apostaAtual = undefined; 
     this.palpites.clear(); 
     this.jogosDaApostaAtual = [];
 
-    // 3. Delay de segurança para o Angular processar a limpeza do HTML antigo
+    // 2. CARGA: O Angular é forçado a criar novos inputs, sem reusar os velhos
     setTimeout(() => {
-      this.apostaAtual = apostaSelecionada;
-      
+      this.apostaAtual = apostaSelecionada; 
       const pCollection = apostaSelecionada.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-      // 4. Reconstrói o formulário garantindo que os placares fiquem atrelados aos jogos certos
+      // Confiamos na ordem que vem do Repositório C#
       listaPalpites.forEach((p: any) => {
         this.palpites.push(this.fb.group({
           id: [p.id],
-          jogoId: [p.jogoId],
-          placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
-          placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
+          placarApostaCasa: [p.placarApostaCasa],
+          placarApostaVisita: [p.placarApostaVisita]
         }));
-        this.jogosDaApostaAtual.push(p.jogo); // Mantém o objeto jogo original do backend
+        this.jogosDaApostaAtual.push(p.jogo);
       });
-      
-      this.apostaForm.markAsPristine();
-      console.log('Troca concluída com sucesso para:', this.apostaSelecionadaId);
-    }, 150); 
+    }, 20); // Delay mínimo apenas para o ciclo de vida do Angular
   }
 }
+
 
 voltar(): void {
   this.location.back();
