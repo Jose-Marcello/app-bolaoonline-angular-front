@@ -1,64 +1,37 @@
-<div class="w-full px-6 pt-6 bg-slate-800">
-  <button (click)="voltar()" 
-          class="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-700 rounded text-white hover:bg-slate-700 transition-all shadow-lg group">
-    <mat-icon class="scale-75 group-hover:-translate-x-1 transition-transform">arrow_back</mat-icon>
-    <span class="text-[11px] font-black uppercase tracking-widest">Voltar</span>
+<div class="w-full px-4 pt-4 bg-slate-500">
+  <button (click)="voltar()" class="flex items-center gap-2 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white shadow-lg active:scale-95 transition-all">
+    <mat-icon class="scale-75">arrow_back</mat-icon>
+    <span class="text-[10px] font-black uppercase">Voltar</span>
   </button>
 </div>
 
-<div class="flex flex-col items-center justify-center w-full py-3 bg-slate-800">
-  <div class="px-6 py-1 bg-slate-900/40 border border-slate-700/50 rounded-full">
-    <h1 class="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 whitespace-nowrap">
-      {{ rodadaSelecionada?.campeonato?.nome || 'Campeonato Brasileiro 2025' }}
+<div class="flex flex-col items-center justify-center w-full py-2 bg-slate-500">
+  <div class="px-3 py-0.5 bg-slate-900/80 border border-slate-700 rounded-full">
+    <h1 class="text-[8px] font-black uppercase tracking-tight text-slate-300 truncate whitespace-nowrap">
+      {{ rodadaSelecionada?.campeonato?.nome }}
     </h1>
   </div>
 </div>
 
-<div class="container-dashboard p-4 space-y-6 bg-slate-800 min-h-screen">
+<div class="container-dashboard p-3 space-y-4 bg-slate-500 min-h-screen">
 
-  <div class="bg-slate-950/90 rounded-2xl border border-slate-700/50 overflow-hidden shadow-2xl">
-    <div class="p-4 border-b border-slate-700/50 bg-black/20">
-      <h3 class="text-xs font-black text-white uppercase tracking-widest">1. Rodadas em Aposta</h3>
+  <div class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden mb-4">
+    <div class="p-3 border-b border-slate-900 bg-black/40">
+      <h3 class="text-[9px] font-black text-white uppercase tracking-widest">2. Minhas Cartelas</h3>
     </div>
-    <div class="p-4 overflow-x-auto">
-      <table class="w-full text-[11px] font-bold text-slate-300">
-        <tbody class="divide-y divide-slate-800">
-          <tr *ngFor="let r of rodadasDisponiveis" 
-              [ngClass]="{'bg-indigo-500/20': r.id === rodadaId}"
-              class="hover:bg-white/5 transition-colors">
-            <td class="py-3 px-2 text-center">
-              <button (click)="selecionarRodada(r.id)" class="text-indigo-400">
-                <mat-icon class="scale-90">play_circle_filled</mat-icon>
-              </button>
-            </td>
-            <td class="py-3 px-2 text-white uppercase">Rodada {{ r.numeroRodada }}</td>
-            <td class="py-3 px-2 text-center">{{ r.dataInicio | date:'dd/MM' }}</td>
-            <td class="py-3 px-2 text-center">{{ r.dataFim | date:'dd/MM' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="bg-slate-950/90 rounded-2xl border border-slate-700/50 overflow-hidden shadow-2xl">
-    <div class="p-4 border-b border-slate-700/50 bg-black/20">
-      <h3 class="text-xs font-black text-white uppercase tracking-widest">2. Minhas Cartelas</h3>
-    </div>
-    <div class="p-4 space-y-2">
+    <div class="p-2 space-y-1.5">
       <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id)"
-           [ngClass]="apostaAtual?.id === a.id ? 'bg-emerald-500/10 border-emerald-500/40 shadow-lg' : 'bg-black/20 border-transparent'"
-           class="grid grid-cols-5 items-center p-3 rounded-lg border cursor-pointer transition-all">
+           [ngClass]="apostaAtual?.id === a.id ? 'bg-emerald-500/20 border-emerald-500/50 shadow-lg' : 'bg-black/40 border-transparent'"
+           class="grid grid-cols-5 items-center p-2 rounded border cursor-pointer transition-all">
         <div class="text-center">
-          <mat-icon [class.text-emerald-400]="apostaAtual?.id === a.id" class="scale-75 text-slate-600">
+          <mat-icon [class.text-emerald-400]="apostaAtual?.id === a.id" class="scale-75 text-slate-700">
             {{ apostaAtual?.id === a.id ? 'check_circle' : 'radio_button_unchecked' }}
           </mat-icon>
         </div>
-        <div class="col-span-2 flex flex-col">
-          <span class="text-[10px] font-black text-white uppercase">{{ a.identificadorAposta }}</span>
-        </div>
-        <div class="text-center text-[9px] font-black text-slate-500">{{ a.dataHoraSubmissao | date:'dd/MM' }}</div>
+        <div class="col-span-2 text-[9px] font-black text-white uppercase truncate">{{ a.identificadorAposta }}</div>
+        <div class="text-center text-[8px] font-bold text-slate-500">{{ a.dataHoraSubmissao | date:'dd/MM' }}</div>
         <div class="text-center">
-          <span class="bg-blue-600 text-[8px] font-black px-1.5 py-0.5 rounded text-white uppercase">
+          <span class="text-[7px] font-black px-1 rounded text-white uppercase" [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'">
             {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
           </span>
         </div>
@@ -66,63 +39,56 @@
     </div>
   </div>
 
-  <div *ngIf="apostaAtual" class="bg-slate-950/90 rounded-2xl border border-slate-700/50 overflow-hidden shadow-2xl">
-    <div class="p-4 border-b border-slate-700/50 bg-black/20 flex justify-between items-center">
-      <h3 class="text-xs font-black text-white uppercase tracking-widest">3. Palpites da Rodada</h3>
-      <span class="px-2 py-1 bg-slate-800 rounded text-[9px] font-black text-slate-500 uppercase">Ordem: Data + Hora</span>
+  <div *ngIf="apostaAtual" class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden">
+    <div class="p-3 border-b border-slate-900 bg-black/40 flex justify-between items-center">
+      <h3 class="text-[9px] font-black text-white uppercase tracking-widest">3. Palpites</h3>
+      <span class="text-[8px] font-black text-slate-500 px-2 py-0.5 bg-slate-900 rounded">ORDEM: DATA/HORA</span>
     </div>
 
-    <form [formGroup]="apostaForm" class="p-4 space-y-3">
-      <div formArrayName="palpites">
+    <form [formGroup]="apostaForm" class="p-3">
+      <div formArrayName="palpites" class="space-y-3">
         <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
-             class="bg-black/20 rounded-xl p-4 border border-slate-700/40 flex flex-col mb-3">
+             class="bg-black/30 rounded-lg p-3 border border-slate-900 flex flex-col shadow-inner">
           
-          <div class="w-full text-center border-b border-slate-700/20 pb-2 mb-3">
-            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
-              {{ jogosDaApostaAtual[i]?.dataHoraReal | date:'EEEE, dd/MM':'':'pt-BR' | uppercase }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo?.substring(0,5) }}
+          <div class="w-full text-center border-b border-slate-900/50 pb-1.5 mb-2">
+            <p class="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">
+              {{ jogosDaApostaAtual[i]?.diaSemana | uppercase }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} 
+              ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
             </p>
-            <p class="text-[8px] font-bold text-slate-600 uppercase mt-0.5">{{ jogosDaApostaAtual[i]?.estadioNome }}</p>
           </div>
 
-          <div class="grid grid-cols-7 items-center gap-2">
+          <div class="grid grid-cols-7 items-center gap-1">
             <div class="col-span-2 flex flex-col items-center">
-              <div class="w-12 h-12 rounded-full bg-white/5 p-2 mb-1 border border-slate-700/50 flex items-center justify-center overflow-hidden shadow-inner">
-                <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" class="w-full h-full object-contain">
-              </div>
-              <span class="text-[9px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" class="w-10 h-10 object-contain mb-1">
+              <span class="text-[8px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
             </div>
 
-            <div class="col-span-3 flex items-center justify-center gap-2">
-              <input type="number" formControlName="placarApostaCasa" class="w-12 h-10 bg-white text-slate-900 text-center font-black text-lg rounded-lg border-none shadow-md">
-              <span class="text-white font-black opacity-30 text-lg">X</span>
-              <input type="number" formControlName="placarApostaVisita" class="w-12 h-10 bg-white text-slate-900 text-center font-black text-lg rounded-lg border-none shadow-md">
+            <div class="col-span-3 flex items-center justify-center gap-1.5">
+              <input type="number" formControlName="placarApostaCasa" class="w-10 h-8 bg-white text-slate-900 text-center font-black text-sm rounded shadow-md border-none focus:ring-2 focus:ring-emerald-500">
+              <span class="text-white font-black opacity-20 text-xs">X</span>
+              <input type="number" formControlName="placarApostaVisita" class="w-10 h-8 bg-white text-slate-900 text-center font-black text-sm rounded shadow-md border-none focus:ring-2 focus:ring-emerald-500">
             </div>
 
             <div class="col-span-2 flex flex-col items-center">
-              <div class="w-12 h-12 rounded-full bg-white/5 p-2 mb-1 border border-slate-700/50 flex items-center justify-center overflow-hidden shadow-inner">
-                <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" class="w-full h-full object-contain">
-              </div>
-              <span class="text-[9px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" class="w-10 h-10 object-contain mb-1">
+              <span class="text-[8px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
             </div>
           </div>
         </div>
       </div>
     </form>
 
-    <div class="p-4 bg-black/40 border-t border-slate-700/60 flex items-center justify-between">
+    <div class="p-3 bg-black/60 border-t border-slate-900 flex items-center justify-between">
       <div class="flex flex-col">
-        <span class="text-[9px] uppercase text-slate-500 font-black tracking-widest mb-1">Status da Aposta</span>
-        <div class="flex items-center gap-2">
-          <div *ngIf="apostaAtual?.dataHoraSubmissao" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-          <span class="text-[10px] font-black uppercase" [ngClass]="apostaAtual?.dataHoraSubmissao ? 'text-emerald-400' : 'text-slate-500'">
-            {{ apostaAtual?.dataHoraSubmissao ? 'Enviada em ' + (apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm') : 'Não Enviada' }}
-          </span>
-        </div>
+        <span class="text-[8px] uppercase text-slate-500 font-black">Data de Envio</span>
+        <span class="text-[9px] font-black uppercase text-emerald-400" *ngIf="apostaAtual?.dataHoraSubmissao">
+          {{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+        <span class="text-[9px] font-black uppercase text-slate-600" *ngIf="!apostaAtual?.dataHoraSubmissao">Não Enviada</span>
       </div>
-
-      <button (click)="salvarApostas()" class="bg-white text-slate-900 px-6 py-2.5 rounded-xl flex items-center gap-2 shadow-lg active:scale-95 transition-all">
-        <mat-icon class="scale-90 font-black">check_circle</mat-icon>
-        <span class="text-[10px] font-black uppercase tracking-widest">Salvar Palpites</span>
+      <button (click)="salvarApostas()" class="bg-white text-slate-900 px-5 py-2 rounded-lg flex items-center gap-1.5 shadow-lg active:scale-95">
+        <mat-icon class="scale-75 font-bold">save</mat-icon>
+        <span class="text-[9px] font-black uppercase">Confirmar</span>
       </button>
     </div>
   </div>

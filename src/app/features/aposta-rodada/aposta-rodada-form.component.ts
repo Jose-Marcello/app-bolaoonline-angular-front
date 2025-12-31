@@ -253,41 +253,29 @@ onApostaSelected(apostaId: string): void {
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    this.apostaAtual = apostaSelecionada; 
-    
-    // 1. LIMPEZA TOTAL E IMEDIATA
-    this.palpites.clear(); // Limpa o formulário
-    this.jogosDaApostaAtual = []; // Limpa os escudos e nomes
+    // 1. Limpeza total para evitar "fantasma" da cartela anterior
+    this.palpites.clear();
+    this.jogosDaApostaAtual = [];
+    this.apostaAtual = undefined;
 
-    // 2. Extrai palpites tratando o $values
-    const listaPalpites = (apostaSelecionada.palpites as any)?.$values || apostaSelecionada.palpites || [];
+    setTimeout(() => {
+      this.apostaAtual = apostaSelecionada;
+      const pCollection = apostaSelecionada.palpites as any;
+      const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-    // 3. RECONSTRUÇÃO EM SINCRONIA (Garante que a ordem do formulário = ordem dos escudos)
-    this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
-      
-      // Alimenta o FormArray ao mesmo tempo que mapeia os dados visuais
-      this.palpites.push(this.fb.group({
-        idJogo: [p.jogoId],
-        placarApostaCasa: [p.placarApostaCasa],
-        placarApostaVisita: [p.placarApostaVisita]
-      }));
+      // 2. Mapeamento Sincronizado: FormArray e Lista Visual seguem a mesma ordem
+      this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
+        // Alimenta o formulário
+        this.palpites.push(this.fb.group({
+          idJogo: [p.jogoId],
+          placarApostaCasa: [p.placarApostaCasa],
+          placarApostaVisita: [p.placarApostaVisita]
+        }));
 
-      // Retorna o objeto completo para o HTML (Garante nomes e escudos certos)
-      return {
-        ...p.jogo,
-        idJogo: p.jogoId,
-        escudoMandante: p.jogo.equipeCasaEscudoUrl,
-        escudoVisitante: p.jogo.equipeVisitanteEscudoUrl,
-        equipeMandante: p.jogo.equipeCasaNome,
-        equipeVisitante: p.jogo.equipeVisitanteNome,
-        dataHoraReal: p.jogo.dataHoraReal,
-        horaJogo: p.jogo.horaJogo,
-        estadioNome: p.jogo.estadioNome
-      };
-    });
-    
-    this.isReadOnly = false;
-    this.apostaForm.markAsPristine();
+        // Retorna o objeto Jogo com os campos que você mapeou no C#
+        return p.jogo; 
+      });
+    }, 10);
   }
 }
 
