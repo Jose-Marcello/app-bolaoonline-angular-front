@@ -79,17 +79,23 @@
   </div>
 
   <div *ngIf="apostaAtual; else modoConsulta" class="...">
-    <div class="p-4 ... flex justify-between items-center">
-      <div class="flex flex-col">
-         <h3 class="text-xs font-black text-white uppercase tracking-widest">3. Palpites da Rodada</h3>
-         <span class="text-[10px] text-slate-400 font-bold">
-           {{ apostaAtual.identificadorAposta }} - 
-           <span class="text-indigo-400">{{ apostaAtual.ehApostaCampeonato ? 'CAMPEONATO' : 'AVULSA' }}</span>
-         </span>
-      </div>
-    <div class="px-2 py-1 ...">Ordem: Data + Hora</div>
   </div>
-</div>
+
+<ng-template #modoConsulta>
+  <div class="bg-slate-800/40 rounded-2xl border border-slate-700 overflow-hidden p-4">
+    <div class="flex justify-between items-center">
+      <div class="flex flex-col">
+        <h3 class="text-xs font-black text-white uppercase tracking-widest">3. Palpites da Rodada</h3>
+        <span class="text-[10px] text-amber-500 font-bold uppercase">
+          MODO CONSULTA: SELECIONE UMA CARTELA OU VEJA OS JOGOS ABAIXO
+        </span>
+      </div>
+      <div class="px-2 py-1 bg-slate-700 rounded text-[9px] font-black text-slate-400 uppercase">
+        Ordem: Data + Hora
+      </div>
+    </div>
+  </div>
+</ng-template>
 
     <form [formGroup]="apostaForm">
       <div class="p-3 space-y-3" formArrayName="palpites">
@@ -148,4 +154,3 @@
       </button>
     </div>
   </div>
-</div>
