@@ -249,6 +249,7 @@ montarGridVazio(): void {
       });
   }
 
+  
 onApostaSelected(apostaId: string): void {
   // 1. Atualiza IMEDIATAMENTE o ID da cartela para o backend
   this.apostaSelecionadaId = apostaId; 
@@ -326,19 +327,22 @@ criarNovaApostaAvulsa(): void {
 
 selecionarRodada(id: string) {
   // 1. Atualiza o estado do componente
-  this.rodadaId = id;
-  this.apostaAtual = null; // Limpa a cartela selecionada anteriormente
+  this.rodadaId = id; //
+  
+  // LIMPEZA CRÍTICA: Garante que a fachada e os palpites da rodada anterior sumam
+  this.apostaAtual = undefined; // Força o sumiço da Fachada
+  this.apostaSelecionadaId = ''; // Reseta o ponteiro da cartela
   this.jogosDaApostaAtual = []; // Limpa os jogos do Grid 3
   this.palpites.clear(); // Limpa o formulário de palpites
   
-  // Encontra o objeto da rodada para mostrar o nome/número se precisar
+  // Encontra o objeto da rodada para o título do campeonato
   this.rodadaSelecionada = this.rodadasDisponiveis.find(r => r.id === id);
 
   console.log(`[Rodada] Alterando para rodada: ${this.rodadaSelecionada?.numeroRodada}`);
 
   // 2. Carrega as cartelas (Grid 2) desta rodada específica
-  // Este método você provavelmente já tem, ele preenche 'apostasUsuarioRodada'
-  this.carregarApostasDaRodada(id);
+  // Certifique-se de que este método limpe a lista 'apostasUsuarioRodada' antes de preencher
+  this.carregarApostasDaRodada(id); 
 }
 
 carregarApostasDaRodada(id: string) {
