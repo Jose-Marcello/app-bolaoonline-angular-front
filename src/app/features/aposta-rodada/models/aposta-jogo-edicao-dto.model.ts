@@ -14,6 +14,7 @@ export interface ApostaJogoEdicaoDto {
   placarApostaVisita: number | null;
   
   dataJogo: string;
+  diaSemana: string;
   horaJogo: string;  
   statusJogo: string;
 
