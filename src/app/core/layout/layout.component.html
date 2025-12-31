@@ -15,7 +15,7 @@
         Dashboard
       </a>
       
-      <!-- <<-- Botão para a tela de Perfil adicionado aqui -->> -->
+      <!-- <<-- Botão para a tela de Perfil adicionado aqui -->>
       <a mat-list-item routerLink="/dashboard/perfil" (click)="toggleSidenav()" class="flex items-center py-3 px-4 hover:bg-gray-600 transition-colors duration-200 rounded-lg">
         <mat-icon class="mr-3 text-primary-300">person</mat-icon>
         Perfil
@@ -62,7 +62,8 @@
   </button>
   <mat-icon class="text-xl ml-4 mr-2">sports_soccer</mat-icon>
    
-  <span class="flex-grow"></span> <span class="text-sm mr-4 "  Bolão Online></span> </span>
+  <span class="flex-grow"></span>
+  <span class="text-sm mr-4 "  Bolão Online> </span>
 
   <span class="flex-grow"></span> <span class="text-sm mr-4" *ngIf="isAuthenticated">{{ apostadorNome || 'Apostador' }}</span>
   
