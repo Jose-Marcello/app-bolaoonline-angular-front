@@ -250,43 +250,37 @@ montarGridVazio(): void {
   }
 
   
+// GRID 2: Seleção de Cartela (Ajuste para o Erro Crônico)
 onApostaSelected(apostaId: string): void {
-  // 1. Atualiza IMEDIATAMENTE o ID da cartela para o backend
-  this.apostaSelecionadaId = apostaId; 
-
+  this.apostaSelecionadaId = apostaId;
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    // 2. RESET TOTAL: Limpa tudo para não misturar com a cartela anterior
+    // 1. Limpeza agressiva para garantir que o Grid 3 seja reconstruído do zero
     this.palpites.clear();
     this.jogosDaApostaAtual = [];
     this.apostaAtual = undefined;
 
-    // 3. Aguarda 10ms para o DOM limpar e reconstrói na ordem correta
+    // 2. Pequeno delay para o Angular processar a destruição do grid anterior
     setTimeout(() => {
       this.apostaAtual = apostaSelecionada;
       
       const pCollection = apostaSelecionada.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-      // 4. Mapeamento Sincronizado: Garante que o palpite X pertença ao jogo X
+      // 3. Montagem na ordem exata do banco
       this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
         this.palpites.push(this.fb.group({
+          id: [p.id],
           idJogo: [p.jogoId],
           placarApostaCasa: [p.placarApostaCasa],
           placarApostaVisita: [p.placarApostaVisita]
         }));
-        
-        // Inclui o estádio que estava sumindo
-        return {
-          ...p.jogo,
-          diaSemana: p.jogo.diaSemana,
-          horaJogo: p.jogo.horaJogo,
-          estadioNome: p.jogo.estadioNome
-        };
+        return p.jogo;
       });
+
       this.apostaForm.markAsPristine();
-    }, 10);
+    }, 50); 
   }
 }
 
@@ -325,25 +319,19 @@ criarNovaApostaAvulsa(): void {
   });
 }
 
+// GRID 1: Seleção de Rodada
 selecionarRodada(id: string) {
-  // 1. Atualiza o estado do componente
-  this.rodadaId = id; //
+  this.rodadaId = id;
+  this.apostaAtual = undefined; // Esconde fachada e palpites
+  this.apostaSelecionadaId = ''; 
+  this.jogosDaApostaAtual = []; 
+  this.palpites.clear(); // Limpa formulário
   
-  // LIMPEZA CRÍTICA: Garante que a fachada e os palpites da rodada anterior sumam
-  this.apostaAtual = undefined; // Força o sumiço da Fachada
-  this.apostaSelecionadaId = ''; // Reseta o ponteiro da cartela
-  this.jogosDaApostaAtual = []; // Limpa os jogos do Grid 3
-  this.palpites.clear(); // Limpa o formulário de palpites
-  
-  // Encontra o objeto da rodada para o título do campeonato
   this.rodadaSelecionada = this.rodadasDisponiveis.find(r => r.id === id);
-
-  console.log(`[Rodada] Alterando para rodada: ${this.rodadaSelecionada?.numeroRodada}`);
-
-  // 2. Carrega as cartelas (Grid 2) desta rodada específica
-  // Certifique-se de que este método limpe a lista 'apostasUsuarioRodada' antes de preencher
-  this.carregarApostasDaRodada(id); 
+  this.carregarApostasDaRodada(id);
 }
+
+//
 
 carregarApostasDaRodada(id: string) {
   this.isLoadingApostas = true;
