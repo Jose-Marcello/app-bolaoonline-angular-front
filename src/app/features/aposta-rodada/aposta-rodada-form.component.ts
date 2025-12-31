@@ -254,40 +254,37 @@ onApostaSelected(apostaId: string): void {
   
   if (apostaSelecionada) {
     this.apostaAtual = apostaSelecionada; 
-    this.apostaSelecionadaId = apostaId;
     
-    // 1. LIMPEZA TOTAL: Garante que nada da aposta anterior permaneça
-    this.palpites.clear();
-    this.jogosDaApostaAtual = []; 
+    // 1. LIMPEZA TOTAL E IMEDIATA
+    this.palpites.clear(); // Limpa o formulário
+    this.jogosDaApostaAtual = []; // Limpa os escudos e nomes
 
-    const pCollection = apostaSelecionada.palpites as any;
-    const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
+    // 2. Extrai palpites tratando o $values
+    const listaPalpites = (apostaSelecionada.palpites as any)?.$values || apostaSelecionada.palpites || [];
 
-    if (listaPalpites.length > 0) {
-      // 2. SINCRONIA: Mapeia jogos e gera formulário no MESMO loop
-      this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
-        
-        this.palpites.push(this.fb.group({
-          idJogo: [p.jogoId],
-          placarApostaCasa: [p.placarApostaCasa],
-          placarApostaVisita: [p.placarApostaVisita]
-        }));
+    // 3. RECONSTRUÇÃO EM SINCRONIA (Garante que a ordem do formulário = ordem dos escudos)
+    this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
+      
+      // Alimenta o FormArray ao mesmo tempo que mapeia os dados visuais
+      this.palpites.push(this.fb.group({
+        idJogo: [p.jogoId],
+        placarApostaCasa: [p.placarApostaCasa],
+        placarApostaVisita: [p.placarApostaVisita]
+      }));
 
-        return {
-          ...p.jogo, 
-          idJogo: p.jogoId,
-          // Blindagem de mapeamento conforme os JSONs validados
-          escudoMandante: p.jogo.equipeCasaEscudoUrl || p.jogo.escudoMandante,
-          escudoVisitante: p.jogo.equipeVisitanteEscudoUrl || p.jogo.escudoVisitante,
-          equipeMandante: p.jogo.equipeCasaNome || p.jogo.equipeMandante,
-          equipeVisitante: p.jogo.equipeVisitanteNome || p.jogo.equipeVisitante,
-          dataHoraReal: p.jogo.dataHoraReal || p.jogo.dataHora,
-          horaJogo: p.jogo.horaJogo
-        };
-      });
-    } else {
-      this.loadJogosSemPalpites();
-    }
+      // Retorna o objeto completo para o HTML (Garante nomes e escudos certos)
+      return {
+        ...p.jogo,
+        idJogo: p.jogoId,
+        escudoMandante: p.jogo.equipeCasaEscudoUrl,
+        escudoVisitante: p.jogo.equipeVisitanteEscudoUrl,
+        equipeMandante: p.jogo.equipeCasaNome,
+        equipeVisitante: p.jogo.equipeVisitanteNome,
+        dataHoraReal: p.jogo.dataHoraReal,
+        horaJogo: p.jogo.horaJogo,
+        estadioNome: p.jogo.estadioNome
+      };
+    });
     
     this.isReadOnly = false;
     this.apostaForm.markAsPristine();
