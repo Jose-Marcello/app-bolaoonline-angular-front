@@ -249,50 +249,43 @@ montarGridVazio(): void {
       });
   }
 
-  // --- CERTIFIQUE-SE QUE ESTE MÉTODO ESTÁ MAPEANDO JOGOSDAAPOSTAATUAL ---
 onApostaSelected(apostaId: string): void {
-  // 1. Localiza a cartela selecionada
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
     this.apostaAtual = apostaSelecionada; 
-    this.apostaSelecionadaId = apostaId; // Garante a pintura Teal
+    this.apostaSelecionadaId = apostaId;
     
-    // 2. Limpa o formulário anterior para não duplicar campos
+    // 1. LIMPEZA TOTAL: Garante que nada da aposta anterior permaneça
     this.palpites.clear();
+    this.jogosDaApostaAtual = []; 
 
-    // 3. Extrai a coleção de palpites tratando o $values do .NET
     const pCollection = apostaSelecionada.palpites as any;
     const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
     if (listaPalpites.length > 0) {
-      // 4. Preenche o FormArray (Lógica de Edição)
-      listaPalpites.forEach((p: any) => {
+      // 2. SINCRONIA: Mapeia jogos e gera formulário no MESMO loop
+      this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
+        
         this.palpites.push(this.fb.group({
           idJogo: [p.jogoId],
           placarApostaCasa: [p.placarApostaCasa],
           placarApostaVisita: [p.placarApostaVisita]
         }));
+
+        return {
+          ...p.jogo, 
+          idJogo: p.jogoId,
+          // Blindagem de mapeamento conforme os JSONs validados
+          escudoMandante: p.jogo.equipeCasaEscudoUrl || p.jogo.escudoMandante,
+          escudoVisitante: p.jogo.equipeVisitanteEscudoUrl || p.jogo.escudoVisitante,
+          equipeMandante: p.jogo.equipeCasaNome || p.jogo.equipeMandante,
+          equipeVisitante: p.jogo.equipeVisitanteNome || p.jogo.equipeVisitante,
+          dataHoraReal: p.jogo.dataHoraReal || p.jogo.dataHora,
+          horaJogo: p.jogo.horaJogo
+        };
       });
-
-      // 5. ATUALIZA A VARIÁVEL VISUAL (O que faltava para o grid aparecer!)
-      // Mapeamos os dados do 'jogo' que vêm dentro do PalpiteDto para o array do HTML
-      this.jogosDaApostaAtual = listaPalpites.map((p: any) => ({
-        // Espalhamos o objeto jogo que vem do backend
-       ...p.jogo, 
-       idJogo: p.jogoId,
-       placarApostaCasa: p.placarApostaCasa,
-       placarApostaVisita: p.placarApostaVisita,
-       // Forçamos o mapeamento se o backend usar nomes diferentes:
-       escudoMandante: p.jogo.escudoMandante || p.jogo.escudoCasa || p.jogo.equipeCasaEscudoUrl,
-       escudoVisitante: p.jogo.escudoVisitante || p.jogo.escudoFora || p.jogo.equipeVisitanteEscudoUrl,
-       equipeMandante: p.jogo.equipeMandante || p.jogo.nomeEquipeCasa,
-       equipeVisitante: p.jogo.equipeVisitante || p.jogo.nomeEquipeVisitante
-  }));
-
-
     } else {
-      // Se a cartela estiver vazia, monta o grid baseado nos jogos da rodada
       this.loadJogosSemPalpites();
     }
     
@@ -300,6 +293,7 @@ onApostaSelected(apostaId: string): void {
     this.apostaForm.markAsPristine();
   }
 }
+
 
 voltar(): void {
   this.location.back();

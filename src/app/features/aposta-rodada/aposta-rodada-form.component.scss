@@ -1,3 +1,25 @@
+
+// Fundo principal da página (Cinza azulado médio para contraste)
+.container-dashboard {
+  background-color: #0f172a; // Equivalente ao slate-900
+  min-height: 100vh;
+}
+
+// Cards internos (Mais escuros para "saltarem" do fundo)
+.bg-slate-800\/40, .bg-slate-900\/60 {
+  background-color: rgba(2, 6, 23, 0.7) !important; // slate-950 com transparência
+  border: 1px solid rgba(71, 85, 105, 0.3); // borda slate-600 sutil
+}
+
+// Estilo específico do botão Voltar (Padrão Imagem 10)
+.btn-voltar-padrao {
+  background-color: #1e293b; // slate-800
+  border: 1px solid #334155; // slate-700
+  &:hover {
+    background-color: #334155;
+  }
+}
+
 /* Cores distintas para cada seleção */
 .linha-ativa-indigo { 
   background-color: #4f46e5 !important; // Indigo para Rodada
