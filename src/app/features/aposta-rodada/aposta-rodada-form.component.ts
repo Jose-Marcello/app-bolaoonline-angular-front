@@ -250,39 +250,53 @@ montarGridVazio(): void {
   }
 
   
-// GRID 2: Seleção de Cartela (Ajuste para o Erro Crônico)
-onApostaSelected(apostaId: string): void {
-  // 1. Atualiza o ID imediatamente para o backend saber o que salvar
-  this.apostaSelecionadaId = apostaId;
+validarRegraMinima(): boolean {
+  if (!this.palpites || this.palpites.length === 0) return false;
+  
+  const valores = this.palpites.value;
+  let contador = 0;
 
+  for (let p of valores) {
+    // Se houver algum nulo, a cartela é inválida
+    if (p.placarApostaCasa === null || p.placarApostaVisita === null) return false;
+    // Regra: Visitante Ganha ou Empate
+    if (p.placarApostaVisita >= p.placarApostaCasa) {
+      contador++;
+    }
+  }
+  return contador >= 3;
+}
+
+// TROCA DE CARTELA (RESET DEFINITIVO)
+onApostaSelected(apostaId: string): void {
+  this.apostaSelecionadaId = apostaId;
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    // 2. RESET AGRESSIVO: Esconde o Grid 3 e limpa o formulário
+    // 1. Limpeza total antes de carregar
     this.apostaAtual = undefined;
-    this.palpites.clear(); 
+    this.palpites.clear();
     this.jogosDaApostaAtual = [];
 
-    // 3. Aguarda o Angular processar a remoção do Grid 3
+    // 2. Delay de 150ms para o Angular reconstruir o DOM
     setTimeout(() => {
-      this.apostaAtual = apostaSelecionada; // O Grid 3 reaparece agora com os novos dados
+      this.apostaAtual = apostaSelecionada;
       
       const pCollection = apostaSelecionada.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-      // 4. Mapeia os novos jogos e palpites na ordem correta
-      this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
+      listaPalpites.forEach((p: any) => {
         this.palpites.push(this.fb.group({
           id: [p.id],
-          idJogo: [p.jogoId],
-          placarApostaCasa: [p.placarApostaCasa],
-          placarApostaVisita: [p.placarApostaVisita]
+          jogoId: [p.jogoId],
+          placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
+          placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
         }));
-        return p.jogo;
+        this.jogosDaApostaAtual.push(p.jogo);
       });
       
       this.apostaForm.markAsPristine();
-    }, 50); // Delay de 50ms é o suficiente para garantir a troca visual
+    }, 150); 
   }
 }
 
