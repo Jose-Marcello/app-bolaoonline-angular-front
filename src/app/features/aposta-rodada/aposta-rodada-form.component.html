@@ -7,41 +7,28 @@
 </div>
 
 <div class="flex flex-col items-center justify-center w-full py-2 bg-slate-950 border-b border-slate-800">
-  <div class="px-3 py-0.5 bg-slate-900 border border-slate-700 rounded-full max-w-[95%]">
-    <h1 class="text-[8px] font-black uppercase tracking-tight text-slate-300 truncate whitespace-nowrap">
+  <div class="px-2 py-0.5 bg-slate-900 border border-slate-700 rounded-full w-[98%]">
+    <h1 class="text-[7px] font-black uppercase tracking-tighter text-slate-300 text-center truncate whitespace-nowrap">
       {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO BRASILEIRO 2025' }}
     </h1>
   </div>
 </div>
 
-<div class="container-dashboard p-3 space-y-4 bg-slate-500 min-h-screen">
+<div class="container-dashboard p-2 space-y-4 bg-slate-500 min-h-screen">
 
   <div class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden">
     <div class="p-3 border-b border-slate-900 bg-black/40">
-      <h3 class="text-[9px] font-black text-white uppercase tracking-widest">1. Rodadas em Aposta</h3>
+      <h3 class="text-[9px] font-black text-white uppercase tracking-widest italic">1. Rodadas em Aposta</h3>
     </div>
-    <div class="p-2 overflow-x-auto">
+    <div class="p-1 overflow-x-auto">
       <table class="w-full text-[10px] font-bold text-slate-400">
-        <thead>
-          <tr class="text-[8px] uppercase text-slate-600 border-b border-slate-900">
-            <th class="pb-2 text-center">SEL</th>
-            <th class="pb-2 text-left px-2">RODADA</th>
-            <th class="pb-2 text-center">INÍCIO</th>
-            <th class="pb-2 text-center">FIM</th>
-          </tr>
-        </thead>
         <tbody class="divide-y divide-slate-900">
-          <tr *ngFor="let r of rodadasDisponiveis" 
-              [ngClass]="{'bg-indigo-600/30 text-white': r.id === rodadaId}"
-              class="transition-colors hover:bg-white/5">
-            <td class="py-2 text-center">
-              <button (click)="selecionarRodada(r.id)" class="text-indigo-400">
-                <mat-icon class="scale-75">play_arrow</mat-icon>
-              </button>
-            </td>
-            <td class="py-2 px-2 uppercase">Rodada {{ r.numeroRodada }}</td>
-            <td class="py-2 text-center">{{ r.dataInicio | date:'dd/MM' }}</td>
-            <td class="py-2 text-center">{{ r.dataFim | date:'dd/MM' }}</td>
+          <tr *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)"
+              [ngClass]="{'bg-indigo-600/30 text-white': r.id === rodadaId}" class="cursor-pointer">
+            <td class="py-3 px-2 text-center"><mat-icon class="scale-75">play_arrow</mat-icon></td>
+            <td class="py-3 px-1 uppercase font-black text-[9px]">Rodada {{ r.numeroRodada }}</td>
+            <td class="py-3 px-1 text-center text-[9px]">{{ r.dataInicio | date:'dd/MM' }}</td>
+            <td class="py-3 px-1 text-center text-[9px]">{{ r.dataFim | date:'dd/MM' }}</td>
           </tr>
         </tbody>
       </table>
@@ -50,44 +37,37 @@
 
   <div class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden">
     <div class="p-3 border-b border-slate-900 bg-black/40">
-      <h3 class="text-[9px] font-black text-white uppercase tracking-widest">2. Minhas Cartelas</h3>
+      <h3 class="text-[9px] font-black text-white uppercase tracking-widest italic">2. Minhas Cartelas</h3>
     </div>
     <div class="p-2 space-y-1.5">
       <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id)"
            [ngClass]="apostaAtual?.id === a.id ? 'bg-indigo-500/20 border-indigo-500/50' : 'bg-black/40 border-slate-900'"
-           class="grid grid-cols-5 items-center p-2 rounded border cursor-pointer transition-all hover:border-slate-500">
-        <div class="text-center">
-          <mat-icon [class.text-indigo-400]="apostaAtual?.id === a.id" class="scale-75 text-slate-700">
-            {{ apostaAtual?.id === a.id ? 'check_circle' : 'radio_button_unchecked' }}
-          </mat-icon>
-        </div>
+           class="grid grid-cols-5 items-center p-2 rounded border cursor-pointer transition-all">
+        <div class="text-center"><mat-icon class="scale-75 text-slate-700">{{ apostaAtual?.id === a.id ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon></div>
         <div class="col-span-2 text-[9px] font-black text-white uppercase truncate">{{ a.identificadorAposta }}</div>
         <div class="text-center text-[8px] font-bold text-slate-500">{{ a.dataHoraSubmissao | date:'dd/MM' }}</div>
-        <div class="text-center">
-          <span class="text-[7px] font-black px-1 rounded text-white uppercase shadow-sm" 
-                [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'">
-            {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
-          </span>
-        </div>
+        <div class="text-center"><span class="text-[7px] font-black px-1 rounded text-white uppercase" [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'">{{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}</span></div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="apostaAtual; else modoConsulta" class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden">
-    <div class="p-3 border-b border-slate-900 bg-black/40 flex justify-between items-center">
-      <h3 class="text-[9px] font-black text-white uppercase tracking-widest">3. Palpites da Rodada</h3>
-      <span class="text-[8px] font-black text-slate-500 px-2 py-0.5 bg-slate-900 rounded uppercase">Ordem: Data + Hora</span>
+  <div *ngIf="apostaAtual" class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden mt-6">
+    <div class="p-4 border-b border-indigo-500/30 bg-indigo-950/40">
+      <h2 class="text-lg font-black text-white uppercase italic tracking-tighter">{{ apostaAtual.identificadorAposta }}</h2>
     </div>
 
-    <form [formGroup]="apostaForm" class="p-3">
+    <form [formGroup]="apostaForm" class="p-2">
       <div formArrayName="palpites" class="space-y-3">
         <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
              class="bg-black/30 rounded-lg p-3 border border-slate-900 flex flex-col shadow-inner mb-2">
           
-          <div class="w-full text-center border-b border-slate-900/50 pb-1.5 mb-2">
-            <p class="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">
+          <div class="w-full text-center border-b border-slate-900/50 pb-2 mb-3">
+            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-tight">
               {{ jogosDaApostaAtual[i]?.diaSemana | uppercase }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} 
               ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
+            </p>
+            <p class="text-[8px] font-bold text-slate-500 uppercase mt-1">
+              {{ jogosDaApostaAtual[i]?.estadioNome || 'Local a definir' }}
             </p>
           </div>
 
@@ -112,25 +92,14 @@
 
     <div class="p-3 bg-black/60 border-t border-slate-900 flex items-center justify-between">
       <div class="flex flex-col">
-        <span class="text-[8px] uppercase text-slate-500 font-black">Data de Envio</span>
-        <span class="text-[9px] font-black uppercase text-emerald-400" *ngIf="apostaAtual?.dataHoraSubmissao">
-          {{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm' }}
-        </span>
+        <span class="text-[8px] uppercase text-slate-500 font-black">Status</span>
+        <span class="text-[9px] font-black uppercase text-emerald-400" *ngIf="apostaAtual?.dataHoraSubmissao">{{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm' }}</span>
         <span class="text-[9px] font-black uppercase text-slate-600" *ngIf="!apostaAtual?.dataHoraSubmissao">Pendente</span>
       </div>
-      <button (click)="salvarApostas()" class="bg-white text-slate-900 px-5 py-2 rounded-lg flex items-center gap-1.5 shadow-lg">
+      <button (click)="salvarApostas()" class="bg-white text-slate-900 px-5 py-2 rounded-lg flex items-center gap-1.5 shadow-lg active:scale-95 transition-all">
         <mat-icon class="scale-75 font-bold">save</mat-icon>
         <span class="text-[9px] font-black uppercase">Confirmar</span>
       </button>
     </div>
   </div>
-
-  <ng-template #modoConsulta>
-    <div class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl p-6 text-center">
-      <mat-icon class="text-slate-700 scale-[2] mb-4">sports_soccer</mat-icon>
-      <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">Selecione uma Cartela</h3>
-      <p class="text-[10px] text-slate-600 uppercase mt-2">Clique em uma de suas apostas acima para visualizar e editar os palpites</p>
-    </div>
-  </ng-template>
-
 </div>
