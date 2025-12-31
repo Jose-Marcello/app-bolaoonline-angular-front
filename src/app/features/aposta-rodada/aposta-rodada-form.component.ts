@@ -146,7 +146,17 @@ private loadAllIntegratedData(): Observable<any> {
       : of([])
   }).pipe(
     tap(({ rodadas, apostador, apostas }) => {
-      this.rodadasEmAposta = rodadas;
+      // --- CORREÇÃO 1: ALIMENTA O GRID 1 ---
+      // O HTML usa rodadasDisponiveis, por isso o Grid estava vazio!
+      this.rodadasDisponiveis = rodadas; 
+      this.rodadasEmAposta = rodadas; 
+      
+      // --- CORREÇÃO 2: MAPEIA DATA PARA O HTML ---
+      // Garante que r.dataInicio exista para o seu pipe | date:'dd/MM'
+      this.rodadasDisponiveis.forEach(r => {
+          if (!r.dataInicio && r.dataInic) r.dataInicio = r.dataInic;
+      });
+
       this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
       
       if (apostador) {
@@ -156,20 +166,23 @@ private loadAllIntegratedData(): Observable<any> {
 
       this.apostasUsuarioRodada = apostas;
 
-      // Lógica de seleção: se houver apostas, carrega a edição. Se não, modo consulta.
-      if (this.apostasUsuarioRodada.length > 0) {
+      // --- CORREÇÃO 3: LÓGICA DE SELEÇÃO E ESTADO ---
+      if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
         this.isReadOnly = false;
+        // Tenta encontrar a aposta do campeonato ou pega a primeira da lista
         const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
-        this.onApostaSelected(inicial.id);
+        
+        if (inicial && inicial.id) {
+            this.onApostaSelected(inicial.id);
+        }
       } else {
-        this.isReadOnly = true; // Força modo leitura
+        this.isReadOnly = true; 
         this.loadJogosSemPalpites(); 
       }
     }),
     finalize(() => this.isLoading = false)
   );
 }
-
 // aposta-rodada-form.component.ts
 
 private loadJogosSemPalpites(): void {
