@@ -252,23 +252,25 @@ montarGridVazio(): void {
   
 // GRID 2: Seleção de Cartela (Ajuste para o Erro Crônico)
 onApostaSelected(apostaId: string): void {
+  // 1. Atualiza o ID imediatamente para o backend saber o que salvar
   this.apostaSelecionadaId = apostaId;
+
   const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (apostaSelecionada) {
-    // 1. Limpeza agressiva para garantir que o Grid 3 seja reconstruído do zero
-    this.palpites.clear();
-    this.jogosDaApostaAtual = [];
+    // 2. RESET AGRESSIVO: Esconde o Grid 3 e limpa o formulário
     this.apostaAtual = undefined;
+    this.palpites.clear(); 
+    this.jogosDaApostaAtual = [];
 
-    // 2. Pequeno delay para o Angular processar a destruição do grid anterior
+    // 3. Aguarda o Angular processar a remoção do Grid 3
     setTimeout(() => {
-      this.apostaAtual = apostaSelecionada;
+      this.apostaAtual = apostaSelecionada; // O Grid 3 reaparece agora com os novos dados
       
       const pCollection = apostaSelecionada.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-      // 3. Montagem na ordem exata do banco
+      // 4. Mapeia os novos jogos e palpites na ordem correta
       this.jogosDaApostaAtual = listaPalpites.map((p: any) => {
         this.palpites.push(this.fb.group({
           id: [p.id],
@@ -278,12 +280,11 @@ onApostaSelected(apostaId: string): void {
         }));
         return p.jogo;
       });
-
+      
       this.apostaForm.markAsPristine();
-    }, 50); 
+    }, 50); // Delay de 50ms é o suficiente para garantir a troca visual
   }
 }
-
 
 voltar(): void {
   this.location.back();
