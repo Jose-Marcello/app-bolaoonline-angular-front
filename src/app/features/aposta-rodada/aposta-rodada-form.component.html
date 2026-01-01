@@ -71,53 +71,68 @@
       <div formArrayName="palpites" style="display: flex; flex-direction: column; gap: 18px;">
         <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
              style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+          
           <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
             <p style="font-size: 14px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
               {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
             </p>
+            <p *ngIf="jogosDaApostaAtual[i]?.estadioNome" style="font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin: 4px 0 0 0;">
+              {{ jogosDaApostaAtual[i]?.estadioNome }}
+            </p>
           </div>
+
           <div style="display: grid; grid-template-columns: 1fr 130px 1fr; align-items: center; gap: 8px;">
+            
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
               <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" style="width: 48px; height: 48px; object-fit: contain;">
-              <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; line-height: 1.1;">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
+              <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; line-height: 1.1;">
+                {{ jogosDaApostaAtual[i]?.equipeCasaNome }}
+              </span>
             </div>
+
             <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-               <input type="number" 
-                       formControlName="placarApostaCasa" 
-                       min="0"
-                       oninput="if(this.value<0) this.value=0;"
-                       [readonly]="!apostaAtual?.podeEditar" 
-                       style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;"> 
+              <input type="number" formControlName="placarApostaCasa" min="0" oninput="if(this.value<0) this.value=0;"
+                     [readonly]="!apostaAtual?.podeEditar" 
+                     style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;"> 
 
-                    <span style="color: rgba(255,255,255,0.4); font-size: 18px; font-weight: 900;">X</span> 
+              <span style="color: rgba(255,255,255,0.4); font-size: 18px; font-weight: 900;">X</span> 
 
-                <input type="number" 
-                       formControlName="placarApostaVisita" 
-                       min="0"
-                       oninput="if(this.value<0) this.value=0;"
-                       [readonly]="!apostaAtual?.podeEditar" 
-                       style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;">
-              </div>
+              <input type="number" formControlName="placarApostaVisita" min="0" oninput="if(this.value<0) this.value=0;"
+                     [readonly]="!apostaAtual?.podeEditar" 
+                     style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" style="width: 48px; height: 48px; object-fit: contain;">
+              <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; line-height: 1.1;">
+                {{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}
+              </span>
+            </div>
+
           </div>
         </div>
       </div>
 
-     <div style="margin-top: 24px; padding-top: 20px; border-top: 2px solid #1e293b; display: flex; flex-direction: column; gap: 12px; align-items: center;">
-  
-  <div *ngIf="apostaAtual?.dataHoraSubmissao" style="display: flex; align-items: center; gap: 6px;">
-    <mat-icon style="font-size: 14px; width: 14px; height: 14px; color: #cbd5e1;">history</mat-icon>
-    <span style="font-size: 11px; font-weight: bold; color: #cbd5e1; text-transform: uppercase;">
-      Último Envio: {{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm' }}
-    </span>
+      <div style="margin-top: 24px; padding-top: 20px; border-top: 2px solid #1e293b; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        
+        <div *ngIf="apostaAtual?.dataHoraSubmissao" style="display: flex; align-items: center; gap: 6px;">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px; color: #cbd5e1;">history</mat-icon>
+          <span style="font-size: 11px; font-weight: bold; color: #cbd5e1; text-transform: uppercase;">
+            Último Envio: {{ apostaAtual.dataHoraSubmissao | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+
+        <button (click)="salvarApostas()" 
+                [disabled]="!apostaAtual?.podeEditar || apostaForm.invalid || !validarRegraMinima()"
+                [style.background]="(!apostaAtual?.podeEditar || apostaForm.invalid || !validarRegraMinima()) ? '#334155' : '#059669'"
+                style="width: 100%; max-width: 320px; height: 54px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; color: white; box-shadow: 0 8px 16px rgba(0,0,0,0.4); transition: all 0.3s ease;">
+           <mat-icon>{{ (apostaAtual?.podeEditar && validarRegraMinima()) ? 'save' : 'lock' }}</mat-icon>
+           <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">
+             {{ (apostaAtual?.podeEditar && !validarRegraMinima()) ? 'Faltam palpites (Min 3 Emp/Vis)' : 'SALVAR PALPITES' }}
+           </span>
+        </button>
+
+      </div>
+    </form>
   </div>
-
-<button (click)="salvarApostas()" 
-        [disabled]="!apostaAtual?.podeEditar || apostaForm.invalid || !validarRegraMinima()"
-        [style.background]="(!apostaAtual?.podeEditar || apostaForm.invalid || !validarRegraMinima()) ? '#334155' : '#059669'"
-        ... >
-   <mat-icon>{{ (apostaAtual?.podeEditar && validarRegraMinima()) ? 'save' : 'lock' }}</mat-icon>
-   <span>{{ (apostaAtual?.podeEditar && !validarRegraMinima()) ? 'Faltam palpites (Min 3 Emp/Vis)' : 'SALVAR PALPITES' }}</span>
-</button>
-
-
 </div>
