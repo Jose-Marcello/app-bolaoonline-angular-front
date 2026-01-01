@@ -30,7 +30,6 @@ import { ConfirmacaoApostaModalComponent } from '../../shared/components/confirm
 
 import { CriarApostaAvulsaRequestDto } from '../../features/aposta-rodada/models/criar-aposta-avulsa-request.Dto.model'
 
-
 @Component({
   selector: 'app-aposta-rodada-form',
   standalone: true,
@@ -77,6 +76,9 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   apostasUsuarioRodada: ApostaRodadaDto[] = []; 
   jogosDaApostaAtual: any[] = []; // Alterado para any[] para evitar erros de tipagem
   apostaAtual: any = null;
+  
+  // Crie uma variável para armazenar o estado da regra
+  regraValidada: boolean = false;
 
   apostaForm!: FormGroup;
   baseUrlImagens: string = environment.imagesUrl;
@@ -118,6 +120,11 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
         error: () => this.isLoading = false
       })
     );
+
+    // No ngOnInit ou após carregar os palpites, monitore as mudanças
+    this.apostaForm.valueChanges.subscribe(() => {
+    this.regraValidada = this.validarRegraMinima();
+});
   }
 
   ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
@@ -186,7 +193,6 @@ private loadAllIntegratedData(): Observable<any> {
     finalize(() => this.isLoading = false)
   );
 }
-// aposta-rodada-form.component.ts
 
 private loadJogosSemPalpites(): void {
   this.isLoading = true;

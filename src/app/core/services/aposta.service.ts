@@ -31,7 +31,9 @@ export class ApostaService {
     salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
        // Tente remover o domínio fixo e usar apenas a rota relativa se o seu baseHref estiver configurado
        // Ou garanta que a barra entre o controller e o método está correta
-       const url = `${this.apiUrl}/SalvarApostas`; 
+       //const url = `${this.apiUrl}/SalvarApostas`; 
+       // Garanta que não existam barras duplas (//)
+       const url = `${environment.apiUrl}/api/ApostaRodada/SalvarApostas`;
     
       return this.http.post<ApiResponse<any>>(url, apostaRequest)
         .pipe(
