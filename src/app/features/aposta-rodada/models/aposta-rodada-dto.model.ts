@@ -12,6 +12,7 @@ export interface ApostaRodadaDto {
   apostadorCampeonatoId: string;
   rodadaId: string;
   identificadorAposta: string | null;
+  podeEditar: boolean;
   dataHoraSubmissao: string | null;
   ehApostaCampeonato: boolean;
   ehApostaIsolada: boolean;

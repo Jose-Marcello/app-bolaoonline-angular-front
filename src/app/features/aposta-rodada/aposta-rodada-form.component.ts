@@ -46,6 +46,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   isLoading = true; 
   isLoadingPalpites = false;
   isReadOnly = true;
+  podeEditar: boolean;
   errorMessage: string | null = null;  
   isLoadingCartelas: boolean = false; 
   isLoadingJogos:boolean = false;
@@ -267,21 +268,22 @@ validarRegraMinima(): boolean {
   return contador >= 3;
 }
 
-// TROCA DE CARTELA (RESET DEFINITIVO)
-// MÉTODO DE SELEÇÃO DE CARTELA (ESTABILIZADO)
 onApostaSelected(apostaId: string): void {
   this.apostaSelecionadaId = apostaId;
   const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (aposta) {
-    // 1. Limpeza total para forçar o Angular a destruir o Grid 3 antigo
     this.apostaAtual = undefined;
     this.palpites.clear();
     this.jogosDaApostaAtual = [];
 
-    // 2. Aguarda um microssegundo para reconstruir com os dados novos e ordenados
     setTimeout(() => {
-      this.apostaAtual = aposta;
+      // GARANTIA DA VARIÁVEL: Força o reconhecimento do booleano da API
+      this.apostaAtual = {
+        ...aposta,
+        podeEditar: aposta.podeEditar === true || (aposta as any).podeEditar === 'true'
+      };
+
       const pCollection = aposta.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
@@ -291,9 +293,9 @@ onApostaSelected(apostaId: string): void {
           placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
           placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
         }));
-        // Alimenta a lista de apoio para Dia, Hora e Estádio
         this.jogosDaApostaAtual.push(p.jogo);
       });
+
       this.apostaForm.markAsPristine();
     }, 50);
   }
