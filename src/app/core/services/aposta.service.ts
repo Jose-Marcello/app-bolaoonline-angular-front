@@ -25,15 +25,12 @@ export class ApostaService {
 
   constructor(private http: HttpClient) { }
 
-  // CORREÇÃO DO SALVAR: Use a apiUrl correta (ApostaRodada)
+  // CORREÇÃO DO SALVAR: Use a apiUrl correta (ApostaRodada)  
   // No aposta.service.ts
-// No aposta.service.ts
-    salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
-       // Tente remover o domínio fixo e usar apenas a rota relativa se o seu baseHref estiver configurado
-       // Ou garanta que a barra entre o controller e o método está correta
-       //const url = `${this.apiUrl}/SalvarApostas`; 
-       // Garanta que não existam barras duplas (//)
-       const url = `${environment.apiUrl}/api/ApostaRodada/SalvarApostas`;
+   salvarApostas(apostaRequest: SalvarApostaRequestDto): Observable<ApiResponse<any>> {
+  
+      // Tente forçar a URL relativa se estiver no mesmo domínio
+      const url = `${this.apiUrl}/SalvarApostas`.replace(/([^:]\/)\/+/g, "$1"); 
     
       return this.http.post<ApiResponse<any>>(url, apostaRequest)
         .pipe(
