@@ -271,33 +271,33 @@ validarRegraMinima(): boolean {
 // MÉTODO DE SELEÇÃO DE CARTELA (ESTABILIZADO)
 onApostaSelected(apostaId: string): void {
   this.apostaSelecionadaId = apostaId;
-  const apostaSelecionada = this.apostasUsuarioRodada.find(a => a.id === apostaId);
+  const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
-  if (apostaSelecionada) {
-    // 1. LIMPEZA SÍNCRONA: O grid de palpites some do DOM imediatamente
-    this.apostaAtual = undefined; 
-    this.palpites.clear(); 
+  if (aposta) {
+    // 1. Limpeza total para forçar o Angular a destruir o Grid 3 antigo
+    this.apostaAtual = undefined;
+    this.palpites.clear();
     this.jogosDaApostaAtual = [];
 
-    // 2. CARGA: O Angular é forçado a criar novos inputs, sem reusar os velhos
+    // 2. Aguarda um microssegundo para reconstruir com os dados novos e ordenados
     setTimeout(() => {
-      this.apostaAtual = apostaSelecionada; 
-      const pCollection = apostaSelecionada.palpites as any;
+      this.apostaAtual = aposta;
+      const pCollection = aposta.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
-      // Confiamos na ordem que vem do Repositório C#
       listaPalpites.forEach((p: any) => {
         this.palpites.push(this.fb.group({
           id: [p.id],
-          placarApostaCasa: [p.placarApostaCasa],
-          placarApostaVisita: [p.placarApostaVisita]
+          placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
+          placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
         }));
+        // Alimenta a lista de apoio para Dia, Hora e Estádio
         this.jogosDaApostaAtual.push(p.jogo);
       });
-    }, 20); // Delay mínimo apenas para o ciclo de vida do Angular
+      this.apostaForm.markAsPristine();
+    }, 50);
   }
 }
-
 
 voltar(): void {
   this.location.back();
