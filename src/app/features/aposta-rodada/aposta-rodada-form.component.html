@@ -1,57 +1,121 @@
-<div class="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden">
-  <div class="p-3 border-b border-slate-900 bg-black/40">
-    <h3 class="text-[9px] font-black text-white uppercase italic tracking-widest">2. Minhas Cartelas</h3>
-  </div>
-  <div class="p-2 space-y-1.5 min-h-[50px]">
-    <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id)"
-         [ngClass]="apostaSelecionadaId === a.id ? 'bg-indigo-600/30 border-indigo-500' : 'bg-slate-900/50 border-slate-800'"
-         class="grid grid-cols-6 items-center p-2 rounded-lg border cursor-pointer transition-all">
-       <div class="text-center"><mat-icon [class.text-indigo-400]="apostaSelecionadaId === a.id" class="text-slate-600 scale-90">{{ apostaSelecionadaId === a.id ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon></div>
-       <div class="col-span-3 px-2 text-[10px] font-black text-white uppercase truncate">{{ a.identificadorAposta }}</div>
-       <div class="text-center text-[8px] font-bold text-slate-500 italic">{{ a.dataHoraSubmissao | date:'dd/MM' }}</div>
-       <div class="flex justify-end pr-1"><span class="text-[7px] font-black px-1.5 py-0.5 rounded text-white uppercase" [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'">{{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="flex justify-center mt-3">
-  <button (click)="criarNovaApostaAvulsa()" class="w-[60%] py-1.5 bg-emerald-600 border border-emerald-500 rounded-lg text-white shadow-lg active:scale-95 flex items-center justify-center gap-2">
-    <mat-icon class="scale-50">add_circle</mat-icon>
-    <span class="text-[8px] font-black uppercase">Criar Nova Aposta Avulsa</span>
+<div style="width: 100%; padding: 8px 12px; background: #020617; display: flex; flex-direction: column; gap: 6px;">
+  
+  <button (click)="voltar()" 
+          style="background: #059669; color: white; border: 1px solid #10b981; border-radius: 4px; padding: 4px 10px; width: fit-content; display: flex; align-items: center; gap: 4px; cursor: pointer; border: none;">
+    <mat-icon style="font-size: 12px; width: 12px; height: 12px; line-height: 12px;">arrow_back</mat-icon>
+    <span style="font-size: 8px; font-weight: 900; text-transform: uppercase;">Voltar</span>
   </button>
-</div>
 
-<div *ngIf="apostaAtual" class="w-full flex justify-center -mb-2 z-20 mt-6">
-  <div class="w-[94%] py-1.5 bg-amber-500 border-b-2 border-amber-600 rounded-t-xl shadow-lg flex items-center justify-center gap-4 px-4">
-    <span class="text-[8px] font-black text-amber-900 uppercase italic">Aposta Selecionada -></span>
-    <h2 class="text-sm font-black text-white uppercase italic tracking-tighter truncate leading-none">{{ apostaAtual.identificadorAposta }}</h2>
+  <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 99px; padding: 3px 10px; text-align: center; width: 100%;">
+    <h1 style="font-size: 7px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin: 0; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      CAMPEONATO BRASILEIRO 2026 - 1º TURNO
+    </h1>
   </div>
 </div>
 
-<div *ngIf="apostaAtual && jogosDaApostaAtual.length > 0" class="w-full bg-slate-950 border border-slate-800 rounded-b-xl shadow-2xl overflow-hidden -mt-1">
-  <form [formGroup]="apostaForm" class="p-2 pt-6">
-    <div formArrayName="palpites" class="space-y-4">
-      <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" class="bg-black/40 rounded-lg p-3 border border-slate-900 flex flex-col gap-3">
-        <div class="w-full text-center border-b border-slate-900/50 pb-2">
-          <p class="text-[10px] font-black text-indigo-400 uppercase">{{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}</p>
-          <p class="text-[8px] font-bold text-slate-500 uppercase italic">{{ jogosDaApostaAtual[i]?.estadioNome }}</p>
-        </div>
-        <div class="grid grid-cols-7 items-center gap-1">
-          <div class="col-span-2 flex flex-col items-center">
-            <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" class="w-10 h-10 object-contain mb-1">
-            <span class="text-[8px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
-          </div>
-          <div class="col-span-3 flex items-center justify-center gap-1.5">
-            <input type="number" formControlName="placarApostaCasa" class="w-11 h-9 bg-white text-slate-900 text-center font-black rounded"> 
-            <span class="text-white opacity-20 text-xs">X</span> 
-            <input type="number" formControlName="placarApostaVisita" class="w-11 h-9 bg-white text-slate-900 text-center font-black rounded">
-          </div>
-          <div class="col-span-2 flex flex-col items-center">
-            <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" class="w-10 h-10 object-contain mb-1">
-            <span class="text-[8px] font-black text-white text-center uppercase truncate w-full">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
-          </div>
-        </div>
+<div style="padding: 10px; background: #0f172a; min-height: 100vh;">
+
+  <div style="background: rgba(79, 70, 229, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="padding: 8px 12px; border-bottom: 1px solid rgba(99, 102, 241, 0.2); background: rgba(79, 70, 229, 0.1);">
+      <h3 style="font-size: 8px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">
+        <mat-icon style="font-size: 10px; width: 10px; height: 10px; line-height: 10px;">play_arrow</mat-icon>
+        1. Seleção de Rodada
+      </h3>
+    </div>
+    <div style="padding: 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;">
+      <div *ngFor="let r of rodadas" (click)="selecionarRodada(r.id)"
+           [style.background]="rodadaIdSelecionada === r.id ? '#4f46e5' : '#020617'"
+           [style.border-color]="rodadaIdSelecionada === r.id ? '#818cf8' : '#1e293b'"
+           style="min-width: 100px; padding: 8px; border-radius: 10px; border: 1px solid; cursor: pointer; text-align: center; transition: all 0.3s;">
+        <span style="display: block; font-size: 7px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px;" [style.color]="rodadaIdSelecionada === r.id ? '#e0e7ff' : '#64748b'">Rodada</span>
+        <span style="font-size: 12px; font-weight: 900; color: white; font-style: italic;">{{ r.numero }}</span>
       </div>
     </div>
-  </form>
+  </div>
+
+  <div style="background: #020617; border-radius: 12px; border: 1px solid #1e293b; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.2);">
+    <div style="padding: 10px; border-bottom: 1px solid #0f172a; background: rgba(255,255,255,0.03);">
+      <h3 style="font-size: 8px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-style: italic;">2. Minhas Cartelas</h3>
+    </div>
+    <div style="padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 50px;">
+      <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id)"
+           [style.background]="apostaSelecionadaId === a.id ? 'rgba(79, 70, 229, 0.2)' : 'rgba(15, 23, 42, 0.5)'"
+           [style.border-color]="apostaSelecionadaId === a.id ? '#6366f1' : '#1e293b'"
+           style="display: grid; grid-template-columns: 30px 1fr 50px 40px; align-items: center; padding: 8px; border-radius: 8px; border: 1px solid; cursor: pointer;">
+         <div style="text-align: center;">
+           <mat-icon [style.color]="apostaSelecionadaId === a.id ? '#818cf8' : '#334155'" style="font-size: 16px; width: 16px; height: 16px;">
+             {{ apostaSelecionadaId === a.id ? 'check_circle' : 'radio_button_unchecked' }}
+           </mat-icon>
+         </div>
+         <div style="padding: 0 8px; font-size: 9px; font-weight: 900; color: white; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+           {{ a.identificadorAposta }}
+         </div>
+         <div style="text-align: center; font-size: 7px; font-weight: bold; color: #64748b; font-style: italic;">
+           {{ a.dataHoraSubmissao | date:'dd/MM' }}
+         </div>
+         <div style="text-align: right;">
+           <span [style.background]="a.ehApostaCampeonato ? '#2563eb' : '#d97706'" 
+                 style="font-size: 6px; font-weight: 900; padding: 2px 4px; border-radius: 3px; color: white; text-transform: uppercase;">
+             {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
+           </span>
+         </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: center; margin-top: 12px;">
+    <button (click)="criarNovaApostaAvulsa()" 
+            style="width: 60%; background: #059669; border: 1px solid #10b981; color: white; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
+      <mat-icon style="font-size: 14px; width: 14px; height: 14px;">add_circle</mat-icon>
+      <span style="font-size: 8px; font-weight: 900; text-transform: uppercase;">Criar Nova Aposta Avulsa</span>
+    </button>
+  </div>
+
+  <div *ngIf="apostaAtual" style="width: 100%; display: flex; justify-content: center; margin-top: 24px; position: relative; z-index: 20; margin-bottom: -4px;">
+    <div style="width: 94%; background: #f59e0b; border-bottom: 2px solid #d97706; border-radius: 12px 12px 0 0; padding: 4px 12px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <span style="font-size: 7px; font-weight: 900; color: #78350f; text-transform: uppercase; font-style: italic;">Aposta Selecionada -></span>
+      <h2 style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: -0.3px;">
+        {{ apostaAtual.identificadorAposta }}
+      </h2>
+    </div>
+  </div>
+
+  <div *ngIf="apostaAtual && jogosDaApostaAtual.length > 0" 
+       style="width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 20px 25px rgba(0,0,0,0.3);">
+    <form [formGroup]="apostaForm" style="padding: 8px; padding-top: 16px;">
+      <div formArrayName="palpites" style="display: flex; flex-direction: column; gap: 12px;">
+        <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
+             style="background: rgba(255,255,255,0.02); border: 1px solid #0f172a; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+          
+          <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px;">
+            <p style="font-size: 9px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
+              {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
+            </p>
+            <p style="font-size: 7px; font-weight: bold; color: #475569; text-transform: uppercase; font-style: italic; margin: 2px 0 0 0;">
+              {{ jogosDaApostaAtual[i]?.estadioNome }}
+            </p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 100px 1fr; align-items: center; gap: 4px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" style="width: 32px; height: 32px; object-fit: contain;">
+              <span style="font-size: 7px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; width: 100%; overflow: hidden; text-overflow: ellipsis;">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
+            </div>
+
+            <div style="display: flex; items-center; justify-content: center; gap: 6px;">
+              <input type="number" formControlName="placarApostaCasa" style="width: 40px; height: 32px; background: white; color: #0f172a; text-align: center; font-size: 16px; font-weight: 900; border-radius: 4px; border: none;"> 
+              <span style="color: rgba(255,255,255,0.2); font-size: 10px; font-weight: 900;">X</span> 
+              <input type="number" formControlName="placarApostaVisita" style="width: 40px; height: 32px; background: white; color: #0f172a; text-align: center; font-size: 16px; font-weight: 900; border-radius: 4px; border: none;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" style="width: 32px; height: 32px; object-fit: contain;">
+              <span style="font-size: 7px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; width: 100%; overflow: hidden; text-overflow: ellipsis;">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
