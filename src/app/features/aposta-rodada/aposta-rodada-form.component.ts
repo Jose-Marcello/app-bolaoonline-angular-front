@@ -378,49 +378,35 @@ onClickCriarNovaAposta(): void {
   })
 }
 
-  salvarApostas() {
-  if (!this.apostaAtual || this.apostaForm.invalid) return;
+  salvarApostas(): void {
+  if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar) return;
 
-  this.isSaving = true;
-
-  // Captura os valores do FormArray garantindo que o jogoId esteja presente
-  const valoresForm = this.palpites.getRawValue(); 
-
-  // Montagem conforme o SalvarApostaRequestDto
-  const request: SalvarApostaRequestDto = {
+  const dadosParaSalvar: SalvarApostaRequestDto = {
     id: this.apostaAtual.id,
-    campeonatoId: this.campeonatoId!,
-    rodadaId: this.rodadaId!,
-    apostadorCampeonatoId: this.apostadorCampeonatoId!,
+    campeonatoId: this.campeonatoId, // Certifique-se que esta variável está inicializada
+    rodadaId: this.rodadaSelecionadaId,
+    apostadorCampeonatoId: this.apostadorCampeonatoId,
     ehApostaIsolada: !this.apostaAtual.ehApostaCampeonato,
-    identificadorAposta: this.apostaAtual.identificadorAposta || 'AVULSA',
-    ehCampeonato: this.apostaAtual.ehApostaCampeonato || false,
-    
-    // IMPORTANTE: O nome da propriedade deve ser apostasJogos
-    apostasJogos: valoresForm.map((p: any) => ({
-      jogoId: p.jogoId,
-      placarCasa: p.placarApostaCasa, // Mapeie para o nome do DTO: placarCasa
-      placarVisitante: p.placarApostaVisita // Mapeie para: placarVisitante
+    identificadorAposta: this.apostaAtual.identificadorAposta, // Campo faltante
+    ehCampeonato: this.apostaAtual.ehApostaCampeonato, // Campo faltante
+    apostasJogos: this.apostaForm.value.palpites.map((p: any) => ({
+      jogoId: p.id,
+      placarCasa: p.placarApostaCasa,
+      placarVisitante: p.placarApostaVisita
     }))
   };
 
-  console.log('[Aposta] Enviando para o Servidor:', request);
-
-  this.apostaService.salvarApostas(request)
-    .pipe(finalize(() => this.isSaving = false))
-    .subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.showSnackBar('Aposta salva com sucesso!', 'Fechar', 'success');
-          this.isReadOnly = true;
-          this.loadCartelasDaRodada(); // Atualiza a Data de Envio no Grid 2
-        }
-      },
-      error: (err) => {
-        console.error('Erro no salvamento:', err);
-        this.showSnackBar('Erro ao processar salvamento.', 'Fechar', 'error');
+  this.apostaService.salvarApostas(dadosParaSalvar).subscribe({
+    next: (res) => {
+      if (res.success) {
+        alert("Palpites salvos com sucesso!");
+        this.apostaForm.markAsPristine();
+        // Atualiza a data visual de envio
+        this.apostaAtual!.dataHoraSubmissao = new Date();
       }
-    });
+    },
+    error: (err) => console.error("Erro ao salvar:", err)
+  });
 }
 
 private loadCartelasDaRodada(): void {
