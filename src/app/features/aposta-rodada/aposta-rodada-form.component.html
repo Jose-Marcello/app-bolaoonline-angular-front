@@ -23,11 +23,11 @@
       </h3>
     </div>
     <div style="padding: 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;">
-      <div *ngFor="let r of rodadas" (click)="selecionarRodada(r.id)"
-           [style.background]="rodadaIdSelecionada === r.id ? '#4f46e5' : '#020617'"
-           [style.border-color]="rodadaIdSelecionada === r.id ? '#818cf8' : '#1e293b'"
+      <div *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)"
+           [style.background]="rodadaSelecionadaId === r.id ? '#4f46e5' : '#020617'"
+           [style.border-color]="rodadaSelecionadaId === r.id ? '#818cf8' : '#1e293b'"
            style="min-width: 100px; padding: 8px; border-radius: 10px; border: 1px solid; cursor: pointer; text-align: center; transition: all 0.3s;">
-        <span style="display: block; font-size: 7px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px;" [style.color]="rodadaIdSelecionada === r.id ? '#e0e7ff' : '#64748b'">Rodada</span>
+        <span style="display: block; font-size: 7px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px;" [style.color]="rodadaSelecionadaId === r.id ? '#e0e7ff' : '#64748b'">Rodada</span>
         <span style="font-size: 12px; font-weight: 900; color: white; font-style: italic;">{{ r.numero }}</span>
       </div>
     </div>
