@@ -273,15 +273,15 @@ onApostaSelected(apostaId: string): void {
   const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
   
   if (aposta) {
-    this.apostaAtual = undefined;
+    this.apostaAtual = undefined; // Limpeza para resetar o grid
     this.palpites.clear();
     this.jogosDaApostaAtual = [];
 
     setTimeout(() => {
-      // GARANTIA DA VARIÁVEL: Força o reconhecimento do booleano da API
+      // INICIALIZAÇÃO CRUCIAL
       this.apostaAtual = {
         ...aposta,
-        podeEditar: aposta.podeEditar === true || (aposta as any).podeEditar === 'true'
+        podeEditar: aposta.podeEditar === true // Garante que o booleano seja lido
       };
 
       const pCollection = aposta.palpites as any;
@@ -290,13 +290,13 @@ onApostaSelected(apostaId: string): void {
       listaPalpites.forEach((p: any) => {
         this.palpites.push(this.fb.group({
           id: [p.id],
-          placarApostaCasa: [p.placarApostaCasa, [Validators.required, Validators.min(0)]],
-          placarApostaVisita: [p.placarApostaVisita, [Validators.required, Validators.min(0)]]
+          placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
+          placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
         }));
         this.jogosDaApostaAtual.push(p.jogo);
       });
 
-      this.apostaForm.markAsPristine();
+      this.apostaForm.markAsPristine(); // Inicia o botão em cinza até o usuário mexer
     }, 50);
   }
 }

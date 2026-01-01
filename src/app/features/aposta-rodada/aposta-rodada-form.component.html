@@ -103,15 +103,15 @@
     </span>
   </div>
 
-  <button (click)="salvarApostas()" 
-          [disabled]="!apostaAtual?.podeEditar || apostaForm.invalid"
-          [style.background]="(!apostaAtual?.podeEditar) ? '#334155' : '#059669'"
-          style="width: 100%; color: white; padding: 16px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
-    <mat-icon style="font-size: 24px;">{{ apostaAtual?.podeEditar ? 'save' : 'lock' }}</mat-icon>
-    <span style="font-size: 14px; font-weight: 900; text-transform: uppercase;">
-      {{ apostaAtual?.podeEditar ? 'Salvar Palpites' : 'Aposta Encerrada' }}
-    </span>
-  </button>
+ <button (click)="salvarApostas()" 
+        [disabled]="!apostaAtual?.podeEditar || apostaForm.invalid"
+        [style.background]="(apostaAtual?.podeEditar && apostaForm.dirty) ? '#059669' : '#334155'"
+        style="width: 100%; color: white; padding: 16px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
+  <mat-icon style="font-size: 24px;">{{ apostaAtual?.podeEditar ? 'save' : 'lock' }}</mat-icon>
+  <span style="font-size: 14px; font-weight: 900; text-transform: uppercase;">
+    {{ apostaAtual?.podeEditar ? 'Salvar Palpites' : 'Aposta Encerrada' }}
+  </span>
+</button>
 
 
 </div>
