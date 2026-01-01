@@ -1,61 +1,58 @@
-<div style="width: 100%; padding: 8px 12px; background: #020617; display: flex; flex-direction: column; gap: 6px;">
+<div style="width: 100%; padding: 12px; background: #1e293b; display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid #0f172a;">
   
   <button (click)="voltar()" 
-          style="background: #059669; color: white; border: 1px solid #10b981; border-radius: 4px; padding: 4px 10px; width: fit-content; display: flex; align-items: center; gap: 4px; cursor: pointer; border: none;">
-    <mat-icon style="font-size: 12px; width: 12px; height: 12px; line-height: 12px;">arrow_back</mat-icon>
-    <span style="font-size: 8px; font-weight: 900; text-transform: uppercase;">Voltar</span>
+          style="background: #059669; color: white; border-radius: 6px; padding: 6px 14px; width: fit-content; display: flex; align-items: center; gap: 6px; cursor: pointer; border: none; shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <mat-icon style="font-size: 18px; width: 18px; height: 18px; line-height: 18px;">arrow_back</mat-icon>
+    <span style="font-size: 11px; font-weight: 900; text-transform: uppercase;">Voltar</span>
   </button>
 
-  <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 99px; padding: 3px 10px; text-align: center; width: 100%;">
-    <h1 style="font-size: 7px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin: 0; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+  <div style="background: #020617; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; text-align: center;">
+    <h1 style="font-size: 10px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; margin: 0; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
       CAMPEONATO BRASILEIRO 2026 - 1º TURNO
     </h1>
   </div>
 </div>
 
-<div style="padding: 10px; background: #0f172a; min-height: 100vh;">
+<div style="padding: 14px; background: #94a3b8; min-height: 100vh;">
 
-  <div style="background: rgba(79, 70, 229, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <div style="padding: 8px 12px; border-bottom: 1px solid rgba(99, 102, 241, 0.2); background: rgba(79, 70, 229, 0.1);">
-      <h3 style="font-size: 8px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">
-        <mat-icon style="font-size: 10px; width: 10px; height: 10px; line-height: 10px;">play_arrow</mat-icon>
-        1. Seleção de Rodada
-      </h3>
+  <div style="background: #020617; border-radius: 12px; border: 1px solid #475569; overflow: hidden; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
+    <div style="padding: 10px; border-bottom: 1px solid #1e293b; background: #0f172a;">
+      <h3 style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: 1px;">1. Seleção de Rodada</h3>
     </div>
-    <div style="padding: 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;">
+    <div style="padding: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px;">
       <div *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)"
-           [style.background]="rodadaSelecionadaId === r.id ? '#4f46e5' : '#020617'"
-           [style.border-color]="rodadaSelecionadaId === r.id ? '#818cf8' : '#1e293b'"
-           style="min-width: 100px; padding: 8px; border-radius: 10px; border: 1px solid; cursor: pointer; text-align: center; transition: all 0.3s;">
-        <span style="display: block; font-size: 7px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px;" [style.color]="rodadaSelecionadaId === r.id ? '#e0e7ff' : '#64748b'">Rodada</span>
-        <span style="font-size: 12px; font-weight: 900; color: white; font-style: italic;">{{ r.numero }}</span>
+           [style.background]="rodadaSelecionadaId === r.id ? '#4f46e5' : '#1e293b'"
+           [style.border-color]="rodadaSelecionadaId === r.id ? '#818cf8' : '#334155'"
+           style="padding: 12px 6px; border-radius: 10px; border: 2px solid; cursor: pointer; text-align: center; transition: all 0.2s;">
+        <span style="display: block; font-size: 8px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px;" [style.color]="rodadaSelecionadaId === r.id ? '#e0e7ff' : '#94a3b8'">Rodada</span>
+        <span style="font-size: 16px; font-weight: 900; color: white; font-style: italic;">{{ r.numero }}</span>
       </div>
     </div>
   </div>
 
-  <div style="background: #020617; border-radius: 12px; border: 1px solid #1e293b; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.2);">
-    <div style="padding: 10px; border-bottom: 1px solid #0f172a; background: rgba(255,255,255,0.03);">
-      <h3 style="font-size: 8px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-style: italic;">2. Minhas Cartelas</h3>
+  <div style="background: #020617; border-radius: 12px; border: 1px solid #475569; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
+    <div style="padding: 10px; border-bottom: 1px solid #1e293b; background: #0f172a;">
+      <h3 style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: 1px;">2. Minhas Cartelas</h3>
     </div>
-    <div style="padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 50px;">
+    <div style="padding: 10px; display: flex; flex-direction: column; gap: 10px;">
       <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id)"
-           [style.background]="apostaSelecionadaId === a.id ? 'rgba(79, 70, 229, 0.2)' : 'rgba(15, 23, 42, 0.5)'"
-           [style.border-color]="apostaSelecionadaId === a.id ? '#6366f1' : '#1e293b'"
-           style="display: grid; grid-template-columns: 30px 1fr 50px 40px; align-items: center; padding: 8px; border-radius: 8px; border: 1px solid; cursor: pointer;">
+           [style.background]="apostaSelecionadaId === a.id ? 'rgba(79, 70, 229, 0.3)' : '#1e293b'"
+           [style.border-color]="apostaSelecionadaId === a.id ? '#818cf8' : '#334155'"
+           style="display: grid; grid-template-columns: 40px 1fr 65px 50px; align-items: center; padding: 12px; border-radius: 10px; border: 2px solid; cursor: pointer;">
          <div style="text-align: center;">
-           <mat-icon [style.color]="apostaSelecionadaId === a.id ? '#818cf8' : '#334155'" style="font-size: 16px; width: 16px; height: 16px;">
+           <mat-icon [style.color]="apostaSelecionadaId === a.id ? '#818cf8' : '#475569'" style="font-size: 24px; width: 24px; height: 24px;">
              {{ apostaSelecionadaId === a.id ? 'check_circle' : 'radio_button_unchecked' }}
            </mat-icon>
          </div>
-         <div style="padding: 0 8px; font-size: 9px; font-weight: 900; color: white; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+         <div style="padding: 0 8px; font-size: 12px; font-weight: 900; color: white; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
            {{ a.identificadorAposta }}
          </div>
-         <div style="text-align: center; font-size: 7px; font-weight: bold; color: #64748b; font-style: italic;">
+         <div style="text-align: center; font-size: 10px; font-weight: bold; color: #94a3b8; font-style: italic;">
            {{ a.dataHoraSubmissao | date:'dd/MM' }}
          </div>
          <div style="text-align: right;">
            <span [style.background]="a.ehApostaCampeonato ? '#2563eb' : '#d97706'" 
-                 style="font-size: 6px; font-weight: 900; padding: 2px 4px; border-radius: 3px; color: white; text-transform: uppercase;">
+                 style="font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; color: white; text-transform: uppercase;">
              {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
            </span>
          </div>
@@ -63,57 +60,56 @@
     </div>
   </div>
 
-  <div style="display: flex; justify-content: center; margin-top: 12px;">
+  <div style="display: flex; justify-content: center; margin-top: 20px;">
     <button (click)="criarNovaApostaAvulsa()" 
-            style="width: 60%; background: #059669; border: 1px solid #10b981; color: white; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;">
-      <mat-icon style="font-size: 14px; width: 14px; height: 14px;">add_circle</mat-icon>
-      <span style="font-size: 8px; font-weight: 900; text-transform: uppercase;">Criar Nova Aposta Avulsa</span>
+            style="width: 75%; background: #059669; border: 2px solid #10b981; color: white; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3);">
+      <mat-icon style="font-size: 20px; width: 20px; height: 20px;">add_circle</mat-icon>
+      <span style="font-size: 11px; font-weight: 900; text-transform: uppercase;">Criar Nova Aposta Avulsa</span>
     </button>
   </div>
 
-  <div *ngIf="apostaAtual" style="width: 100%; display: flex; justify-content: center; margin-top: 24px; position: relative; z-index: 20; margin-bottom: -4px;">
-    <div style="width: 94%; background: #f59e0b; border-bottom: 2px solid #d97706; border-radius: 12px 12px 0 0; padding: 4px 12px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      <span style="font-size: 7px; font-weight: 900; color: #78350f; text-transform: uppercase; font-style: italic;">Aposta Selecionada -></span>
-      <h2 style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: -0.3px;">
+  <div *ngIf="apostaAtual" style="width: 100%; display: flex; justify-content: center; margin-top: 32px; position: relative; z-index: 20; margin-bottom: -4px;">
+    <div style="width: 90%; background: #f59e0b; border-bottom: 2px solid #d97706; border-radius: 12px 12px 0 0; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);">
+      <span style="font-size: 10px; font-weight: 900; color: #78350f; text-transform: uppercase; font-style: italic; white-space: nowrap;">Cartela Selecionada -></span>
+      <h2 style="font-size: 13px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; letter-spacing: -0.5px; white-space: nowrap;">
         {{ apostaAtual.identificadorAposta }}
       </h2>
     </div>
   </div>
 
   <div *ngIf="apostaAtual && jogosDaApostaAtual.length > 0" 
-       style="width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 20px 25px rgba(0,0,0,0.3);">
-    <form [formGroup]="apostaForm" style="padding: 8px; padding-top: 16px;">
-      <div formArrayName="palpites" style="display: flex; flex-direction: column; gap: 12px;">
+       style="width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+    <form [formGroup]="apostaForm" style="padding: 16px; padding-top: 24px;">
+      <div formArrayName="palpites" style="display: flex; flex-direction: column; gap: 16px;">
         <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
-             style="background: rgba(255,255,255,0.02); border: 1px solid #0f172a; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+             style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
           
-          <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px;">
-            <p style="font-size: 9px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
+          <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+            <p style="font-size: 12px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
               {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
             </p>
-            <p style="font-size: 7px; font-weight: bold; color: #475569; text-transform: uppercase; font-style: italic; margin: 2px 0 0 0;">
+            <p style="font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; font-style: italic; margin: 4px 0 0 0;">
               {{ jogosDaApostaAtual[i]?.estadioNome }}
             </p>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 100px 1fr; align-items: center; gap: 4px;">
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" style="width: 32px; height: 32px; object-fit: contain;">
-              <span style="font-size: 7px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; width: 100%; overflow: hidden; text-overflow: ellipsis;">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
+          <div style="display: grid; grid-template-columns: 1fr 120px 1fr; align-items: center; gap: 8px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" style="width: 42px; height: 42px; object-fit: contain;">
+              <span style="font-size: 10px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; line-height: 1.1;">{{ jogosDaApostaAtual[i]?.equipeCasaNome }}</span>
             </div>
 
-            <div style="display: flex; items-center; justify-content: center; gap: 6px;">
-              <input type="number" formControlName="placarApostaCasa" style="width: 40px; height: 32px; background: white; color: #0f172a; text-align: center; font-size: 16px; font-weight: 900; border-radius: 4px; border: none;"> 
-              <span style="color: rgba(255,255,255,0.2); font-size: 10px; font-weight: 900;">X</span> 
-              <input type="number" formControlName="placarApostaVisita" style="width: 40px; height: 32px; background: white; color: #0f172a; text-align: center; font-size: 16px; font-weight: 900; border-radius: 4px; border: none;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <input type="number" formControlName="placarApostaCasa" style="width: 50px; height: 42px; background: white; color: #020617; text-align: center; font-size: 22px; font-weight: 900; border-radius: 8px; border: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);"> 
+              <span style="color: rgba(255,255,255,0.4); font-size: 14px; font-weight: 900;">X</span> 
+              <input type="number" formControlName="placarApostaVisita" style="width: 50px; height: 42px; background: white; color: #020617; text-align: center; font-size: 22px; font-weight: 900; border-radius: 8px; border: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">
             </div>
 
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" style="width: 32px; height: 32px; object-fit: contain;">
-              <span style="font-size: 7px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; width: 100%; overflow: hidden; text-overflow: ellipsis;">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" style="width: 42px; height: 42px; object-fit: contain;">
+              <span style="font-size: 10px; font-weight: 900; color: white; text-align: center; text-transform: uppercase; line-height: 1.1;">{{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}</span>
             </div>
           </div>
-
         </div>
       </div>
     </form>
