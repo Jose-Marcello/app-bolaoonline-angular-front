@@ -146,13 +146,16 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
       tap(({ rodadas, apostador, apostas }) => {
         this.rodadasDisponiveis = rodadas; 
         this.rodadasEmAposta = rodadas; 
+             
         
         this.rodadasDisponiveis.forEach(r => {
             if (!r.dataInicio && r.dataInic) r.dataInicio = r.dataInic;
         });
 
         this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
-        
+       
+        this.custoAposta = this.rodadaSelecionada.custoApostaRodada || 0;
+
         if (apostador) {
           this.userId = apostador.id; 
           this.apostadorSaldo = apostador.saldo?.valor || 0;

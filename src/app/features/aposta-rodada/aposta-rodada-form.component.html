@@ -1,8 +1,17 @@
 <div style="width: 100%; padding: 12px; background: #1e293b; display: flex; flex-direction: column; gap: 10px; border-bottom: 2px solid #0f172a;">
-  <button (click)="voltar()" style="background: #059669; color: white; border-radius: 6px; padding: 8px 16px; width: fit-content; display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <mat-icon style="font-size: 20px; width: 20px; height: 20px; line-height: 20px;">arrow_back</mat-icon>
-    <span style="font-size: 12px; font-weight: 900; text-transform: uppercase;">Voltar</span>
-  </button>
+  
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <button (click)="voltar()" style="background: #059669; color: white; border-radius: 6px; padding: 8px 16px; width: fit-content; display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+      <mat-icon style="font-size: 20px; width: 20px; height: 20px; line-height: 20px;">arrow_back</mat-icon>
+      <span style="font-size: 12px; font-weight: 900; text-transform: uppercase;">Voltar</span>
+    </button>
+
+    <div style="background: rgba(2, 6, 23, 0.8); padding: 6px 12px; border-radius: 10px; border: 1px solid #10b981; text-align: right;">
+      <div style="font-size: 8px; color: #94a3b8; font-weight: 900; text-transform: uppercase; margin-bottom: 2px;">Saldo</div>
+      <div style="font-size: 14px; color: #10b981; font-weight: 900;">{{ apostadorSaldo | currency:'BRL' }}</div>
+    </div>
+  </div>
+
   <div style="background: #020617; border: 1px solid #334155; border-radius: 6px; padding: 10px; text-align: center;">
     <h1 style="font-size: 12px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; margin: 0; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
       CAMPEONATO BRASILEIRO 2026 - 1º TURNO
