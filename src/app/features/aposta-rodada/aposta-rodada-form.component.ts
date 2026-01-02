@@ -152,7 +152,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
             if (!r.dataInicio && r.dataInic) r.dataInicio = r.dataInic;
         });
 
-        this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
+        this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;        
        
         this.custoAposta = this.rodadaSelecionada.custoApostaRodada || 0;
 
