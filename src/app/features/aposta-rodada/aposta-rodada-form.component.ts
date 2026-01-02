@@ -404,14 +404,21 @@ onClickCriarNovaAposta(): void {
 
   this.apostaService.salvarApostas(dadosParaSalvar).subscribe({
     next: (res) => {
-      if (res.success) {
+      // TRATAMENTO DO FALSO POSITIVO
+      // Verificamos se o sucesso é verdadeiro E se o 'data' não é nulo
+      if (res.success && res.data !== null) {
+        console.log('Salvo com sucesso real no banco:', res);
         alert("Palpites salvos com sucesso!");
-        this.apostaForm.markAsPristine();
-        // Atualiza a data visual de envio
-        this.apostaAtual!.dataHoraSubmissao = new Date();
+      } else {
+        // Se o data for null, houve um erro no C# que o try/catch "engoliu"
+        console.error('Erro detectado (Data Null):', res.message);
+        alert("Atenção: O servidor não gravou os dados. Erro: " + (res.message || "Desconhecido"));
       }
     },
-    error: (err) => console.error("Erro ao salvar:", err)
+    error: (err) => {
+      console.error('Erro de conexão ou rota:', err);
+      alert("Erro ao conectar com o servidor.");
+    }
   });
 }
 
