@@ -293,14 +293,20 @@ onApostaSelected(apostaId: string): void {
       const pCollection = aposta.palpites as any;
       const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
 
+
       listaPalpites.forEach((p: any) => {
-        this.palpites.push(this.fb.group({
-          id: [p.id],
-          placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
-          placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
-        }));
+         this.palpites.push(this.fb.group({
+         id: [p.id], // PK do Palpite (8CD54...)
+    
+         // NOVIDADE: Adicione esta linha abaixo para guardar o ID do Jogo (56CE7...)
+         jogoId: [p.jogoId || p.jogo?.id], 
+    
+         placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
+         placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
+      }));
         this.jogosDaApostaAtual.push(p.jogo);
-      });
+     });
+    
 
       this.apostaForm.markAsPristine(); // Inicia o botão em cinza até o usuário mexer
     }, 50);
@@ -396,7 +402,7 @@ onClickCriarNovaAposta(): void {
     identificadorAposta: this.apostaAtual.identificadorAposta, // Campo faltante
     ehCampeonato: this.apostaAtual.ehApostaCampeonato, // Campo faltante
     apostasJogos: this.apostaForm.value.palpites.map((p: any) => ({
-      jogoId: p.id,
+      jogoId: p.jogoId,
       placarCasa: p.placarApostaCasa,
       placarVisitante: p.placarApostaVisita
     }))
