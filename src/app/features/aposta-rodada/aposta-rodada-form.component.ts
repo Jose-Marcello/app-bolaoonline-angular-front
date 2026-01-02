@@ -27,7 +27,6 @@ import { SalvarApostaRequestDto } from '../../features/aposta-rodada/models/salv
 import { ApostadorDto } from '../../features/apostador/models/apostador-dto.model';
 import { environment } from '../../../environments/environment';
 import { ConfirmacaoApostaModalComponent } from '../../shared/components/confirmacao-modal/confirmacao-apostaModal.Component';
-
 import { CriarApostaAvulsaRequestDto } from '../../features/aposta-rodada/models/criar-aposta-avulsa-request.Dto.model'
 
 @Component({
@@ -45,39 +44,29 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   isLoading = true; 
   isLoadingPalpites = false;
   isReadOnly = true;
-  podeEditar: boolean;
+  podeEditar: boolean = false;
   errorMessage: string | null = null;  
   isLoadingCartelas: boolean = false; 
-  isLoadingJogos:boolean = false;
-
-  cartelasDaRodada: any[] = [];
-  // Correção para o erro no método salvarApostas
+  isLoadingJogos: boolean = false;
   isSaving: boolean = false; 
   isLoadingApostas: boolean = false; 
-  
-  // Variáveis de controle de IDs (certifique-se que estão aqui)
-  //rodadaId: string = '';
-  //apostadorCampeonatoId: string = '';
 
   campeonatoId: string | null = null;
   rodadaId: string | null = null;
   apostadorCampeonatoId: string | null = null;
   rodadaSelecionadaId: string | null = null;
-  apostaSelecionadaId: string | null = null; // Para a pintura da linha
+  apostaSelecionadaId: string | null = null; 
   userId: string | null = null;
 
   apostadorSaldo: number | null = null;
   custoAposta = 0;
   
-  rodadasDisponiveis: any[] = []; // A lista que alimenta o Grid 1
-
+  rodadasDisponiveis: any[] = []; 
   rodadasEmAposta: RodadaDto[] = [];
   rodadaSelecionada: RodadaDto | null = null;
   apostasUsuarioRodada: ApostaRodadaDto[] = []; 
-  jogosDaApostaAtual: any[] = []; // Alterado para any[] para evitar erros de tipagem
+  jogosDaApostaAtual: any[] = []; 
   apostaAtual: any = null;
-  
-  // Crie uma variável para armazenar o estado da regra
   regraValidada: boolean = false;
 
   apostaForm!: FormGroup;
@@ -121,428 +110,227 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
       })
     );
 
-    // No ngOnInit ou após carregar os palpites, monitore as mudanças
-    this.apostaForm.valueChanges.subscribe(() => {
-    this.regraValidada = this.validarRegraMinima();
-});
+    this.subscriptions.add(
+      this.apostaForm.valueChanges.subscribe(() => {
+        this.regraValidada = this.validarRegraMinima();
+      })
+    );
   }
 
   ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
 
-// No seu aposta-rodada-form.component.ts
-private loadAllIntegratedData(): Observable<any> {
-  // Blindagem contra IDs nulos
-  if (!this.campeonatoId || !this.rodadaId) {
-    this.showSnackBar('Erro: Parâmetros de rota ausentes.', 'Fechar', 'error');
-    return of(null);
-  }
+  private loadAllIntegratedData(): Observable<any> {
+    if (!this.campeonatoId || !this.rodadaId) {
+      this.showSnackBar('Erro: Parâmetros de rota ausentes.', 'Fechar', 'error');
+      return of(null);
+    }
 
-  this.isLoading = true;
+    this.isLoading = true;
 
-  return forkJoin({
-    rodadas: this.rodadaService.getRodadasEmAposta(this.campeonatoId).pipe(
-      map(res => (res.data as any)?.$values || res.data || []),
-      catchError(() => of([]))
-    ),
-    apostador: this.apostadorService.getDadosApostador().pipe(
-      map(res => res.data as ApostadorDto),
-      catchError(() => of(null))
-    ),
-    apostas: this.apostadorCampeonatoId 
-      ? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId, this.apostadorCampeonatoId).pipe(
-          map(res => (res.data as any)?.$values || res.data || []),
-          catchError(() => of([]))
-        )
-      : of([])
-  }).pipe(
-    tap(({ rodadas, apostador, apostas }) => {
-      // --- CORREÇÃO 1: ALIMENTA O GRID 1 ---
-      // O HTML usa rodadasDisponiveis, por isso o Grid estava vazio!
-      this.rodadasDisponiveis = rodadas; 
-      this.rodadasEmAposta = rodadas; 
-      
-      // --- CORREÇÃO 2: MAPEIA DATA PARA O HTML ---
-      // Garante que r.dataInicio exista para o seu pipe | date:'dd/MM'
-      this.rodadasDisponiveis.forEach(r => {
-          if (!r.dataInicio && r.dataInic) r.dataInicio = r.dataInic;
-      });
-
-      this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
-      
-      if (apostador) {
-        this.userId = apostador.id; 
-        this.apostadorSaldo = apostador.saldo?.valor || 0;
-      }
-
-      this.apostasUsuarioRodada = apostas;
-
-      // --- CORREÇÃO 3: LÓGICA DE SELEÇÃO E ESTADO ---
-      if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
-        this.isReadOnly = false;
-        // Tenta encontrar a aposta do campeonato ou pega a primeira da lista
-        const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
+    return forkJoin({
+      rodadas: this.rodadaService.getRodadasEmAposta(this.campeonatoId).pipe(
+        map(res => (res.data as any)?.$values || res.data || []),
+        catchError(() => of([]))
+      ),
+      apostador: this.apostadorService.getDadosApostador().pipe(
+        map(res => res.data as ApostadorDto),
+        catchError(() => of(null))
+      ),
+      apostas: this.apostadorCampeonatoId 
+        ? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId, this.apostadorCampeonatoId).pipe(
+            map(res => (res.data as any)?.$values || res.data || []),
+            catchError(() => of([]))
+          )
+        : of([])
+    }).pipe(
+      tap(({ rodadas, apostador, apostas }) => {
+        this.rodadasDisponiveis = rodadas; 
+        this.rodadasEmAposta = rodadas; 
         
-        if (inicial && inicial.id) {
-            this.onApostaSelected(inicial.id);
+        this.rodadasDisponiveis.forEach(r => {
+            if (!r.dataInicio && r.dataInic) r.dataInicio = r.dataInic;
+        });
+
+        this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;
+        
+        if (apostador) {
+          this.userId = apostador.id; 
+          this.apostadorSaldo = apostador.saldo?.valor || 0;
         }
-      } else {
-        this.isReadOnly = true; 
-        this.loadJogosSemPalpites(); 
-      }
-    }),
-    finalize(() => this.isLoading = false)
-  );
-}
 
-private loadJogosSemPalpites(): void {
-  this.isLoading = true;
-  this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe({
-    next: (res) => {
-      // Extração robusta dos dados vindos do novo endpoint
-      const jogosBrutos = res.data?.$values || res.data || [];
-      
-      this.jogosDaApostaAtual = jogosBrutos.map((j: any) => ({
-        ...j,
-        idJogo: j.id,
-        // Blindagem de escudos que já testamos e funcionou
-        escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
-        escudoVisitante: j.escudoVisitante || j.equipeVisitanteEscudoUrl || j.escudoVisita,
-        placarApostaCasa: null,
-        placarApostaVisita: null
-      }));
+        this.apostasUsuarioRodada = apostas;
 
-      this.montarGridVazio();
-      this.isLoading = false;
-    },
-    error: (err) => {
-      this.isLoading = false;
-      this.showSnackBar('Erro ao carregar confrontos da rodada.', 'Fechar', 'error');
-    }
-  });
-}
-
-montarGridVazio(): void {
-  this.palpites.clear();
-  this.jogosDaApostaAtual.forEach(j => {
-    this.palpites.push(this.fb.group({
-      idJogo: [j.id || j.idJogo],
-      // No Modo Consulta/Sem Aposta, os campos nascem desabilitados
-      placarApostaCasa: [{ value: null, disabled: true }],
-      placarApostaVisita: [{ value: null, disabled: true }]
-    }));
-  });
-  console.log('[Modo Consulta] Grid vazio montado com ' + this.jogosDaApostaAtual.length + ' jogos.');
-}
-
-
-  onRodadaSelected(rodadaId: string) {
-    this.rodadaSelecionadaId = rodadaId;
-    this.rodadaId = rodadaId;
-    this.apostaAtual = null;
-    this.apostaSelecionadaId = null;
-    this.isReadOnly = true;
-    this.isLoadingPalpites = true;
-    this.loadJogosSemPalpites();
-    this.recarregarApostasDaRodada(rodadaId);
-  }
-
-  private recarregarApostasDaRodada(rodadaId: string) {
-    if(!this.apostadorCampeonatoId) return;
-    this.apostaService.getApostasPorRodadaEApostadorCampeonato(rodadaId, this.apostadorCampeonatoId)
-      .subscribe(res => {
-        this.apostasUsuarioRodada = (res.data as any)?.$values || res.data || [];
-        if(this.apostasUsuarioRodada.length > 0) this.onApostaSelected(this.apostasUsuarioRodada[0].id);
-        this.isLoadingPalpites = false;
-      });
-  }
-
-  
-validarRegraMinima(): boolean {
-  if (!this.palpites || this.palpites.length === 0) return false;
-  
-  const valores = this.palpites.value;
-  let contador = 0;
-
-  for (let p of valores) {
-    // Se houver algum nulo, a cartela é inválida
-    if (p.placarApostaCasa === null || p.placarApostaVisita === null) return false;
-    // Regra: Visitante Ganha ou Empate
-    if (p.placarApostaVisita >= p.placarApostaCasa) {
-      contador++;
-    }
-  }
-  return contador >= 3;
-}
-
-onApostaSelected(apostaId: string): void {
-  this.apostaSelecionadaId = apostaId;
-  const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
-  
-  if (aposta) {
-    this.apostaAtual = undefined; // Limpeza para resetar o grid
-    this.palpites.clear();
-    this.jogosDaApostaAtual = [];
-
-    setTimeout(() => {
-      // INICIALIZAÇÃO CRUCIAL
-      this.apostaAtual = {
-        ...aposta,
-        podeEditar: aposta.podeEditar === true // Garante que o booleano seja lido
-      };
-
-      const pCollection = aposta.palpites as any;
-      const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
-
-
-      listaPalpites.forEach((p: any) => {
-         this.palpites.push(this.fb.group({
-         id: [p.id], // PK do Palpite (8CD54...)
-    
-         // NOVIDADE: Adicione esta linha abaixo para guardar o ID do Jogo (56CE7...)
-         jogoId: [p.jogoId || p.jogo?.id], 
-    
-         placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
-         placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
-      }));
-        this.jogosDaApostaAtual.push(p.jogo);
-     });
-    
-
-      this.apostaForm.markAsPristine(); // Inicia o botão em cinza até o usuário mexer
-    }, 50);
-  }
-}
-
-voltar(): void {
-  this.location.back();
-}
-
-criarNovaApostaAvulsa(): void {
-  // Monta o objeto de requisição conforme o modelo CriarApostaAvulsaRequestDto
-  const request: CriarApostaAvulsaRequestDto = {
-    campeonatoId: this.campeonatoId!,
-    rodadaId: this.rodadaId!,
-    apostadorId: this.userId!,
-    custoAposta: this.custoAposta
-  };
-
-  this.isSaving = true; // Ativa o spinner de carregamento
-
-  this.apostaService.criarNovaApostaAvulsa(request).pipe(
-    finalize(() => this.isSaving = false)
-  ).subscribe({
-    next: (res) => {
-      if (res.success) {
-        this.showSnackBar('Nova aposta avulsa criada com sucesso!', 'Fechar', 'success');
-        
-        // RECARREGA A TELA: Chama o método principal para atualizar a lista de apostas
-        // e selecionar a nova cartela automaticamente
-        this.loadAllIntegratedData().subscribe();
-      }
-    },
-    error: (err) => {
-      console.error('Erro ao criar aposta:', err);
-      this.showSnackBar('Erro ao criar nova cartela. Verifique seu saldo.', 'Fechar', 'error');
-    }
-  });
-}
-
-// GRID 1: Seleção de Rodada
-selecionarRodada(id: string) {
-  this.rodadaId = id;
-  this.apostaAtual = undefined; // Esconde fachada e palpites
-  this.apostaSelecionadaId = ''; 
-  this.jogosDaApostaAtual = []; 
-  this.palpites.clear(); // Limpa formulário
-  
-  this.rodadaSelecionada = this.rodadasDisponiveis.find(r => r.id === id);
-  this.carregarApostasDaRodada(id);
-}
-
-//
-
-carregarApostasDaRodada(id: string) {
-  this.isLoadingApostas = true;
-  this.apostaService.obterApostasPorRodada(id).subscribe({
-    next: (res: any) => {
-      this.apostasUsuarioRodada = res.data?.$values || res.data || [];
-      this.isLoadingApostas = false;
-    },
-    error: (err) => {
-      this.isLoadingApostas = false;
-      this.showSnackBar('Erro ao carregar suas cartelas.', 'Fechar', 'error');
-    }
-  });
-}
-
-
-// --- ADICIONE ESTE MÉTODO PARA RESOLVER O ERRO NG9 ---
-onClickCriarNovaAposta(): void {
-  this.dialog.open(ConfirmacaoApostaModalComponent, {
-    data: { 
-      mensagem: `Deseja criar uma nova aposta avulsa?`, 
-      valorAposta: this.custoAposta 
-    }
-  }).afterClosed().subscribe(result => {
-    if (result) {
-      this.criarNovaApostaAvulsa();
-    }
-  })
-}
-
-  salvarApostas(): void {
-  if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar) return;
-
-  const dadosParaSalvar: SalvarApostaRequestDto = {
-    id: this.apostaAtual.id,
-    campeonatoId: this.campeonatoId, // Certifique-se que esta variável está inicializada
-    rodadaId: this.rodadaSelecionadaId,
-    apostadorCampeonatoId: this.apostadorCampeonatoId,
-    ehApostaIsolada: !this.apostaAtual.ehApostaCampeonato,
-    identificadorAposta: this.apostaAtual.identificadorAposta, // Campo faltante
-    ehCampeonato: this.apostaAtual.ehApostaCampeonato, // Campo faltante
-    apostasJogos: this.apostaForm.value.palpites.map((p: any) => ({
-      jogoId: p.jogoId,
-      placarCasa: p.placarApostaCasa,
-      placarVisitante: p.placarApostaVisita
-    }))
-  };
-
-  this.apostaService.salvarApostas(dadosParaSalvar).subscribe({
-    next: (res) => {
-      // TRATAMENTO DO FALSO POSITIVO
-      // Verificamos se o sucesso é verdadeiro E se o 'data' não é nulo
-      if (res.success && res.data !== null) {
-        console.log('Salvo com sucesso real no banco:', res);
-        alert("Palpites salvos com sucesso!");
-      } else {
-        // Se o data for null, houve um erro no C# que o try/catch "engoliu"
-        console.error('Erro detectado (Data Null):', res.message);
-        alert("Atenção: O servidor não gravou os dados. Erro: " + (res.message || "Desconhecido"));
-      }
-    },
-    error: (err) => {
-      console.error('Erro de conexão ou rota:', err);
-      alert("Erro ao conectar com o servidor.");
-    }
-  });
-}
-
-private loadCartelasDaRodada(): void {
-  if (!this.rodadaId || !this.apostadorCampeonatoId) return;
-
-  this.isLoadingCartelas = true;
-  
-  // Chamada ao serviço para buscar as apostas do utilizador nesta rodada
-  this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId, this.apostadorCampeonatoId)
-    .pipe(finalize(() => this.isLoadingCartelas = false))
-    .subscribe({
-      next: (res) => {
-        // Extração dos dados tratando a coleção preservada ($values)
-        //this.cartelasDaRodada = res.data?.$values || res.data || [];
-        this.cartelasDaRodada = (res.data as any)?.$values || res.data || [];
-
-        if (this.cartelasDaRodada.length > 0) {
-          // Se houver cartelas, seleciona a primeira por padrão
-          this.onApostaSelected(this.cartelasDaRodada[0]);
+        if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
+          this.isReadOnly = false;
+          const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
+          if (inicial && inicial.id) {
+              this.onApostaSelected(inicial.id);
+          }
         } else {
-          // Se não houver, entra no Modo Consulta
-          this.apostaAtual = null;
-          this.isReadOnly = true;
+          this.isReadOnly = true; 
           this.loadJogosSemPalpites(); 
         }
+      }),
+      finalize(() => this.isLoading = false)
+    );
+  }
+
+  private loadJogosSemPalpites(): void {
+    this.isLoading = true;
+    this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe({
+      next: (res) => {
+        const jogosBrutos = res.data?.$values || res.data || [];
+        this.jogosDaApostaAtual = jogosBrutos.map((j: any) => ({
+          ...j,
+          idJogo: j.id,
+          escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
+          escudoVisitante: j.escudoVisitante || j.equipeVisitanteEscudoUrl || j.escudoVisita,
+          placarApostaCasa: null,
+          placarApostaVisita: null
+        }));
+        this.montarGridVazio();
+        this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Erro ao carregar cartelas:', err);
-        this.showSnackBar('Erro ao carregar as suas apostas.', 'Fechar', 'error');
+      error: () => {
+        this.isLoading = false;
+        this.showSnackBar('Erro ao carregar confrontos.', 'Fechar', 'error');
       }
     });
-}
+  }
 
-// Adicione no seu componente
+  montarGridVazio(): void {
+    this.palpites.clear();
+    this.jogosDaApostaAtual.forEach(j => {
+      this.palpites.push(this.fb.group({
+        jogoId: [j.id || j.idJogo],
+        placarApostaCasa: [{ value: null, disabled: true }],
+        placarApostaVisita: [{ value: null, disabled: true }]
+      }));
+    });
+  }
 
-selecionarAposta(aposta: any) {
-  // 1. Marca qual cartela o usuário clicou para destacar no Grid 2
-  this.apostaAtual = aposta;
-  this.isReadOnly = true; 
-  this.isLoadingJogos = true;
-
-  // 2. Busca os jogos e palpites ordenados via Backend (Melhor Performance)
-  this.apostaService.obterJogosComPalpites(aposta.id, this.rodadaId).subscribe({
-    next: (res: any) => {
-      // O Backend já entrega ordenado por Data e Hora!
-      this.jogosDaApostaAtual = res.data?.$values || res.data || [];
-
-      // 3. Limpa e reconstrói o formulário de palpites
+  onApostaSelected(apostaId: string): void {
+    this.apostaSelecionadaId = apostaId;
+    const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
+    
+    if (aposta) {
+      this.apostaAtual = undefined;
       this.palpites.clear();
-      this.jogosDaApostaAtual.forEach((jogo: any) => {
-        this.palpites.push(this.fb.group({
-          // jogoId é fundamental para o backend não dar falso positivo
-          jogoId: [jogo.id || jogo.jogoId], 
-          placarApostaCasa: [jogo.placarApostaCasa],
-          placarApostaVisita: [jogo.placarApostaVisita]
-        }));
-      });
+      this.jogosDaApostaAtual = [];
 
-      this.isLoadingJogos = false;
-      console.log(`[Aposta] Cartela ${aposta.identificadorAposta} carregada com sucesso.`);
-    },
-    error: (err) => {
-      this.isLoadingJogos = false;
-      this.showSnackBar('Erro ao carregar jogos da cartela.', 'Fechar', 'error');
+      setTimeout(() => {
+        this.apostaAtual = {
+          ...aposta,
+          podeEditar: aposta.podeEditar === true
+        };
+
+        const pCollection = aposta.palpites as any;
+        const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
+
+        listaPalpites.forEach((p: any) => {
+          this.palpites.push(this.fb.group({
+            id: [p.id],
+            jogoId: [p.jogoId || p.jogo?.id], // CORREÇÃO DO CONTRATO
+            placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
+            placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
+          }));
+          this.jogosDaApostaAtual.push(p.jogo);
+        });
+
+        this.apostaForm.markAsPristine();
+      }, 50);
     }
-  });
-}
+  }
 
-// Chame este método após o sucesso do salvamento para atualizar o rodapé
-atualizarStatusAposta() {
-  this.loadAllIntegratedData().subscribe(() => {
-    // Ao recarregar tudo, a propriedade dataHoraSubmissao virá atualizada do banco
-    console.log('Status de envio atualizado no rodapé.');
-  });
-}
-
-loadJogosComPalpites(apostaId: string) {
-  this.isLoadingJogos = true;
-  
-  this.apostaService.obterJogosComPalpites(apostaId,this.rodadaId).subscribe({
-    next: (res: any) => {
-      // 1. Recebe os jogos e aplica a ORDENAÇÃO POR DATA E HORA
-      const jogosBrutos = res.data?.$values || res.data || [];
-      
-      this.jogosDaApostaAtual = jogosBrutos.sort((a: any, b: any) => {
-        const dataA = new Date(`${a.dataJogo}T${a.horaJogo}`).getTime();
-        const dataB = new Date(`${b.dataJogo}T${b.horaJogo}`).getTime();
-        return dataA - dataB;
-      });
-
-      // 2. Limpa o formulário anterior
-      this.palpites.clear();
-
-      // 3. Preenche o FormArray com os novos jogos e palpites
-      this.jogosDaApostaAtual.forEach((jogo: any) => {
-        this.palpites.push(this.fb.group({
-          jogoId: [jogo.id], // Campo oculto essencial para o salvamento
-          placarApostaCasa: [jogo.placarApostaCasa],
-          placarApostaVisita: [jogo.placarApostaVisita]
-        }));
-      });
-
-      this.isLoadingJogos = false;
-      console.log(`[Aposta] ${this.jogosDaApostaAtual.length} jogos carregados e ordenados.`);
-    },
-    error: (err) => {
-      console.error('Erro ao carregar jogos da aposta:', err);
-      this.isLoadingJogos = false;
-      this.showSnackBar('Erro ao carregar os jogos.', 'Fechar', 'error');
+  validarRegraMinima(): boolean {
+    if (!this.palpites || this.palpites.length === 0) return false;
+    const valores = this.palpites.getRawValue();
+    let contador = 0;
+    for (let p of valores) {
+      if (p.placarApostaCasa === null || p.placarApostaVisita === null) return false;
+      if (p.placarApostaVisita >= p.placarApostaCasa) contador++;
     }
-  });
-}
+    return contador >= 3;
+  }
 
+  criarNovaApostaAvulsa(): void {
+    if (this.apostadorSaldo !== null && this.apostadorSaldo < this.custoAposta) {
+      this.showSnackBar('Saldo insuficiente para criar uma nova cartela.', 'Fechar', 'warning');
+      return;
+    }
 
+    const request: CriarApostaAvulsaRequestDto = {
+      campeonatoId: this.campeonatoId!,
+      rodadaId: this.rodadaId!,
+      apostadorId: this.userId!,
+      custoAposta: this.custoAposta
+    };
 
-  goBackToDashboard() { this.router.navigate(['/dashboard']); }
-  private showSnackBar(m: string, a: string, t: string) {
-    this.snackBar.open(m, a, { duration: 3000, panelClass: [`snackbar-${t}`] });
+    this.isSaving = true;
+    this.apostaService.criarNovaApostaAvulsa(request).pipe(
+      finalize(() => this.isSaving = false)
+    ).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.showSnackBar('Aposta criada e valor debitado!', 'Fechar', 'success');
+          this.loadAllIntegratedData().subscribe();
+        } else {
+          this.showSnackBar(res.message || 'Erro ao processar aposta.', 'Fechar', 'error');
+        }
+      },
+      error: () => this.showSnackBar('Erro de comunicação financeira.', 'Fechar', 'error')
+    });
+  }
+
+  salvarApostas(): void {
+    if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar) return;
+
+    const dadosParaSalvar: SalvarApostaRequestDto = {
+      id: this.apostaAtual.id,
+      campeonatoId: this.campeonatoId!,
+      rodadaId: this.rodadaSelecionadaId!,
+      apostadorCampeonatoId: this.apostadorCampeonatoId!,
+      ehApostaIsolada: !this.apostaAtual.ehApostaCampeonato,
+      identificadorAposta: this.apostaAtual.identificadorAposta,
+      ehCampeonato: this.apostaAtual.ehApostaCampeonato,
+      apostasJogos: this.palpites.getRawValue().map((p: any) => ({
+        jogoId: p.jogoId, // ENVIANDO O ID DO JOGO CORRETO
+        placarCasa: p.placarApostaCasa,
+        placarVisitante: p.placarApostaVisita
+      }))
+    };
+
+    this.apostaService.salvarApostas(dadosParaSalvar).subscribe({
+      next: (res) => {
+        if (res.success && res.data !== null) {
+          alert("Palpites salvos com sucesso!"); // Mantendo conforme seu print de sucesso
+          this.loadAllIntegratedData().subscribe();
+        } else {
+          this.showSnackBar(res.message || 'O servidor não gravou os dados.', 'Fechar', 'error');
+        }
+      },
+      error: () => alert("Erro ao conectar com o servidor.")
+    });
+  }
+
+  // MÉTODOS DE APOIO
+  selecionarRodada(id: string) {
+    this.rodadaId = id;
+    this.rodadaSelecionadaId = id;
+    this.apostaAtual = undefined;
+    this.apostaSelecionadaId = ''; 
+    this.palpites.clear();
+    this.loadAllIntegratedData().subscribe();
+  }
+
+  voltar(): void { this.location.back(); }
+
+  private showSnackBar(message: string, action: string = 'Fechar', type: string = 'success') {
+    this.snackBar.open(message, action, {
+      duration: 4000,
+      panelClass: [`snackbar-${type}`],
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

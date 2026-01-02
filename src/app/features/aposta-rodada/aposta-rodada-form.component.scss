@@ -1,106 +1,39 @@
+/* Estilos para os alertas (SnackBar) */
+::ng-deep {
+  .snackbar-success {
+    --mdc-snackbar-container-color: #059669; // Verde Esmeralda
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
 
-// Fundo principal da página (Cinza azulado médio para contraste)
-.container-dashboard {
-  background-color: #0f172a; // Equivalente ao slate-900
-  min-height: 100vh;
-}
+  .snackbar-error {
+    --mdc-snackbar-container-color: #dc2626; // Vermelho Intenso
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    font-weight: bold;
+    border-radius: 8px;
+  }
 
-// Cards internos (Mais escuros para "saltarem" do fundo)
-.bg-slate-800\/40, .bg-slate-900\/60 {
-  background-color: rgba(2, 6, 23, 0.7) !important; // slate-950 com transparência
-  border: 1px solid rgba(71, 85, 105, 0.3); // borda slate-600 sutil
-}
-
-// Estilo específico do botão Voltar (Padrão Imagem 10)
-.btn-voltar-padrao {
-  background-color: #1e293b; // slate-800
-  border: 1px solid #334155; // slate-700
-  &:hover {
-    background-color: #334155;
+  .snackbar-warning {
+    --mdc-snackbar-container-color: #d97706; // Laranja/Âmbar para Saldo Insuficiente
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    font-weight: bold;
+    border-radius: 8px;
   }
 }
 
-/* Cores distintas para cada seleção */
-.linha-ativa-indigo { 
-  background-color: #4f46e5 !important; // Indigo para Rodada
-  border-radius: 8px;
-}
-
-.linha-ativa-teal { 
-  background-color: #0d9488 !important; // Teal para Aposta
-  border-left: 4px solid #10b981 !important;
-  border-radius: 0 8px 8px 0;
-}
-
-.btn-nova-cartela-dash {
-  width: 100%; margin-top: 8px; padding: 12px; border-radius: 10px;
-  border: 2px dashed #475569; background: transparent; color: #818cf8;
-  font-weight: 900; font-size: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-
-/* Estilo para o Botão de Nova Cartela (Cor Diferente) */
-.btn-nova-cartela-avulsa {
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  border: 2px dashed #6366f1; // Cor indigo para destacar
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
-  font-weight: 900;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  &:hover { background: rgba(99, 102, 241, 0.2); }
-}
-
-
-.btn-nova-cartela-dash {
-  width: 100%;
-  margin-top: 8px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 2px dashed #6366f1; /* Indigo pontilhado para destacar */
-  background: rgba(99, 102, 241, 0.05);
-  color: #818cf8;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.btn-confirmar-palpites {
-  background-color: #10b981 !important; // emerald-500
+/* Complementos para os botões do formulário */
+.btn-save-active {
+  background-color: #059669 !important;
   color: white !important;
-  font-weight: 900 !important;
-  font-size: 0.75rem !important;
-  padding: 0 1.5rem !important;
-  border-radius: 0.5rem !important;
+  box-shadow: 0 8px 16px rgba(5, 150, 105, 0.4);
+  transition: transform 0.2s ease;
+  &:active { transform: scale(0.95); }
 }
 
-.input-placar-dash { 
-  width: 46px; height: 46px; background-color: #ffffff !important; 
-  color: #0f172a !important; border: 2px solid #334155; border-radius: 10px; 
-  text-align: center; font-weight: 900; font-size: 22px; 
+.btn-locked {
+  background-color: #334155 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
 }
-
-.card-grafite-setor {
-  background-color: #334155 !important; // Cor grafite
-  border-radius: 1.5rem;
-  overflow: hidden;
-  border: 1px solid #475569;
-  margin-bottom: 1rem;
-}
-
-.card-jogo-item-preto {
-  background-color: #0f172a !important; // Fundo preto para o card de jogo
-  padding: 15px;
-  border-radius: 16px;
-  border: 1px solid #1e293b;
-}
-
-.linha-ativa-indigo { background-color: #4f46e5 !important; color: white !important; }
-.linha-ativa-teal { background-color: #0d9488 !important; color: white !important; border-left: 4px solid #10b981 !important; }
-.linha-off { background-color: transparent; color: #cbd5e1; }
