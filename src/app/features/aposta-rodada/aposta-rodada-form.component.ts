@@ -154,7 +154,9 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
 
         this.rodadaSelecionada = rodadas.find((r: any) => r.id === this.rodadaId) || null;        
        
-        this.custoAposta = this.rodadaSelecionada.custoApostaRodada || 0;
+       // Use exatamente o nome que vem do banco Azure/Postgre
+       this.custoAposta = this.rodadaSelecionada.custoApostaRodada || 5; 
+       console.log('Valor enviado ao servidor:', this.custoAposta);
 
         if (apostador) {
           this.userId = apostador.id; 
