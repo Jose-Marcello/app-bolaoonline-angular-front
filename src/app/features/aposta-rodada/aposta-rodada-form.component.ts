@@ -181,27 +181,35 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   }
 
   private loadJogosSemPalpites(): void {
-    this.isLoading = true;
-    this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe({
-      next: (res) => {
-        const jogosBrutos = res.data?.$values || res.data || [];
-        this.jogosDaApostaAtual = jogosBrutos.map((j: any) => ({
-          ...j,
-          idJogo: j.id,
-          escudoMandante: j.escudoMandante || j.equipeCasaEscudoUrl || j.escudoCasa,
-          escudoVisitante: j.escudoVisitante || j.equipeVisitanteEscudoUrl || j.escudoVisita,
-          placarApostaCasa: null,
-          placarApostaVisita: null
-        }));
-        this.montarGridVazio();
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.showSnackBar('Erro ao carregar confrontos.', 'Fechar', 'error');
-      }
-    });
-  }
+  this.isLoading = true;
+  this.rodadaService.getJogosByRodada(this.rodadaId!).subscribe({
+    next: (res) => {
+      const jogosBrutos = res.data?.$values || res.data || [];
+      
+      // Mapeamos para garantir que o objeto tenha a estrutura que o template espera
+      this.jogosDaApostaAtual = jogosBrutos.map((j: any) => ({
+        ...j,
+        idJogo: j.id,
+        equipeCasa: j.equipeCasa || { nome: j.nomeCasa, escudo: j.escudoCasa },
+        equipeVisitante: j.equipeVisitante || { nome: j.nomeVisita, escudo: j.escudoVisita }
+      }));
+
+      // Criamos um "mock" de aposta atual para o HTML não esconder o painel
+      this.apostaAtual = { 
+        identificadorAposta: 'CONSULTA DE JOGOS', 
+        podeEditar: false 
+      };
+
+      this.montarGridVazio();
+      this.isLoading = false;
+    },
+    error: () => {
+      this.isLoading = false;
+      this.showSnackBar('Erro ao carregar confrontos.', 'Fechar', 'error');
+    }
+  });
+}
+
 
   montarGridVazio(): void {
     this.palpites.clear();
