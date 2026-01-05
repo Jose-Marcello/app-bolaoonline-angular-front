@@ -1,83 +1,69 @@
-<div class="flex flex-col h-full bg-cover bg-center text-gray-900 rounded-lg shadow-lg p-4 sm:p-6"
-  style="background-image: url('assets/images/fundobolao.png');">
+<div style="height: 100vh; width: 100%; display: flex; flex-direction: column; background-image: url('assets/images/fundobolao.png'); background-size: cover; background-position: center; overflow: hidden;">
 
-  <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-400">
-    <h1 class="font-bold text-slate-800 min-w-0 flex-shrink-0 text-lg sm:text-xl"
-      style="font-size: clamp(0.9rem, 3.5vw, 1.25rem);">
-      <span class="text-slate-900">Novo Depósito</span>
-    </h1>
-    <button mat-raised-button color="primary" (click)="goBackToDashboard()"
-      class="px-3 py-1 text-sm sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-md transition duration-300 ease-in-out transform hover:scale-105 ml-2">
-      <mat-icon>arrow_back</mat-icon>
-      Voltar
-    </button>
+  <div style="padding: 16px; flex-shrink: 0;">
+    <div style="width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.9); display: flex; justify-content: space-between; align-items: center; border-radius: 12px; border: 1px solid #334155;">
+      <h1 style="font-size: 18px; font-weight: 900; text-transform: uppercase; margin: 0; color: white;">Novo Depósito</h1>
+      <button (click)="goBackToDashboard()" style="background: #4f46e5; color: white; border-radius: 8px; padding: 8px 16px; border: none; cursor: pointer; font-weight: 900;">
+        VOLTAR
+      </button>
+    </div>
   </div>
 
-  <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-8">
-    <mat-spinner color="accent"></mat-spinner>
-    <p class="mt-4 text-lg text-gray-600">Processando depósito...</p>
-  </div>
+  <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 16px;">
+    
+    <mat-card *ngIf="!isLoading && !showPixScreen" 
+              style="background: #020617; border: 1px solid #475569; border-radius: 20px; padding: 32px; width: 100%; max-width: 400px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #10b981;">account_balance_wallet</mat-icon>
+        <h2 style="font-weight: 900; text-transform: uppercase; color: white;">Adicionar Crédito</h2>
+      </div>
 
-  <!-- Tela principal do formulário de depósito -->
-  <div *ngIf="!isLoading && !showPixScreen" class="flex-grow flex flex-col items-center justify-center">
-    <mat-card class="w-full max-w-sm rounded-lg shadow-lg p-6 bg-white">
-      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Realizar Depósito</h2>
-      <form [formGroup]="depositoForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Valor (R$)</mat-label>
-          <span matPrefix>R$&nbsp;</span>
-          <input matInput type="number" formControlName="valor" placeholder="Ex: 10.00">
-          <mat-icon matSuffix>attach_money</mat-icon>
-          <mat-error *ngIf="depositoForm.get('valor')?.invalid && depositoForm.get('valor')?.touched">
-            Por favor, insira um valor válido.
-          </mat-error>
-        </mat-form-field>
-
-        <button mat-raised-button color="primary" type="submit" [disabled]="depositoForm.invalid"
-          class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-          <mat-icon>credit_card</mat-icon> Gerar PIX
+      <form [formGroup]="depositoForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+        <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 2px solid #334155;">
+          <label style="color: #94a3b8; font-size: 11px; font-weight: 900; text-transform: uppercase; display: block; margin-bottom: 8px;">Valor do Depósito</label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 24px; font-weight: 900; color: #10b981;">R$</span>
+            <input type="number" formControlName="valor" placeholder="0.00" min="1" 
+                   oninput="if(this.value < 0) this.value = 0;"
+                   style="width: 100%; background: transparent; border: none; color: white; font-size: 32px; font-weight: 900; outline: none;">
+          </div>
+        </div>
+        <button type="submit" [disabled]="depositoForm.invalid"
+          style="width: 100%; padding: 18px; background: #059669; color: white; font-weight: 900; text-transform: uppercase; border-radius: 12px; border: none; cursor: pointer;">
+          GERAR PIX
         </button>
       </form>
     </mat-card>
-  </div>
 
-  <!-- Tela de pagamento PIX -->
-  <div *ngIf="showPixScreen" class="flex-grow flex flex-col items-center justify-center">
-    <mat-card class="w-full max-w-md rounded-lg shadow-lg p-6 bg-white text-center">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">Pagar com PIX</h2>
-      <p class="text-gray-600 mb-6">Escaneie o QR Code ou use o código para pagar.</p>
-
-      <!-- QR Code dinâmico -->
-      <div class="flex flex-col items-center justify-center mb-6">
-        <img [src]="pixResponse?.qrCodeBase64" alt="QR Code PIX" class="w-48 h-48 border border-gray-300 rounded-lg p-2">
-        <p class="text-sm text-gray-500 mt-1">Simulação. Não use para pagamento real.</p>
+    <mat-card *ngIf="!isLoading && showPixScreen" 
+              style="background: #020617; border: 1px solid #475569; border-radius: 20px; padding: 24px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+      <div style="background: #334155; margin: -24px -24px 24px -24px; padding: 16px; border-radius: 20px 20px 0 0; border-bottom: 1px solid #475569;">
+         <h2 style="font-weight: 900; text-transform: uppercase; margin: 0; color: white;">Pague com PIX</h2>
       </div>
 
-      <!-- Código Copia e Cola -->
-      <div class="mb-6">
-        <p class="font-semibold text-gray-700">Ou use o código:</p>
-        <div class="flex items-center mt-2">
-          <input type="text" [value]="pixResponse?.pixCopiaECola" readonly
-            class="flex-grow p-2 border rounded-lg bg-gray-100 text-sm truncate">
-          <button mat-icon-button (click)="copiarPix()" class="ml-2 text-indigo-600 hover:text-indigo-800">
-            <mat-icon>content_copy</mat-icon>
-          </button>
+      <div style="background: white; padding: 15px; border-radius: 16px; display: inline-block; margin: 15px 0; border: 4px solid #ef4444;">
+        <img *ngIf="pixResponse?.qrCodeBase64" [src]="pixResponse?.qrCodeBase64" style="width: 200px; height: 200px; display: block;">
+        <div *ngIf="!pixResponse?.qrCodeBase64" style="width: 200px; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fee2e2; color: #b91c1c;">
+          <mat-icon style="font-size: 64px; width: 64px; height: 64px;">qr_code_2</mat-icon>
+          <span style="font-weight: 900;">QR CODE SIMULADO</span>
         </div>
       </div>
 
-      <div class="flex justify-between items-center mt-4">
-        <!-- Botão de Simulação -->
-        <button mat-raised-button color="accent" (click)="simularPagamento()"
-          class="py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-          <mat-icon>check_circle</mat-icon> Simular Pagamento
+      <p style="color: #ef4444; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px;">⚠️ Simulação de Teste</p>
+
+      <div class="flex flex-col gap-3">
+        <button (click)="simularPagamento()" style="width: 100%; padding: 16px; background: #10b981; color: white; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;">
+          CONFIRMAR PAGAMENTO
         </button>
-        
-        <button mat-raised-button (click)="goBackToDashboard()"
-          class="py-2 bg-gray-400 hover:bg-gray-500 text-gray-800 font-semibold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-          Voltar
+        <button (click)="showPixScreen = false" style="width: 100%; padding: 12px; background: transparent; color: #94a3b8; font-weight: 700; border: 1px solid #334155; border-radius: 12px; cursor: pointer;">
+          CANCELAR
         </button>
       </div>
     </mat-card>
+
+  </div>
+
+  <div *ngIf="isLoading" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <mat-spinner color="accent"></mat-spinner>
   </div>
 </div>
-

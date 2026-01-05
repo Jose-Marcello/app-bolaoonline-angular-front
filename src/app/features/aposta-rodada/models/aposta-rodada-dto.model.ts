@@ -22,6 +22,7 @@ export interface ApostaRodadaDto {
   enviada: boolean;
   numJogosApostados: number;
   apostadorCampeonato: any | null; // Pode ser tipado mais especificamente se você tiver ApostadorCampeonatoDto
+  apostador?: any | null;
   
   // <<-- NOVO: Adicionado a propriedade palpites -->>
   palpites?: PreservedCollection<PalpiteDto>; // A coleção de palpites de jogo

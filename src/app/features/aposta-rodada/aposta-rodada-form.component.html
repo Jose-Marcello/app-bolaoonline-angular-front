@@ -52,28 +52,30 @@
     </div>
   </div>
 
-  <div style="display: flex; justify-content: center;">
-    <button (click)="criarNovaApostaAvulsa()" style="width: 85%; background: #059669; border: 2px solid #10b981; color: white; padding: 14px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
-      <mat-icon>add_circle</mat-icon>
-      <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">Criar Nova Aposta Avulsa</span>
-    </button>
-  </div>
+ <button mat-raised-button 
+        class="btn-criar-avulsa-custom"
+        [disabled]="loading" 
+        (click)="criarNovaAposta()">
+  
+  <mat-icon *ngIf="!loading">add_shopping_cart</mat-icon>
+  <mat-spinner *ngIf="loading" diameter="20" class="spinner-branco"></mat-spinner>
+  
+  <span class="texto-botao">
+    {{ loading ? 'PROCESSANDO...' : 'CRIAR NOVA APOSTA AVULSA' }}
+  </span>
+</button>
 
   <div *ngIf="jogosDaApostaAtual.length > 0" style="width: 100%; display: flex; justify-content: center; margin-top: 32px; position: relative; z-index: 20; margin-bottom: -4px;">
-    <div style="width: 100%; background: #f59e0b; border-bottom: 3px solid #d97706; border-radius: 12px 12px 0 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 12px; font-weight: 900; color: #78350f; text-transform: uppercase;">Cartela -></span>
-        <h2 style="font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; margin: 0;">
-            {{ apostaAtual?.identificadorAposta || 'CONFERIR CONFRONTOS' }}
-        </h2>
-      </div>
-      <div [style.background]="apostaAtual?.podeEditar ? '#064e3b' : '#7f1d1d'" style="padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
-        <span style="font-size: 10px; font-weight: 900; color: white;">
-            {{ apostaAtual?.podeEditar ? 'EDIÇÃO' : 'CONSULTA' }}
-        </span>
-      </div>
+  <div style="width: 100%; background: #334155; border-bottom: 3px solid #1e293b; border-radius: 12px 12px 0 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; font-style: italic;">Visualizando -></span>
+      <h2 style="font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; margin: 0;">{{ apostaAtual?.identificadorAposta || 'CONFERIR CONFRONTOS' }}</h2>
+    </div>
+    <div [style.background]="apostaAtual?.podeEditar ? '#064e3b' : '#1e293b'" style="padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
+      <span style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase;">{{ apostaAtual?.podeEditar ? 'EDIÇÃO' : 'CONSULTA' }}</span>
     </div>
   </div>
+</div>
 
   <div *ngIf="jogosDaApostaAtual.length > 0" style="width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
     <form [formGroup]="apostaForm" style="padding: 16px; padding-top: 24px;">
@@ -82,11 +84,16 @@
              style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 14px;">
           
           <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
-            <p style="font-size: 14px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
-              {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} ÀS {{ jogosDaApostaAtual[i]?.horaJogo }}
-            </p>
+             <p style="font-size: 14px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
+                 {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} 
+                <span *ngIf="jogosDaApostaAtual[i]?.dataHora">ÀS {{ jogosDaApostaAtual[i]?.dataHora | date:'HH:mm' }}</span>
+             </p>
+  
+             <p *ngIf="jogosDaApostaAtual[i]?.estadioNome" 
+                 style="font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin: 4px 0 0 0;">
+                    {{ jogosDaApostaAtual[i]?.estadioNome }}
+             </p>
           </div>
-
           <div style="display: grid; grid-template-columns: 1fr 130px 1fr; align-items: center; gap: 8px;">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
               <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" style="width: 48px; height: 48px; object-fit: contain;">

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ClipboardModule, ClipboardService } from 'ngx-clipboard';
 import { Subscription, finalize, filter, switchMap, take, map } from 'rxjs';
-import { Observable } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,33 +10,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
-// Services
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { FinanceiroService } from '../../../core/services/financeiro.service';
 import { ApostadorService } from '../../../core/services/apostador.service';
-
-// Models
-import { DepositarRequestDto } from '../../../features/financeiro/models/depositar-request-dto.model';
 import { PixResponseDto } from '../../../features/financeiro/models/pix-response.model';
-import { isPreservedCollection } from '../../../shared/models/api-response.model';
 import { ApostadorDto } from '../../../features/apostador/models/apostador-dto.model';
+import { isPreservedCollection } from '../../../shared/models/api-response.model';
 
 @Component({
   selector: 'app-depositar',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    ClipboardModule
+    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
+    MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule,
+    MatSnackBarModule, ClipboardModule
   ],
   templateUrl: './depositar.component.html',
   styleUrls: ['./depositar.component.scss']
@@ -48,6 +36,10 @@ export class DepositarComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   pixResponse: PixResponseDto | null = null;
   showPixScreen = false;
+
+  // DECLARAÇÃO DAS VARIÁVEIS (Resolve o erro da image_967da7.jpg)
+  campeonatoId: string | null = null;
+  rodadaId: string | null = null;
   
   private subscriptions: Subscription = new Subscription();
 
@@ -58,22 +50,29 @@ export class DepositarComponent implements OnInit, OnDestroy {
     private apostadorService: ApostadorService,
     private snackBar: MatSnackBar,
     private router: Router,
+    private route: ActivatedRoute,
     private clipboardService: ClipboardService
   ) {
     this.depositoForm = this.fb.group({
-      valor: ['', [Validators.required, Validators.min(1), Validators.pattern(/^\d+(\.\d{1,2})?$/)]]
+      // Validação: Mínimo 1 real e não aceita negativos
+      valor: ['', [Validators.required, Validators.min(1)]]
     });
   }
 
   ngOnInit(): void {
+    // Captura parâmetros para o retorno inteligente
+    this.campeonatoId = this.route.snapshot.queryParamMap.get('campeonatoId');
+    this.rodadaId = this.route.snapshot.queryParamMap.get('rodadaId');
+
     this.subscriptions.add(
       this.authService.isAuthenticated$.pipe(
         filter(isAuthenticated => isAuthenticated),
         switchMap(() => this.apostadorService.getDadosApostador()),
         map(response => {
           if (response.success && response.data) {
-            const apostadorData = isPreservedCollection<ApostadorDto>(response.data) ? (response.data.$values && response.data.$values.length > 0 ? response.data.$values[0] : null) : response.data as ApostadorDto;
-            return apostadorData;
+            return isPreservedCollection<ApostadorDto>(response.data) 
+              ? (response.data.$values?.[0] || null) 
+              : (response.data as ApostadorDto);
           }
           return null;
         }),
@@ -81,104 +80,68 @@ export class DepositarComponent implements OnInit, OnDestroy {
         take(1)
       ).subscribe(apostador => {
         this.apostadorId = apostador!.id;
-        console.log('[DepositarComponent] Apostador ID carregado:', this.apostadorId);
       })
     );
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
+  ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
 
   onSubmit(): void {
     if (this.depositoForm.valid && this.apostadorId) {
       this.isLoading = true;
-      const valor = this.depositoForm.value.valor;
+      // Garante que o valor enviado seja absoluto (positivo)
+      const valor = Math.abs(this.depositoForm.value.valor);
       
-      const request: DepositarRequestDto = {
-        apostadorId: this.apostadorId,
-        valor: parseFloat(valor)
-      };
-
-      this.subscriptions.add(
-        this.financeiroService.depositar(request).pipe(
-          finalize(() => this.isLoading = false)
-        ).subscribe({
-          next: (response) => {
-            if (response.success && response.data) {
-              this.showSnackBar('Solicitação de PIX gerada com sucesso!', 'Fechar', 'success');
-              
-              this.pixResponse = response.data;
-              this.showPixScreen = true;
-            } else {
-              this.showSnackBar(response.message || 'Erro ao processar depósito.', 'Fechar', 'error');
-            }
-          },
-          error: (error) => {
-            this.showSnackBar('Erro de conexão. Tente novamente.', 'Fechar', 'error');
-            console.error('Erro no depósito:', error);
+      this.financeiroService.depositar({ apostadorId: this.apostadorId, valor }).pipe(
+        finalize(() => this.isLoading = false)
+      ).subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.pixResponse = response.data;
+            this.showPixScreen = true;
+            this.showSnackBar('PIX gerado com sucesso!', 'OK', 'success');
           }
-        })
-      );
-    } else {
-      this.showSnackBar('Por favor, insira um valor válido para o depósito.', 'Fechar', 'warning');
+        }
+      });
     }
   }
 
-  // Novo método para simular o pagamento via webhook
   simularPagamento(): void {
     if (this.pixResponse?.chaveTransacao && this.depositoForm.valid) {
-      const valor = this.depositoForm.value.valor;
+      this.isLoading = true;
+      const valor = Math.abs(this.depositoForm.value.valor);
 
-      this.subscriptions.add(
-        this.financeiroService.simularWebhook(this.pixResponse.chaveTransacao, valor).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.showSnackBar('Pagamento simulado com sucesso! O saldo será atualizado.', 'Fechar', 'success');
-              this.router.navigate(['/dashboard/financeiro']);
-            } else {
-              this.showSnackBar(response.message || 'Erro na simulação de pagamento.', 'Fechar', 'error');
-            }
-          },
-          error: (err) => {
-            this.showSnackBar('Erro de conexão ao simular pagamento.', 'Fechar', 'error');
-            console.error(err);
+      this.financeiroService.simularWebhook(this.pixResponse.chaveTransacao, valor).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.apostadorService.getDadosApostador().subscribe(() => {
+              this.isLoading = false;
+              if (this.campeonatoId && this.rodadaId) {
+                this.router.navigate(['/apostas-rodada', this.campeonatoId, this.rodadaId]);
+              } else {
+                this.router.navigate(['/dashboard']);
+              }
+            });
           }
-        })
-      );
-    } else {
-      this.showSnackBar('Dados da transação incompletos para simular.', 'Fechar', 'warning');
+        },
+        error: () => this.isLoading = false
+      });
     }
   }
 
-  goBackToDashboard(): void {
-    this.router.navigate(['/dashboard']);
-  }
+  goBackToDashboard(): void { this.router.navigate(['/dashboard']); }
 
   copiarPix(): void {
     if (this.pixResponse?.pixCopiaECola) {
-        this.clipboardService.copyFromContent(this.pixResponse.pixCopiaECola);
-        this.showSnackBar('Código PIX copiado para a área de transferência!', 'Fechar', 'success');
+      this.clipboardService.copyFromContent(this.pixResponse.pixCopiaECola);
+      this.showSnackBar('PIX copiado!', 'OK', 'success');
     }
   }
 
-  private showSnackBar(message: string, action: string = 'Fechar', type: 'success' | 'error' | 'warning' | 'info' = 'info'): void {
-    let panelClass: string[] = [];
-    if (type === 'success') {
-      panelClass = ['snackbar-success'];
-    } else if (type === 'error') {
-      panelClass = ['snackbar-error'];
-    } else if (type === 'warning') {
-      panelClass = ['snackbar-warning'];
-    } else if (type === 'info') {
-      panelClass = ['snackbar-info'];
-    }
-
+  private showSnackBar(message: string, action: string, type: string): void {
     this.snackBar.open(message, action, {
-      duration: 5000,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
-      panelClass: panelClass
+      duration: 3000,
+      panelClass: [`snackbar-${type}`]
     });
   }
 }

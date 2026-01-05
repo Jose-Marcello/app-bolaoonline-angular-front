@@ -44,29 +44,37 @@ export class ApostaService {
     // Se o 404 persistir, verifique se o backend não exige uma rota como '/ObterPorId/'
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
-  getApostasPorRodadaEApostadorCampeonato(rodadaId: string, apostadorCampeonatoId: string | null): Observable<ApiResponse<ApostaRodadaDto[]>> {
-    let params = new HttpParams().set('rodadaId', rodadaId);
-    if (apostadorCampeonatoId) {
-      params = params.set('apostadorCampeonatoId', apostadorCampeonatoId);
-    }
 
-    console.log('[ApostaService] Chamando ListarPorRodadaEApostadorCampeonato com URL:', `${this.apiUrl}/ListarPorRodadaEApostadorCampeonato`, 'e params:', params.toString());
-
-    return this.http.get<ApiResponse<ApostaRodadaDto[]>>(`${this.apiUrl}/ListarPorRodadaEApostadorCampeonato`, { params })
-      .pipe(
-        catchError(this.handleError)
-      );
+  /*
+getApostasPorRodadaEApostadorCampeonato(rodadaId: string, apostadorCampeonatoId: string | null): Observable<ApiResponse<ApostaRodadaDto[]>> {
+  let params = new HttpParams().set('rodadaId', rodadaId);
+  
+  // Se for o Jeff, o apostadorCampeonatoId é null e não será enviado no Params.
+  // O backend deve estar preparado para receber null e buscar pelo ApostadorId do Token.
+  if (apostadorCampeonatoId) {
+    params = params.set('apostadorCampeonatoId', apostadorCampeonatoId);
   }
 
- obterApostasPorRodada(rodadaId: string): Observable<ApiResponse<any>> {
-  // Esta rota deve existir no seu Controller de Apostas ou ApostaRodada
-  const url = `${this.apiUrl}/obter-apostas-rodada/${rodadaId}`;
-  
-  return this.http.get<ApiResponse<any>>(url).pipe(
-    catchError(this.handleError)
-  );
-  
+  return this.http.get<ApiResponse<ApostaRodadaDto[]>>(`${this.apiUrl}/ListarPorRodadaEApostadorCampeonato`, { params })
+    .pipe(catchError(this.handleError));
 }
+*/
+
+obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observable<ApiResponse<ApostaRodadaDto[]>> {
+  let params = new HttpParams().set('rodadaId', rodadaId);
+  
+  // Se existir ID de campeonato, envia. Se for avulsa (null), não envia.
+  if (apostadorCampeonatoId) {
+    params = params.set('apostadorCampeonatoId', apostadorCampeonatoId);
+  }
+
+  // Use EXATAMENTE o nome da rota que está no seu Controller C#
+  return this.http.get<ApiResponse<ApostaRodadaDto[]>>(
+    `${this.apiUrl}/ListarPorRodadaEApostadorCampeonato`, 
+    { params }
+  ).pipe(catchError(this.handleError));
+}
+
 
   getApostasParaEdicao(rodadaId: string, apostaRodadaId: string): Observable<ApiResponse<ApostaJogoEdicaoDto[]>> {
     const url = `${environment.apiUrl}/api/ApostaRodada/ParaEdicao`;

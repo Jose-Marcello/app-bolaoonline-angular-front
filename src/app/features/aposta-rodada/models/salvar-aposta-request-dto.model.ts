@@ -9,9 +9,13 @@ export interface ApostaJogoRequest {
 
 export interface SalvarApostaRequestDto {
   id?: string; // Adicionado para permitir atualização de aposta existente
-  campeonatoId: string; 
+
+  campeonatoId: string | null; 
+  apostadorCampeonatoId: string | null;
+
+  
   rodadaId: string;
-  apostadorCampeonatoId: string;
+  
   ehApostaIsolada: boolean;
   identificadorAposta: string;
   apostasJogos: ApostaJogoRequest[]; // Agora usa o DTO recém-criado

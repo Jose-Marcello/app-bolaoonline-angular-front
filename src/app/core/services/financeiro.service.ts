@@ -39,13 +39,17 @@ export class FinanceiroService {
    */
   simularWebhook(externalReference: string, valor: number): Observable<ApiResponse<any>> {
     const request = { externalReference, valor };
-    console.log('[FinanceiroService] Chamando endpoint de simulação de webhook com:', request);
+    console.log('[FinanceiroService] Chamando simulação:', request);
     
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/TransacaoFinanceira/SimularWebhookPix`, request)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
+    // Ajustado de TransacaoFinanceira para Financeiro
+    const url = `${this.apiUrl}/api/TransacaoFinanceira/SimularWebhookPix`;
+
+    console.log('[FinanceiroService] Chamando URL correta:', url);
+    
+    return this.http.post<ApiResponse<any>>(url, request)
+      .pipe(catchError(this.handleError));
+}
+
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('[FinanceiroService] Erro na requisição HTTP:', error);

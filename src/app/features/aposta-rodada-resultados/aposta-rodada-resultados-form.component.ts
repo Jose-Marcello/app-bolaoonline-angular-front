@@ -109,7 +109,9 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     
     // 2. Carrega Apostas do Usuário
     const apostasDoUsuario$ = this.apostadorCampeonatoId
-        ? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId!, this.apostadorCampeonatoId!).pipe(
+        //? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId!, this.apostadorCampeonatoId!).pipe(
+        ? this.apostaService.obterApostasPorRodada(this.rodadaId!, this.apostadorCampeonatoId!).pipe(
+          
             map(res => (res.data as any)?.$values || res.data || []),
             catchError(() => of([]))
           )
