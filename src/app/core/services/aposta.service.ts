@@ -15,6 +15,7 @@ import { ApostasAvulsasTotaisDto } from '../../features/aposta-rodada/models/apo
 import { ApostasCampeonatoTotaisDto } from '../../features/campeonato/models/apostas-campeonato-totais-dto.model'; // <-- NOVO DTO
 
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -159,6 +160,26 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
   );
 }
   
+/**
+   * MÉTODO 1: Busca todas as rodadas de um campeonato para montar o seletor (1, 2, 3...)
+   *
+   */
+  getRodadasByCampeonato(campeonatoId: string): Observable<ApiResponse<any[]>> {
+    // Ajuste a rota conforme seu Controller de Rodada/Campeonato no C#
+    return this.http.get<ApiResponse<any[]>>(`${environment.apiUrl}/Rodada/ListarPorCampeonato/${campeonatoId}`);
+  }
+
+  /**
+   * MÉTODO 2: Busca os resultados reais e os palpites do apostador (O Grid de Apostas/Fachada)
+   *
+   */
+  getResultadosRodada(campeonatoId: string, rodadaId: string): Observable<ApiResponse<ApostaRodadaResultadosDto>> {
+    // Esta rota deve bater com o erro 404 que vimos no seu console
+    // Verifique se o seu Controller espera esses nomes de parâmetros
+    return this.http.get<ApiResponse<ApostaRodadaResultadosDto>>(
+      `${this.apiUrl}/Resultados?campeonatoId=${campeonatoId}&rodadaId=${rodadaId}`
+    );
+  }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('[ApostaService] Erro na requisição HTTP:', error);

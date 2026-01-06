@@ -88,51 +88,52 @@ export class RankingCampeonatoFormComponent implements OnInit, OnDestroy {
   }
 
   private loadRankingData(): Observable<any> {
-    this.isLoading = true;
-    this.errorMessage = null;
-    
-    // CORREÇÃO: Chama o método do serviço para o ranking do campeonato
-    return this.rankingService.getRankingCampeonato(this.campeonatoId!).pipe(
-      tap(response => {
-  if (response.success && response.data) {
-    const rawData = response.data as any;
-    // Se existir $values, usa ele; se não, tenta o data direto.
-    const rankingCompleto = (rawData.$values ? rawData.$values : rawData) as RankingDto[];
-    
-    if (Array.isArray(rankingCompleto)) {
-      this.ranking = rankingCompleto;
-      
-            if (this.apostadorLogadoId) {
-              this.rankingUsuario = rankingCompleto.find(r => r.apostadorId === this.apostadorLogadoId) || null;
-              const isUserInTop20 = this.ranking.slice(0, 20).some(r => r.apostadorId === this.apostadorLogadoId);
-              
-              if (this.rankingUsuario && !isUserInTop20) {
-                this.ranking = [this.rankingUsuario, ...this.ranking];
-              }
+  this.isLoading = true;
+  this.errorMessage = null;
+  
+  return this.rankingService.getRankingCampeonato(this.campeonatoId!).pipe(
+    tap(response => {
+      if (response.success && response.data) {
+        const rawData = response.data as any;
+        const rankingCompleto = (rawData.$values ? rawData.$values : rawData) as RankingDto[];
+        
+        if (Array.isArray(rankingCompleto)) {
+          // 1. Identifica o usuário logado e calcula o afastamento
+          if (this.apostadorLogadoId) {
+            this.rankingUsuario = rankingCompleto.find(r => r.apostadorId === this.apostadorLogadoId) || null;
+            
+            if (this.rankingUsuario) {
+              this.pontosPrimeiroColocado = rankingCompleto[0].pontuacao;
+              this.pontosAfastado = this.pontosPrimeiroColocado - this.rankingUsuario.pontuacao;
+            }
+          }
 
-              if (rankingCompleto.length > 0 && this.rankingUsuario) {
-                this.pontosPrimeiroColocado = rankingCompleto[0].pontuacao;
-                this.pontosAfastado = this.pontosPrimeiroColocado - this.rankingUsuario.pontuacao;
-              } else {
-                this.pontosAfastado = null;
-              }
-            }
-            this.ranking = this.ranking.slice(0, 20);
-          } else {
-            this.errorMessage = response.message || 'Dados inválidos recebidos da API.';
-          }
-        }
-      }),
-      finalize(() => this.isLoading = false),
-      catchError(error => {
-        this.isLoading = false;
-        this.errorMessage = 'Erro ao carregar os dados do ranking do campeonato.';
-        this.showSnackBar(this.errorMessage, 'Fechar', 'error');
-        console.error('Erro na requisição:', error);
-        return of([]);
-      })
-    );
-  }
+          // 2. Define o Top 20 para exibição
+          this.ranking = rankingCompleto.slice(0, 20);
+
+          // 3. Lógica de Destaque: Se o usuário logado não estiver no Top 20, 
+          // adiciona ele no final da lista para exibir sua linha azul
+          if (this.rankingUsuario) {
+            const isUserInTop20 = this.ranking.some(r => r.apostadorId === this.apostadorLogadoId);
+            if (!isUserInTop20) {
+              this.ranking.push(this.rankingUsuario);
+            }
+          }
+        } else {
+          this.errorMessage = response.message || 'Dados inválidos recebidos da API.';
+        }
+      }
+    }),
+    // O finalize garante que o spinner pare de girar sempre
+    finalize(() => this.isLoading = false), 
+    catchError(error => {
+      this.errorMessage = 'Erro ao carregar os dados do ranking do campeonato.';
+      this.showSnackBar(this.errorMessage, 'Fechar', 'error');
+      console.error('Erro na requisição:', error);
+      return of([]);
+    })
+  );
+}
 
   // Método para voltar à página anterior
 goBack(): void {

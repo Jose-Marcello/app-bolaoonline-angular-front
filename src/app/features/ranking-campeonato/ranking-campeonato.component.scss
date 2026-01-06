@@ -8,3 +8,83 @@
   background-color: #10b981 !important; /* Emerald-500 */
   color: white !important;
 }
+
+/* ranking-campeonato.component.scss */
+
+/* Base para o container principal */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.posicao-box {
+  // Ajustes de tamanho e fonte conforme o HTML
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 800; /* font-extrabold */
+  border-radius: 9999px; // full rounded
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); // Leve sombra para destacar
+
+  // Cor padrão se não for Top 3
+  background-color: #3b82f6; // blue-500
+  color: white;
+}
+
+/* Estilos de Medalha */
+.posicao-1 {
+  background-color: #ffd700 !important; /* Ouro */
+  color: #333 !important; // Texto escuro para contraste
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6), inset 0 0 5px rgba(255, 255, 255, 0.5) !important;
+}
+
+.posicao-2 {
+  background-color: #c0c0c0 !important; /* Prata */
+  color: #333 !important; // Texto escuro para contraste
+  box-shadow: 0 0 8px rgba(192, 192, 192, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.4) !important;
+}
+
+.posicao-3 {
+  background-color: #cd7f32 !important; /* Bronze */
+  color: white !important;
+  box-shadow: 0 0 6px rgba(205, 127, 50, 0.6), inset 0 0 3px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Estilo para o card do usuário logado (highlighted-user-row) */
+.highlighted-user-row {
+  background-color: #1e3a8a !important; /* Um azul mais escuro para o destaque do background */
+  color: white !important;
+  border-color: #4f46e5 !important; /* Borda indigo */
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4) !important; // Sombra mais forte
+  transform: translateY(-2px); // Leve lift para destacar ainda mais
+}
+
+/* Ajuste de cores de texto para o card destacado */
+.highlighted-user-row .text-slate-800 {
+  color: white !important;
+}
+.highlighted-user-row .text-slate-500 {
+  color: #a7aaff !important; // Um azul claro para detalhes
+}
+.highlighted-user-row .text-emerald-600 {
+  color: #6ee7b7 !important; // Verde mais claro para pontuação
+}
+
+/* Animação de hover para todos os cards de ranking */
+.ranking-card {
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.75rem; /* rounded-xl */
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Para garantir que o overflow-y-auto no div funcione */
+.flex-grow.space-y-3.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}

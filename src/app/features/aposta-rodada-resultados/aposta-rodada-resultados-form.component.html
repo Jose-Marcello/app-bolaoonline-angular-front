@@ -2,37 +2,45 @@
   <main class="max-w-lg mx-auto space-y-4">
 
     <div class="flex justify-start px-1">
-      <button (click)="goBackToDashboard()" class="btn-voltar-topo !bg-emerald-600 !text-white shadow-md">
+      <button (click)="goBackToDashboard()" class="btn-voltar-topo !bg-emerald-600 !text-white hover:!bg-emerald-700 shadow-md">
         <mat-icon style="font-size: 14px; width: 14px; height: 14px;">arrow_back</mat-icon> VOLTAR
       </button>
     </div>
 
     <div class="w-full bg-slate-900 border-y border-slate-700 py-3 text-center shadow-inner">
-      <h1 class="text-white font-black uppercase m-0" style="font-size: 11px !important; letter-spacing: 1px;">
-        {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO' }}
+      <h1 class="text-white font-black uppercase m-0" style="font-size: 14px !important; letter-spacing: 1px;">
+         {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO BRASILEIRO 2025' }}
       </h1>
     </div>
 
     <div class="bg-[#020617] rounded-xl border border-[#475569] overflow-hidden shadow-xl">
       <div class="p-3 border-b border-[#1e293b] bg-[#0f172a]">
-        <h3 class="text-[12px] font-black text-white uppercase italic m-0">1. Rodadas Correntes</h3>
+        <h3 class="text-[12px] font-black text-white uppercase italic m-0">1. Rodadas em Aposta</h3>
       </div>
       <div class="p-3 grid grid-cols-3 gap-2">
         <div *ngFor="let r of rodadasCorrentes" (click)="onRodadaSelected(r.id!)"
              [ngClass]="rodadaId === r.id ? 'border-indigo-500 bg-indigo-500/20' : 'border-[#334155] bg-[#1e293b]'"
-             class="flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all">
-          <span class="text-[9px] font-black text-[#94a3b8] uppercase">Rodada</span>
+             class="flex flex-col items-center p-2 rounded-lg border-2 cursor-pointer transition-all">
+          <span class="text-[8px] font-black text-[#94a3b8] uppercase">Rodada</span>
           <span class="text-lg font-black text-white italic leading-none my-1">{{ r.numeroRodada }}</span>
-          <span class="text-[9px] font-bold text-slate-500">{{ (r.dataInicio) | date:'dd/MM' }}</span>
+          <span class="text-[8px] font-bold text-slate-500">
+            {{ (r.dataInicio || r.dataInic) | date:'dd/MM' }} - {{ r.dataFim | date:'dd/MM' }}
+          </span>
         </div>
       </div>
     </div>
 
+    <div *ngIf="rodadaId" class="flex justify-center p-1">
+      <button (click)="onDownloadPlanilhaConferencia()" class="btn-nova-cartela-dash !bg-teal-600 !w-auto !px-6 shadow-md !text-[10px]">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">download</mat-icon> PLANILHA DE CONFERÊNCIA
+      </button>
+    </div>
+
     <div *ngIf="apostasUsuarioRodada.length > 0" class="bg-[#020617] rounded-xl border border-[#475569] overflow-hidden shadow-xl">
       <div class="p-3 border-b border-[#1e293b] bg-[#0f172a]">
-        <h3 class="text-[12px] font-black text-white uppercase italic m-0">2. Rodadas em Aposta</h3>
+        <h3 class="text-[12px] font-black text-white uppercase italic m-0">2. Minhas Cartelas</h3>
       </div>
-      <div class="p-3 space-y-2">
+      <div class="p-2 space-y-2">
         <div *ngFor="let a of apostasUsuarioRodada" (click)="onApostaSelected(a.id!)"
              [ngClass]="apostaAtual?.id === a.id ? 'border-indigo-500 bg-indigo-500/20' : 'border-[#334155] bg-[#1e293b]'"
              class="grid grid-cols-5 items-center p-3 rounded-lg border-2 cursor-pointer">
@@ -49,8 +57,18 @@
       </div>
     </div>
 
+    <div *ngIf="apostaAtual || rodadaId" class="grid grid-cols-2 gap-3">
+      <button (click)="navegarParaRankingRodada()" class="btn-nova-cartela-dash !bg-blue-600 !m-0 shadow-lg !text-[10px]">
+        <mat-icon>leaderboard</mat-icon> RANKING RODADA
+      </button>
+      <button (click)="navegarParaRankingCampeonato()" class="btn-nova-cartela-dash !bg-purple-600 !m-0 shadow-lg !text-[10px]">
+        <mat-icon>bar_chart</mat-icon> RANKING GERAL
+      </button>
+    </div>
+
     <div class="bg-[#020617] rounded-xl border border-[#1e293b] overflow-hidden shadow-2xl">
-      <div class="bg-slate-700 p-4 border-b border-slate-600 flex justify-between items-center">
+      
+      <div class="bg-slate-700 p-4 border-b border-slate-600 flex justify-between items-center shadow-lg">
         <div class="flex flex-col text-left">
           <span class="text-[8px] font-black text-indigo-300 uppercase mb-1">Status da Visualização</span>
           <h2 class="text-sm font-black text-white uppercase italic m-0">
@@ -66,54 +84,66 @@
       
       <div class="p-3 space-y-4">
         <div *ngFor="let jogo of jogosDaApostaAtual" class="bg-[#0f172a] border border-[#1e293b] rounded-xl overflow-hidden shadow-lg">
-          
+    
           <div class="bg-[#1e293b]/50 text-center py-2 border-b border-slate-700/50">
-            <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest m-0">{{ jogo.estadioNome }}</p>
-            <p class="text-[11px] font-bold text-slate-200 m-0">
-                <span class="text-emerald-400 mr-1">{{ extrairDiaSemana(jogo.dataJogo) }}</span>
-                    {{ jogo.dataJogo }} às {{ jogo.horaJogo }}
+             <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest m-0">
+                {{ jogo.estadioNome || 'ESTÁDIO NÃO INFORMADO' }}
+             </p>
+             <p class="text-[9px] font-bold text-slate-300 m-0">
+                {{ jogo.dataJogo }} às {{ jogo.horaJogo }}
             </p>
           </div>
 
           <div class="grid grid-cols-7 items-center p-3 gap-1">
             <div class="col-span-2 flex flex-col items-center text-center">
               <img [src]="baseUrlImagens + (jogo.escudoMandante || 'logobolao.png')" 
-                   onerror="this.src='assets/images/logobolao.png'"
-                   class="w-12 h-12 object-contain mb-1">
-              <span class="text-[10px] font-black text-white uppercase truncate w-full">{{ jogo.equipeMandante }}</span>
+                   onerror="this.src='assets/images/logobolao.png'" 
+                   class="w-10 h-10 object-contain mb-1">
+              <span class="text-[9px] font-black text-white uppercase truncate w-full">
+                  {{ jogo.equipeMandante }}
+              </span>
             </div>
-            
+      
             <div class="col-span-3 flex flex-col items-center">
               <div class="flex items-center gap-2">
-                <span class="text-3xl font-black text-white">{{ jogo.placarRealCasa ?? '-' }}</span>
+                <span class="text-2xl font-black text-white">{{ jogo.placarRealCasa ?? '-' }}</span>
                 <span class="text-slate-600 font-black text-xs">X</span>
-                <span class="text-3xl font-black text-white">{{ jogo.placarRealVisita ?? '-' }}</span>
+                <span class="text-2xl font-black text-white">{{ jogo.placarRealVisita ?? '-' }}</span>
               </div>
-              <span class="text-[8px] font-black uppercase text-emerald-500 tracking-tighter">{{ jogo.statusJogo }}</span>
+              <span [ngClass]="{'text-emerald-500': jogo.statusJogo === 'Finalizado', 'text-blue-400 animate-pulse': jogo.statusJogo !== 'Finalizado'}"
+                    class="text-[7px] font-black uppercase tracking-widest mt-1">
+                 {{ jogo.statusJogo }}
+              </span>
             </div>
-            
+      
             <div class="col-span-2 flex flex-col items-center text-center">
               <img [src]="baseUrlImagens + (jogo.escudoVisitante || 'logobolao.png')" 
-                   onerror="this.src='assets/images/logobolao.png'"
-                   class="w-12 h-12 object-contain mb-1">
-              <span class="text-[10px] font-black text-white uppercase truncate w-full">{{ jogo.equipeVisitante }}</span>
+                   onerror="this.src='assets/images/logobolao.png'" 
+                   class="w-10 h-10 object-contain mb-1">
+              <span class="text-[9px] font-black text-white uppercase truncate w-full">
+                {{ jogo.equipeVisitante }}
+              </span>
             </div>
           </div>
 
-          <div *ngIf="apostaAtual" class="bg-slate-900/40 p-3 border-t border-slate-700/50 flex justify-between items-center px-5">
-            <div class="flex flex-col">
-              <span class="text-[8px] text-slate-500 font-black uppercase">Seu Palpite</span>
-              <span class="text-sm text-white font-black">{{ jogo.placarApostaCasa ?? 0 }} x {{ jogo.placarApostaVisita ?? 0 }}</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-[9px] text-slate-400 font-black uppercase">PONTOS</span>
-              <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center border-2 border-emerald-400/30">
-                <span class="text-xs font-black text-white">{{ jogo.pontuacao }}</span>
-              </div>
-            </div>
+          <div *ngIf="apostaAtual" class="bg-slate-900/40 p-2 border-t border-slate-700/50 flex justify-between items-center px-4">
+             <div class="flex flex-col">
+               <span class="text-[7px] text-slate-500 font-black uppercase">Seu Palpite</span>
+               <span class="text-xs text-white font-black">
+                 {{ jogo.placarApostaCasa ?? 0 }} x {{ jogo.placarApostaVisita ?? 0 }}
+               </span>
+             </div>
+             <div class="flex items-center gap-2">
+                <span class="text-[7px] text-slate-500 font-black uppercase">PONTOS</span>
+                <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-lg">
+                   <span class="text-[10px] font-black text-white">{{ jogo.pontuacao ?? 0 }}</span>
+                </div>
+             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </main>
+
+          <div *ngIf="!apostaAtual" class="bg-slate-900/20 p-2 border-t border-slate-700/50 text-center italic">
+            <span class="text-[8px] text-slate-500 uppercase font-black tracking-widest">Nenhum palpite nesta rodada</span>
+          </div>
+
+        </div> </div> </div> </main>
 </div>

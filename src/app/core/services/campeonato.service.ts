@@ -55,7 +55,12 @@ export class CampeonatoService { // <<-- REMOVIDO extends BaseService -->>
     );
   }
 
-  /**
+  // Adicione este método ao seu CampeonatoService
+getById(id: string) 
+{ return this.http.get<any>(`${environment.apiUrl}/Campeonato/${id}`); }
+
+
+/**
    * Manipulador de erros HTTP genérico.
    * <<-- ADICIONADO ESTE MÉTODO -->>
    */
