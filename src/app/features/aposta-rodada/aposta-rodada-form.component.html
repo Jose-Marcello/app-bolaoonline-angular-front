@@ -19,7 +19,7 @@
 <div style="padding: 12px; background: #94a3b8; min-height: 100vh; display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px;">
   <div style="background: #020617; border-radius: 12px; border: 1px solid #475569; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
     <div style="padding: 12px; border-bottom: 1px solid #1e293b; background: #0f172a;">
-      <h3 style="font-size: 12px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; font-style: italic;">1. Seleção de Rodada</h3>
+      <h3 style="font-size: 12px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; font-style: italic;">1. Seleção de Rodada em Aposta</h3>
     </div>
     <div style="padding: 12px; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;">
       <div *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)"
@@ -66,7 +66,7 @@
 </button>
 
   <div *ngIf="jogosDaApostaAtual.length > 0" style="width: 100%; display: flex; justify-content: center; margin-top: 32px; position: relative; z-index: 20; margin-bottom: -4px;">
-  <div style="width: 100%; background: #334155; border-bottom: 3px solid #1e293b; border-radius: 12px 12px 0 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);">
+   <div style="width: 100%; background: #334155; border-bottom: 3px solid #1e293b; border-radius: 12px 12px 0 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);">
     <div style="display: flex; align-items: center; gap: 8px;">
       <span style="font-size: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; font-style: italic;">Visualizando -></span>
       <h2 style="font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; margin: 0;">{{ apostaAtual?.identificadorAposta || 'CONFERIR CONFRONTOS' }}</h2>
@@ -96,7 +96,11 @@
           </div>
           <div style="display: grid; grid-template-columns: 1fr 130px 1fr; align-items: center; gap: 8px;">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeCasaEscudoUrl" style="width: 48px; height: 48px; object-fit: contain;">
+            
+              <img [src]="baseUrlImagens + (jogosDaApostaAtual[i]?.equipeCasaEscudoUrl || 'logo-bolao.png')" 
+                   onerror="this.src='assets/images/logo-bolao.png'" 
+                   style="width: 48px; height: 48px; object-fit: contain;">
+
               <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase;">
                 {{ jogosDaApostaAtual[i]?.equipeCasaNome }}
               </span>
@@ -111,7 +115,11 @@
             </div>
 
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-              <img [src]="baseUrlImagens + '/' + jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl" style="width: 48px; height: 48px; object-fit: contain;">
+              
+             <img [src]="baseUrlImagens + (jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl || 'logo-bolao.png')" 
+                  onerror="this.src='assets/images/logo-bolao.png'" 
+                  style="width: 48px; height: 48px; object-fit: contain;">
+             
               <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase;">
                 {{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}
               </span>

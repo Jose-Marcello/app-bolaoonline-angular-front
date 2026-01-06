@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 
-import { Subscription, combineLatest, of, Observable } from 'rxjs';
+import { Subscription, combineLatest, of, Observable, forkJoin } from 'rxjs';
 import { switchMap, finalize, catchError, filter, tap, map } from 'rxjs/operators';
 import { utils, writeFile } from 'xlsx';
 
@@ -18,6 +18,7 @@ import { utils, writeFile } from 'xlsx';
 import { RodadaService } from '../../core/services/rodada.service';
 import { ApostaService } from '../../core/services/aposta.service';
 import { AuthService } from '../auth/services/auth.service';
+import { ApostadorService } from '../../core/services/apostador.service';
 
 // Models
 import { RodadaDto } from '../../features/rodada/model/rodada-dto.model';
@@ -51,12 +52,16 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
   campeonatoId: string | null = null;
   rodadaId: string | null = null;
   apostadorCampeonatoId: string | null = null;
+  apostadorId: string | null = null;
+  userId: string | null = null;
 
   rodadasCorrentes: RodadaDto[] = [];
   rodadaSelecionada: RodadaDto | null = null;
   apostasUsuarioRodada: ApostaRodadaDto[] = [];
+  apostaSelecionadaId : string | null = null;
   apostaAtual: ApostaRodadaDto | null = null;
   jogosDaApostaAtual: ApostaJogoResultadoDto[] = [];
+  //jogosDaApostaAtual: any[] = [];
 
   baseUrlImagens: string = environment.imagesUrl;
   private subscriptions: Subscription = new Subscription();
@@ -66,6 +71,7 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     private router: Router,    
     private rodadaService: RodadaService,
     private apostaService: ApostaService,
+    private apostadorService: ApostadorService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -99,49 +105,44 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private loadAllIntegratedData(): Observable<any> {
-    this.isLoading = true;
+// No loadAllIntegratedData
+private loadAllIntegratedData(): Observable<any> {
+  this.isLoading = true;
 
-    // 1. Carrega Rodadas
-    const rodadas$ = this.rodadaService.getRodadasCorrentes(this.campeonatoId!).pipe(
-      map(res => (res.data as any)?.$values || res.data || [])
-    );
-    
-    // 2. Carrega Apostas do Usuário
-    const apostasDoUsuario$ = this.apostadorCampeonatoId
-        //? this.apostaService.getApostasPorRodadaEApostadorCampeonato(this.rodadaId!, this.apostadorCampeonatoId!).pipe(
-        ? this.apostaService.obterApostasPorRodada(this.rodadaId!, this.apostadorCampeonatoId!).pipe(
-          
-            map(res => (res.data as any)?.$values || res.data || []),
-            catchError(() => of([]))
-          )
-        : of([]);
+  // REMOVA QUALQUER .subscribe() DE DENTRO DESTE MÉTODO
+  return forkJoin({
+    rodadas: this.rodadaService.getRodadasCorrentes(this.campeonatoId!).pipe(
+      map(res => (res.data as any)?.$values || res.data || []),
+      catchError(() => of([]))
+    ),
+    apostador: this.apostadorService.getDadosApostador().pipe(
+      map(res => res.data),
+      catchError(() => of(null))
+    )
+  }).pipe(
+    switchMap(({ rodadas, apostador }) => {
+      this.rodadasCorrentes = rodadas;
+      // Seleciona a Rodada 1 (Status 3 - Final 0086D)
+      this.rodadaSelecionada = this.rodadasCorrentes.find((r: any) => r.status === 3) || this.rodadasCorrentes[0];
+      this.rodadaId = this.rodadaSelecionada?.id;
 
-    return combineLatest([rodadas$, apostasDoUsuario$]).pipe(
-        tap(([rodadas, apostasList]) => {
-            this.rodadasCorrentes = rodadas;
-            this.rodadaSelecionada = this.rodadasCorrentes.find(r => r.id === this.rodadaId!) || null;
-            this.apostasUsuarioRodada = apostasList;
-            
-            // Lógica de Seleção Inicial: Prioriza aposta de campeonato
-            if (this.apostasUsuarioRodada.length > 0) {
-                this.apostaAtual = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
-            } else {
-                this.apostaAtual = null;
-            }
-        }),
-        switchMap(() => {
-            // Se tem aposta, carrega resultados COM palpite. Se não, carrega APENAS resultados.
-            if (this.apostaAtual) {
-                return this.loadResultadosDaApostaAtual(this.apostaAtual.id);
-            } else {
-                return this.carregarResultadosApenasConsulta();
-            }
-        }),
-        tap(jogos => this.jogosDaApostaAtual = jogos || []),
-        finalize(() => this.isLoading = false)
-    );
-  }
+      // Chama a busca de apostas - o ZéMarcello agora terá os 12 pontos!
+      return this.apostaService.obterApostasPorRodada(this.rodadaId!, this.apostadorCampeonatoId).pipe(
+        map(res => (res.data as any)?.$values || res.data || []),
+        catchError(() => of([]))
+      );
+    }),
+    tap(apostas => {
+      this.apostasUsuarioRodada = apostas;
+      if (this.apostasUsuarioRodada.length > 0) {
+        // Localiza a cartela C69DABFC97 com os pontos do banco
+        this.apostaAtual = this.apostasUsuarioRodada[0];
+        this.onApostaSelected(this.apostaAtual.id);
+      }
+    }),
+    finalize(() => this.isLoading = false)
+  ); // <--- RETORNA O OBSERVABLE PURO
+}
 
   private loadResultadosDaApostaAtual(apostaRodadaId: string): Observable<ApostaJogoResultadoDto[]> {
     return this.apostaService.getApostasComResultados(this.rodadaId!, apostaRodadaId).pipe(
@@ -154,48 +155,81 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     );
   }
 
-  // NOVO MÉTODO: Para quem não apostou ver apenas os resultados oficiais
-  private carregarResultadosApenasConsulta(): Observable<ApostaJogoResultadoDto[]> {
+// No método carregarResultadosApenasConsulta(), ajuste o mapeamento:
+private carregarResultadosApenasConsulta(): Observable<ApostaJogoResultadoDto[]> {
   return this.rodadaService.getJogosByRodada(this.rodadaId!).pipe(
-    map((res: any) => { // Tipando o 'res' como any aqui resolve o erro
+    map((res: any) => {
+      // Garante que pegamos a lista correta do retorno da API
       const data = res.data?.$values || res.data || [];
       
       return data.map((j: any) => ({
-        equipeMandante: j.equipeCasaNome || j.equipeMandante,
-        escudoMandante: j.equipeCasaEscudoUrl || j.escudoMandante,
-        equipeVisitante: j.equipeVisitanteNome || j.equipeVisitante,
-        escudoVisitante: j.equipeVisitanteEscudoUrl || j.escudoVisitante,
-        placarRealCasa: j.placarCasa,
-        placarRealVisita: j.placarVisitante,
-        statusJogo: j.status || 'Finalizado',
-        estadioNome: j.estadio,
-        dataJogo: j.dataJogo,
-        horaJogo: j.horaJogo
+        id: j.id || '',
+        idJogo: j.id || '', // No modo consulta, o ID do palpite é o próprio ID do jogo
+        equipeMandante: j.equipeCasaNome || j.equipeMandante || '',
+        siglaMandante: j.siglaCasa || '',
+        escudoMandante: j.equipeCasaEscudoUrl || j.escudoMandante || '',
+        equipeVisitante: j.equipeVisitanteNome || j.equipeVisitante || '',
+        siglaVisitante: j.siglaVisitante || '',
+        escudoVisitante: j.equipeVisitanteEscudoUrl || j.escudoVisitante || '',
+        placarRealCasa: j.placarCasa !== undefined ? j.placarCasa : j.placarRealCasa,
+        placarRealVisita: j.placarVisitante !== undefined ? j.placarVisitante : j.placarRealVisita,
+        estadioNome: j.estadioNome || j.estadio || 'ESTÁDIO NÃO INFORMADO',
+        dataJogo: j.dataHora || j.dataJogo, // Fonte da data
+        // O erro na 118 geralmente é aqui. Usamos uma verificação segura:
+        horaJogo: (j.dataHora || j.dataJogo) 
+                   ? new Date(j.dataHora || j.dataJogo).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+                   : '--:--',
+        statusJogo: j.status || 'Agendado',
+        placarApostaCasa: null, // Usuário não apostou
+        placarApostaVisita: null, // Usuário não apostou
+        pontuacao: 0
       }));
     }),
-    tap(() => console.log(`[Resultados] Modo Consulta Ativado.`))
+    tap(jogos => console.log('[Resultados] Modo Consulta:', jogos))
   );
 }
+  
 
   onRodadaSelected(rodadaId: string): void {
-    if (this.rodadaSelecionada?.id === rodadaId) return;
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { rodadaId: rodadaId, apostadorCampeonatoId: this.apostadorCampeonatoId },
-      queryParamsHandling: 'merge'
-    });
-    this.rodadaId = rodadaId;
-    this.loadAllIntegratedData().subscribe();
-  }
-
+  if (this.rodadaId === rodadaId) return;
+  this.rodadaId = rodadaId;
+  this.apostaAtual = null; // Limpa para forçar nova identificação
+  this.loadAllIntegratedData().subscribe();
+}
   onApostaSelected(apostaId: string): void {
-    if (this.apostaAtual?.id === apostaId) return;
-    this.apostaAtual = this.apostasUsuarioRodada.find(a => a.id === apostaId) || null;
-    if (this.apostaAtual) {
-      this.loadResultadosDaApostaAtual(this.apostaAtual.id).subscribe(jogos => this.jogosDaApostaAtual = jogos);
-    }
-  }
+  this.apostaSelecionadaId = apostaId; // Atualiza o ID para o destaque visual
+  this.apostaAtual = this.apostasUsuarioRodada.find(a => a.id === apostaId) || null;
 
+  if (this.apostaAtual) {
+    this.isLoading = true;
+    // IMPORTANTE: Busca os confrontos vinculados a esta cartela específica
+    this.loadResultadosDaApostaAtual(this.apostaAtual.id).subscribe({
+      next: (jogos) => {
+        this.jogosDaApostaAtual = jogos;
+        console.log('Jogos da aposta carregados:', this.jogosDaApostaAtual);
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showSnackBar('Erro ao carregar confrontos.', 'Fechar', 'error');
+      }
+    });
+  }
+}
+
+extrairDiaSemana(data: string): string {
+  if (!data) return '';
+  
+  // Se a data vier como "05/04", precisamos garantir que o JS entenda o ano
+  // Ou, se você mudou o backend para enviar a data completa, melhor ainda.
+  const partes = data.split('/');
+  const hoje = new Date();
+  const dataFormatada = new Date(hoje.getFullYear(), parseInt(partes[1]) - 1, parseInt(partes[0]));
+  
+  const dias = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  return dias[dataFormatada.getDay()];
+}
+ 
   onDownloadPlanilhaConferencia(): void {
     this.rodadaService.obterDadosPlanilhaConferencia(this.rodadaId!).subscribe({
       next: (res) => {
