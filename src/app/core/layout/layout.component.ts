@@ -58,59 +58,44 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar
   ) {}
 
-  ngOnInit(): void {
-  console.log('[DashboardLayoutComponent] ngOnInit: Iniciado.');
-  
-
+// No seu layout.component.ts
+ngOnInit(): void {
   this.subscriptions.add(
-    // ✅ CORREÇÃO: Certifique-se de que os observables estão dentro de um ÚNICO array []
     combineLatest([
       this.authService.isAuthReady$.pipe(filter(isReady => !!isReady)),
-      this.authService.currentUser$.pipe(
-        map(user => user?.uid || null)
-      )
-    ]).pipe(
-      // Agora o TS reconhecerá que a emissão é uma tupla [boolean, string | null]
-      tap(([isAuthReady, userId]) => {
-        console.log('[DashboardLayoutComponent] Auth Ready e userId presente:', { isAuthReady, userId });
-        this.currentUserId = userId;
-        this.isAuthenticated = isAuthReady && !!userId;
-        
-        if (!this.isAuthenticated) {
-          this.apostadorNome = null;
-          this.apostadorSaldo = null;
-        }
-      }),
-      
-      switchMap(([isAuthReady, userId]) => {
-        if (isAuthReady && userId) {
-          console.log('[DashboardLayoutComponent] Identificamos o ID, buscando dados do apostador...');
-          return this.apostadorService.getDadosApostador().pipe(
-            tap(res => console.log('[DashboardLayoutComponent] Resposta bruta da API:', res)),
-            map(response => {
-              if (response.success && response.data) {
-                const apostadorData = isPreservedCollection<ApostadorDto>(response.data) 
-                                      ? (response.data.$values?.[0] || null) 
-                                      : response.data as ApostadorDto;
-                
-                if (apostadorData) {
-                  // ✅ Verifique se o nome do campo é 'apelido' ou 'nome' no seu DTO
-                  this.apostadorNome = apostadorData.apelido; 
-                  this.apostadorSaldo = apostadorData.saldo?.valor ?? 0;
-                  console.log('[DashboardLayoutComponent] Nome definido para:', this.apostadorNome);
-                }
-                return apostadorData;
-              }
-              return null;
-            })
-          );
-        }
-        return of(null);
-      })      
-   
-    ).subscribe()
+      this.authService.currentUser$
+    ]).subscribe(([ready, user]) => {
+      this.currentUserId = user?.uid || null;
+      this.isAuthenticated = !!user;
+
+      if (user) {
+        // ✅ Cenário Logado: Puxa o nome do ZeMarcello
+        this.apostadorNome = user.displayName || 'Apostador';
+        this.carregarDadosDoServidor(); // Chama a função corrigida abaixo
+      } else {
+        // ✅ Cenário Visitante: Limpa para o modo tour
+        this.apostadorNome = 'Convidado';
+        this.apostadorSaldo = 0;
+      }
+    })
   );
 }
+
+// ✅ Adicione esta função para buscar o saldo real quando logado
+private carregarDadosDoServidor(): void {
+  this.apostadorService.getDadosApostador().subscribe(res => {
+    if (res.success && res.data) {
+      // Lógica de unwrap que você já usa no projeto
+      const data = isPreservedCollection<ApostadorDto>(res.data) 
+                   ? res.data.$values[0] : res.data as ApostadorDto;
+      if (data) {
+        this.apostadorSaldo = data.saldo?.valor || 0;
+        this.apostadorNome = data.apelido || this.apostadorNome;
+      }
+    }
+  });
+}
+
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

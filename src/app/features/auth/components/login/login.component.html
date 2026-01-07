@@ -2,6 +2,7 @@
      style="background-image: url('/assets/images/fundobolao.png'); background-size: cover; background-position: center; background-attachment: fixed;">
      
     <div class="max-w-md w-full bolao-login-box bg-[#2D2D2D] p-8 rounded-xl shadow-2xl border border-gray-700"> 
+        
         <div class="text-center mb-6"> 
             <img src="/assets/images/logobolao.png" alt="Logo" class="mx-auto mb-4 h-20 w-20">
             <h2 class="text-3xl font-extrabold text-white">Bolão Online</h2>
@@ -14,56 +15,76 @@
             </div>
         </div>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
-            <input type="email" formControlName="email" placeholder="E-mail"
-                   class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green-500 outline-none">
+        <div class="mb-8">
+            <button type="button" (click)="acessoVisitante()"
+                    class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-lg uppercase transition-all shadow-lg flex items-center justify-center gap-3 group">
+                <mat-icon class="group-hover:animate-bounce">rocket_launch</mat-icon>
+                Conhecer como Visitante (Sem Login)
+            </button>
             
-            <div class="relative">
+            <div class="flex items-center my-6">
+                <div class="flex-grow border-t border-gray-700"></div>
+                <span class="px-4 text-gray-500 text-[10px] font-black uppercase tracking-widest">Ou acesse sua conta</span>
+                <div class="flex-grow border-t border-gray-700"></div>
+            </div>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <div class="space-y-1">
+                <input type="email" formControlName="email" placeholder="E-mail"
+                       class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green-500 outline-none transition-all">
+            </div>
+            
+            <div class="relative space-y-1">
                 <input [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Senha"
-                       class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green-500 outline-none">
-                <button type="button" (click)="togglePasswordVisibility()" class="absolute right-3 top-3 text-gray-400">
-                    <span class="material-icons">{{ hidePassword ? 'visibility_off' : 'visibility' }}</span>
+                       class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green-500 outline-none transition-all">
+                <button type="button" (click)="togglePasswordVisibility()" class="absolute right-3 top-3 text-gray-400 hover:text-white transition-colors">
+                    <mat-icon style="font-size: 20px;">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
             </div>
 
             <button type="submit" [disabled]="loginForm.invalid || isSubmitting"
-                    class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg uppercase transition-all disabled:opacity-50">
+                    class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-black rounded-lg uppercase transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
             </button>
         </form>
 
-        <div class="mt-4 text-center">
+        <div class="mt-6 text-center">
             <button type="button" (click)="openResendEmailModal()" 
-                    class="text-green-400 hover:text-white text-xs font-bold underline uppercase tracking-tight transition-colors">
+                    class="text-green-400 hover:text-green-300 text-[10px] font-black underline uppercase tracking-tight transition-colors">
                 Não recebeu a confirmação? Reenviar e-mail.
             </button>
         </div>
 
-        <div class="mt-6 text-center space-y-2 text-sm border-t border-gray-700 pt-4">
-            <a routerLink="/auth/forgot-password" class="text-gray-400 hover:text-white underline text-xs">Esqueceu a senha?</a>
-            <p class="text-white text-xs">Não tem conta? <a routerLink="/auth/register" class="text-green-400 font-bold hover:underline">Registre-se aqui</a></p>
+        <div class="mt-6 text-center space-y-3 text-sm border-t border-gray-700 pt-5">
+            <div>
+                <a routerLink="/auth/forgot-password" class="text-gray-400 hover:text-white underline text-xs transition-colors">Esqueceu a senha?</a>
+            </div>
+            <p class="text-white text-xs">
+                Não tem conta? 
+                <a routerLink="/auth/register" class="text-green-400 font-black hover:text-green-300 hover:underline ml-1">Registre-se aqui</a>
+            </p>
         </div>
     </div>
 </div>
 
 <div *ngIf="showResendEmailModal" 
-     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-85 px-4">
+     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-90 px-4 backdrop-blur-sm">
     <div class="w-full max-w-sm rounded-xl bg-[#2D2D2D] p-6 shadow-2xl border border-gray-700">
         <h3 class="text-xl font-bold text-white mb-2">Reenviar Confirmação</h3>
-        <p class="text-gray-400 text-sm mb-4">Digite seu e-mail para receber um novo link de ativação.</p>
+        <p class="text-gray-400 text-sm mb-4 font-medium">Digite seu e-mail para receber um novo link de ativação.</p>
 
-        <form [formGroup]="resendForm" (ngSubmit)="resendEmail()">
+        <form [formGroup]="resendForm" (ngSubmit)="resendEmail()" class="space-y-4">
             <input type="email" formControlName="emailToResend" placeholder="Seu endereço de e-mail"
-                   class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green-500 outline-none mb-4"
-                   style="background-color: #1f2937 !important; color: white !important;">
+                   class="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:ring-2 focus:ring-green-500 outline-none">
             
             <div class="flex space-x-3">
                 <button type="button" (click)="closeResendEmailModal()"
-                        class="flex-1 py-2 rounded-lg text-gray-400 hover:text-white border border-gray-600 transition-colors">
+                        class="flex-1 py-2 rounded-lg text-gray-400 font-bold hover:text-white border border-gray-600 transition-all uppercase text-xs">
                     Cancelar
                 </button>
                 <button type="submit" [disabled]="resendForm.invalid || isLoading"
-                        class="flex-1 py-2 rounded-lg bg-green-600 text-white font-bold hover:bg-green-700 disabled:opacity-50">
+                        class="flex-1 py-2 rounded-lg bg-green-600 text-white font-black hover:bg-green-700 disabled:opacity-50 transition-all uppercase text-xs">
                     {{ isLoading ? 'Enviando...' : 'Reenviar' }}
                 </button>
             </div>

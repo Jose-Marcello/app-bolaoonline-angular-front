@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 
 // Serviços e Modelos
 import { AuthService } from '../../../features/auth/services/auth.service';
@@ -18,11 +19,13 @@ import { CampeonatoService } from '../../../core/services/campeonato.service';
 import { RodadaService } from '../../../core/services/rodada.service';
 import { ApostadorService } from '../../../core/services/apostador.service';
 import { ApostaService } from '../../../core/services/aposta.service';
+import { ConfirmacaoAdesaoModalComponent } from '../../components/confirmacao-adesao-modal/confirmacao-adesaoModal.component';
 
 import { CampeonatoDto } from '../../../features/campeonato/models/campeonato-dto.model';
 import { RodadaDto } from '../../../features/rodada/model/rodada-dto.model';
 import { ApostadorDto } from '../../../features/apostador/models/apostador-dto.model';
 import { ApostadorCampeonatoDto } from '../../../features/apostador-campeonato/models/apostador-campeonato-dto.model';
+import { VincularApostadorCampeonatoDto } from '../../../features/campeonato/models/vincular-apostador-campeonato.model';
 import { ApostasCampeonatoTotaisDto } from '../../../features/campeonato/models/apostas-campeonato-totais-dto.model';
 
 import { isPreservedCollection } from '../../../shared/models/api-response.model';
@@ -51,6 +54,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   campeonatosDisponiveis: CampeonatoDto[] = [];
   campeonatoTotais: { [key: string]: ApostasCampeonatoTotaisDto } = {};
 
+  usuarioLogado: boolean = false;
+
   // Galeria de Marketing
   indiceAtual = 0;
   fotos: string[] = Array.from({ length: 11 }, (_, i) => `assets/marketing/parceiros/EspMar-foto${i + 1}.jpeg`);
@@ -66,18 +71,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private apostadorService: ApostadorService,
     private apostaService: ApostaService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
+
   ngOnInit(): void {
-    this.iniciarCarrossel();
-    this.subscriptions.add(
-      this.authService.isAuthenticated$.subscribe(status => {
-        if (status) this.loadDashboardData();
-        else { this.isLoading = false; this.limparDados(); }
-      })
-    );
-  }
+  // 1. Define o estado inicial baseado no token
+  this.usuarioLogado = this.authService.estaLogado(); 
+  this.iniciarCarrossel();
+
+  // 2. Carrega os dados IMEDIATAMENTE. 
+  // O seu loadDashboardData já sabe lidar com o fato de ser logado ou visitante.
+  this.loadDashboardData();
+
+  // 3. Mantém o subscribe apenas para reagir a mudanças (ex: login feito em outra aba)
+  this.subscriptions.add(
+    this.authService.isAuthenticated$.subscribe(status => {
+      // Só recarrega se o status mudar para diferente do que já detectamos
+      if (status !== this.usuarioLogado) {
+        this.usuarioLogado = status;
+        this.loadDashboardData();
+      }
+    })
+  );
+}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -93,36 +111,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadDashboardData(): void {
   this.isLoading = true;
 
-  this.apostadorService.getDadosApostador().pipe(
-    // Tratamento de erro inicial para evitar o alerta de "desconectado" indevido
-    catchError(() => of({ success: false, data: null })),
-    tap(response => {
-      if (response?.success && response.data) {
-        const data = isPreservedCollection<ApostadorDto>(response.data) 
-                    ? response.data.$values[0] : response.data as ApostadorDto;
-        if (data) {
-          this.apostador = data;
-          this.apostadorSaldo = data.saldo?.valor || 0;
-        }
-      }
-    }),
-    // Busca campeonatos baseados no ID do apostador carregado acima
+  // 1. Definimos o fluxo inicial: Se logado, busca dados do apostador. Se não, retorna um "vazio" de sucesso.
+  const inicializarFluxo$ = this.usuarioLogado 
+    ? this.apostadorService.getDadosApostador().pipe(
+        catchError(() => of({ success: false, data: null })),
+        tap(response => {
+          if (response?.success && response.data) {
+            const data = isPreservedCollection<ApostadorDto>(response.data) 
+                        ? response.data.$values[0] : response.data as ApostadorDto;
+            if (data) {
+              this.apostador = data;
+              this.apostadorSaldo = data.saldo?.valor || 0;
+            }
+          }
+        })
+      )
+    : of({ success: true, data: null }); // Atalho para Visitante
+
+  inicializarFluxo$.pipe(
+    // 2. Busca campeonatos: Se não tem ID (visitante), passa string vazia para trazer a vitrine geral
     switchMap(() => this.campeonatoService.getAvailableCampeonatos(this.apostador?.usuarioId || '')),
     map(response => unwrap<CampeonatoDto[]>(response.data) || []),
+    
     switchMap(campeonatos => {
       this.campeonatosDisponiveis = campeonatos;
       if (campeonatos.length === 0) return of([]);
 
-      // Cria a bateria de chamadas paralelas para cada campeonato
+      // 3. Bateria de chamadas paralelas (Vitrine Pública)
       const detalhamentoTarefas = campeonatos.map(camp => 
         forkJoin({
           emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
           correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
           finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
-          totais: this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({ success: false, data: null })))
+          // Totais só fazem sentido se houver um apostador logado para comparar
+          totais: this.usuarioLogado 
+                  ? this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({ success: false, data: null })))
+                  : of({ success: true, data: null })
         }).pipe(
           tap(res => {
-            // Sincronização e Blindagem das Rodadas
             camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta?.data) || [];
             camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes?.data) || [];
             camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas?.data) || [];
@@ -135,7 +161,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       );
       return forkJoin(detalhamentoTarefas);
     }),
-    // O FINALIZE entra aqui, após todos os switchMaps
     finalize(() => {
       this.isLoading = false;
     })
@@ -200,6 +225,59 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, 4000);
   }
 
+  // No seu dashboard.component.ts
+// No seu dashboard.component.ts
+
+abrirModalAdesao(camp: CampeonatoDto): void {
+
+  // 1. Trava de Segurança para Visitante
+  if (!this.authService.estaLogado()) {
+    this.snackBar.open('🏆 Gostou deste campeonato? Crie sua conta para participar!', 'CADASTRAR', {
+      duration: 5000,
+      panelClass: ['snackbar-info']
+    }).onAction().subscribe(() => {
+      this.router.navigate(['/auth/register']);
+    });
+    return; // Aborta antes de abrir qualquer modal
+  }
+
+  // 2. Abre a nova modal estilizada em vez do confirm() do navegador
+  const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
+    width: '350px',
+    data: { campeonatoNome: camp.nome },
+    panelClass: 'custom-modal-panel' // Classe para remover fundos padrão se necessário
+  });
+
+  // 2. Escuta o fechamento da modal
+  dialogRef.afterClosed().subscribe(confirmado => {
+    if (confirmado) {
+      this.isLoading = true;
+
+      // Monta o request com os IDs necessários
+      const request: VincularApostadorCampeonatoDto = {
+        campeonatoId: camp.id,
+        apostadorId: this.apostador?.id || ''
+      };
+
+      // 3. Executa a adesão real no banco
+      this.campeonatoService.entrarEmCampeonato(request).pipe(
+        finalize(() => this.isLoading = false)
+      ).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.snackBar.open('🎯 Inscrição Confirmada! Boa sorte!', 'OK', { duration: 5000 });
+            this.loadDashboardData(); // Atualiza saldo e status
+          } else {
+            const msg = response.errors?.$values?.[0] || 'Erro na adesão.';
+            this.snackBar.open(msg, 'Fechar', { duration: 5000 });
+          }
+        },
+        error: () => this.snackBar.open('Erro de conexão.', 'Fechar', { duration: 4000 })
+      });
+    }
+  });
+}
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth/login']);
@@ -216,6 +294,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private showSnackBar(msg: string, action: string, type: string) {
     this.snackBar.open(msg, action, { duration: 4000, panelClass: [`snackbar-${type}`] });
   }
+
+convidarParaCadastro(): void {
+  // 1. Exibe um convite visual no padrão do sistema
+  this.snackBar.open('🚀 Crie sua conta grátis para começar a palpitar!', 'CADASTRAR', {
+    duration: 6000,
+    horizontalPosition: 'center',
+    verticalPosition: 'bottom',
+    panelClass: ['snackbar-premium-indigo'] // Aquela classe estilizada que criamos
+  }).onAction().subscribe(() => {
+    // 2. Redireciona para a tela de registro se o usuário clicar no botão do SnackBar
+    this.router.navigate(['/auth/register']);
+  });
+
+  // 3. Opcional: Se você não quiser o SnackBar e preferir ir direto:
+  // this.router.navigate(['/auth/register']);
+}
 
   navigateToDepositar() { this.router.navigate(['/dashboard/financeiro/depositar']); }
   informarEmDesenvolvimento() { this.showSnackBar('Em desenvolvimento!', 'OK', 'info'); }

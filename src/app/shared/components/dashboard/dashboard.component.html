@@ -1,3 +1,29 @@
+
+<div *ngIf="!usuarioLogado" 
+     style="width: 100%; background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+  
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+      <mat-icon style="color: white; font-size: 18px; width: 18px; height: 18px;">visibility</mat-icon>
+    </div>
+    <div>
+      <p style="margin: 0; color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+        Você está em Modo Consulta
+      </p>
+      <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 9px; font-weight: 500;">
+        Explore as rodadas e conheça nossa plataforma!
+      </p>
+    </div>
+  </div>
+
+  <button (click)="convidarParaCadastro()" 
+          style="background: white; color: #4f46e5; border: none; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"
+          onmouseover="this.style.transform='scale(1.05)'" 
+          onmouseout="this.style.transform='scale(1)'">
+    Criar Conta Grátis
+  </button>
+</div>
+
 <div class="min-h-screen flex flex-col font-sans dashboard-root" style="background-color: #cbd5e1 !important;">
 
   <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
@@ -16,7 +42,7 @@
       </div>
     </div>
 
-    <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569; display: block; width: 100%;">
+    <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569; display: block; width: 100%; margin-bottom: 1rem;">
       
       <div class="card-header-dark" style="background-color: #0f172a !important; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center;">
         <div class="flex items-center gap-2" style="max-width: 80%;">
@@ -25,19 +51,43 @@
             {{ camp.nome }}
           </h2>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" style="background: #10b981; color: white; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 900; text-transform: uppercase;">Ativo</span>
+        <span *ngIf="camp.aderidoPeloUsuario" 
+              style="background: #10b981; color: white; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 900; text-transform: uppercase;">
+                           Ativo
+</span>
       </div>
 
       <div class="p-3" style="display: flex; flex-direction: column; gap: 12px;">
         
-        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label-final" style="background-color: #22c55e !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">JOGANDO !!</span>
-          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label-final" style="background-color: #f97316 !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">VAMOS JOGAR ?</span>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
+          
+          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label-final" 
+                style="background-color: #22c55e !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">
+            Apostando no Campeonato! 🏆
+          </span>
+          
+          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label-final" 
+                style="background-color: #f97316 !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">
+            Apostar no Campeonato?
+          </span>
 
-          <button (click)="navegarParaApostasRodada(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #d1fae5 !important; color: #065f46 !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
-            Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
+         <button *ngIf="!camp.aderidoPeloUsuario" (click)="abrirModalAdesao(camp)" 
+                style="width: 100%; padding: 16px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #6366f1 !important; color: #ffffff !important; font-size: 14px !important; font-weight: 900 !important; cursor: pointer; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); margin-top: 4px;">
+                   🚀 ENTRAR NO CAMPEONATO
+        </button>
+
+          <div style="position: relative; width: 100%;">
+          <button (click)="navegarParaApostasRodada(camp.id)" 
+              style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #d1fae5 !important; color: #065f46 !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
+              Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
           </button>
+  
+         <span *ngIf="!camp.aderidoPeloUsuario" 
+             style="position: absolute; top: -8px; right: 10px; background: #059669; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid #064e3b;">
+                   Disponível Avulsa !!
+         </span>
         </div>
+      </div>
         
         <button (click)="verRodadasCorrentes(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #dbeafe !important; color: #1e40af !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
           Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})

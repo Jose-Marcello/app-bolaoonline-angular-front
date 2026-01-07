@@ -3,8 +3,8 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../../features/auth/services/auth.service';
-import { map, take } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, take, } from 'rxjs/operators';
+import { Observable,of } from 'rxjs';
 
 export const AuthGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -12,30 +12,30 @@ export const AuthGuard: CanActivateFn = (
 ): Observable<boolean> => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  
 
-  // <<-- AQUI ESTÁ A CORREÇÃO: ADICIONAMOS UMA EXCEÇÃO DIRETA -->>
+  // 1️⃣ LIBERAÇÃO AMPLA PARA O MODO VISITANTE
+// Liberamos o dashboard, a raiz e a rota de apostas
+if (state.url === '/dashboard' || state.url === '/' || state.url.includes('/apostas-rodada')) {
+    console.log('[AuthGuard] 🔓 ACESSO VISITANTE: Portão totalmente aberto para', state.url);
+    return of(true); 
+}
+
+  // 2️⃣ EXCEÇÃO DE TESTE (Se você ainda usar)
   if (state.url.startsWith('/testes/email')) {
-    console.log('[AuthGuard] Rota de teste. Acesso permitido.');
-    return new Observable<boolean>(observer => {
-      observer.next(true);
-      observer.complete();
-    });
+    return of(true);
   }
 
-  console.log('[AuthGuard] Verificando acesso para a rota:', state.url);
-
+  // 3️⃣ REGRA DE SEGURANÇA (Para o Jeff_Bolinha e outros usuários reais)
+  // Só chega aqui se não for uma das rotas liberadas acima
   return authService.isAuthenticated$.pipe(
     take(1),
     map(isAuthenticated => {
-      console.log(`[AuthGuard] Estado de autenticação: ${isAuthenticated}.`);
-      if (isAuthenticated) {
-        console.log('[AuthGuard] Usuário autenticado. Acesso permitido.');
-        return true;
-      } else {
-        console.warn('[AuthGuard] Usuário NÃO autenticado. Redirecionando para /login.');
-        router.navigate(['/auth/login']);
-        return false;
-      }
+      if (isAuthenticated) return true;
+
+      console.warn('[AuthGuard] 🔐 Bloqueado. Redirecionando para login.');
+      router.navigate(['/auth/login']);
+      return false;
     })
   );
 };

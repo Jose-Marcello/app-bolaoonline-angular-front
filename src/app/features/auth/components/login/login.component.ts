@@ -140,4 +140,11 @@ export class LoginComponent implements OnInit {
     }
   });
 }
+acessoVisitante(): void {
+  debugger; // 🛑 O navegador vai pausar aqui quando você clicar no botão!
+  console.log('Botão clicado!');
+  this.authService.clearSession();
+  this.router.navigate(['/dashboard']);
+}
+
 }

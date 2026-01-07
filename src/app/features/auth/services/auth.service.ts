@@ -161,4 +161,23 @@ register(registrationData: any): Observable<ApiResponse<any>> {
   // Esta chamada resultará em .../api/account/register
   return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
 }
+
+obterToken(): string | null {
+    // 'token' deve ser o exato nome que você usou no momento do login (localStorage.setItem('token', ...))
+    return localStorage.getItem(this.AUTH_TOKEN_KEY);
+  }
+
+  // Dica extra: um método simples para retornar um booleano
+  estaLogado(): boolean {
+    const token = this.obterToken();
+    // Retorna true se o token existe e não está vazio
+    return this.hasValidToken();
+  }
+
+  // Permite que componentes verifiquem se devem exibir o modo consulta
+  isVisitor(): boolean {
+     return !this.hasValidToken();
+  }
+
 }
+

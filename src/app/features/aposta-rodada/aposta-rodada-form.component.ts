@@ -21,12 +21,16 @@ import { switchMap, finalize, catchError, filter, tap, map } from 'rxjs/operator
 import { RodadaService } from '../../core/services/rodada.service';
 import { ApostaService } from '../../core/services/aposta.service';
 import { ApostadorService } from '../../core/services/apostador.service';
+import { AuthService } from '../auth/services/auth.service';
 import { RodadaDto } from '../../features/rodada/model/rodada-dto.model';
 import { ApostaRodadaDto } from '../../features/aposta-rodada/models/aposta-rodada-dto.model';
 import { SalvarApostaRequestDto } from '../../features/aposta-rodada/models/salvar-aposta-request-dto.model';
 import { ApostadorDto } from '../../features/apostador/models/apostador-dto.model';
 import { environment } from '../../../environments/environment';
-import { CriarApostaAvulsaRequestDto } from '../../features/aposta-rodada/models/criar-aposta-avulsa-request.Dto.model'
+import { CriarApostaAvulsaRequestDto } from '../../features/aposta-rodada/models/criar-aposta-avulsa-request.Dto.model';
+
+// ✅ Importe o componente de diálogo de confirmação que você já possui
+import { ConfirmacaoApostaDialogComponent } from '../../shared/components/confirmacao-aposta-avulsa/confirmacao-apostaAvulsaModal.component';
 
 @Component({
   selector: 'app-aposta-rodada-form',
@@ -75,6 +79,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   constructor(
+    private authService: AuthService,     // ✅ Resolvido erro TS2339
     private location: Location,
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -83,7 +88,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
     private apostaService: ApostaService,
     private apostadorService: ApostadorService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog     
   ) {
     this.apostaForm = this.fb.group({
       palpites: this.fb.array([])
@@ -103,7 +108,6 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
           this.apostadorCampeonatoId = queryParams.get('apostadorCampeonatoId');
           this.rodadaSelecionadaId = this.rodadaId;
         }),
-        // CORREÇÃO: Filtramos apenas pela RodadaId para permitir apostas avulsas
         filter(() => !!this.rodadaId),
         switchMap(() => this.loadAllIntegratedData())
       ).subscribe({
@@ -120,7 +124,6 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
- 
 
   private loadJogosSemPalpites(): void {
     this.isLoading = true;
@@ -150,68 +153,59 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
     });
   }
 
-private loadAllIntegratedData(): Observable<any> {
-  // CORREÇÃO: Apenas a rodadaId é obrigatória agora para o Jeff entrar
-  if (!this.rodadaId) {
-    this.showSnackBar('Erro: Identificador da rodada ausente.', 'Fechar', 'error');
-    return of(null);
-  }
+  private loadAllIntegratedData(): Observable<any> {
+    if (!this.rodadaId) {
+      this.showSnackBar('Erro: Identificador da rodada ausente.', 'Fechar', 'error');
+      return of(null);
+    }
 
-  this.isLoading = true;
+    this.isLoading = true;
 
-  return forkJoin({
-    // Se não tem campeonatoId (caso do Jeff), retornamos array vazio para as rodadas do campeonato
-    rodadas: this.campeonatoId 
-      ? this.rodadaService.getRodadasEmAposta(this.campeonatoId).pipe(
-          map(res => (res.data as any)?.$values || res.data || []),
-          catchError(() => of([]))
-        )
-      : of([]),
+    return forkJoin({
+      rodadas: this.campeonatoId 
+        ? this.rodadaService.getRodadasEmAposta(this.campeonatoId).pipe(
+            map(res => (res.data as any)?.$values || res.data || []),
+            catchError(() => of([]))
+          )
+        : of([]),
+        
+      apostador: this.apostadorService.getDadosApostador().pipe(
+        map(res => res.data as ApostadorDto),
+        catchError(() => of(null))
+      ),
       
-    apostador: this.apostadorService.getDadosApostador().pipe(
-      map(res => res.data as ApostadorDto),
-      catchError(() => of(null))
-    ),
-    
-    // CORREÇÃO: Usando o método único que aceita campeonato nulo
-    apostas: this.apostaService.obterApostasPorRodada(this.rodadaId, this.apostadorCampeonatoId).pipe(
-      map(res => (res.data as any)?.$values || res.data || []),
-      catchError(() => of([]))
-    )
-  }).pipe(
-    tap(({ rodadas, apostador, apostas }) => {
-      // CORREÇÃO DO ERRO TS2339: Forçamos o tipo para Array antes do .find()
-      const listaRodadas = rodadas as any[];
-      this.rodadasDisponiveis = listaRodadas;
-      this.rodadasEmAposta = listaRodadas;
+      apostas: this.apostaService.obterApostasPorRodada(this.rodadaId, this.apostadorCampeonatoId).pipe(
+        map(res => (res.data as any)?.$values || res.data || []),
+        catchError(() => of([]))
+      )
+    }).pipe(
+      tap(({ rodadas, apostador, apostas }) => {
+        const listaRodadas = rodadas as any[];
+        this.rodadasDisponiveis = listaRodadas;
+        this.rodadasEmAposta = listaRodadas;
+        this.rodadaSelecionada = listaRodadas.find((r: any) => r.id === this.rodadaId) || null;
 
-      // Se houver rodadas no campeonato, selecionamos a atual
-      this.rodadaSelecionada = listaRodadas.find((r: any) => r.id === this.rodadaId) || null;
-
-      // Atualiza dados do apostador (Jeff ou qualquer outro)
-      if (apostador) {
-        this.userId = apostador.id;
-        this.apostadorSaldo = apostador.saldo?.valor || 0;
-      }
-
-      this.apostasUsuarioRodada = apostas as any[];
-
-      // Lógica de visualização: se já tem aposta, abre para edição
-      if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
-        this.isReadOnly = false;
-        const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
-        if (inicial && inicial.id) {
-          this.onApostaSelected(inicial.id);
+        if (apostador) {
+          this.userId = apostador.id;
+          this.apostadorSaldo = apostador.saldo?.valor || 0;
         }
-      } else {
-        // Se o Jeff não tem aposta ainda, carregamos os jogos "limpos" da rodada
-        this.isReadOnly = true;
-        this.loadJogosSemPalpites();
-      }
-    }),
-    finalize(() => this.isLoading = false)
-  );
-}
+
+        this.apostasUsuarioRodada = apostas as any[];
+
+        if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
+          this.isReadOnly = false;
+          const inicial = this.apostasUsuarioRodada.find(a => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
+          if (inicial && inicial.id) {
+            this.onApostaSelected(inicial.id);
+          }
+        } else {
+          this.isReadOnly = true;
+          this.loadJogosSemPalpites();
+        }
+      }),
+      finalize(() => this.isLoading = false)
+    );
+  }
 
   private extrairDiaSemana(dataStr: string): string {
     if (!dataStr) return '';
@@ -231,57 +225,47 @@ private loadAllIntegratedData(): Observable<any> {
     });
   }
 
-onApostaSelected(apostaId: string): void {
-  this.apostaSelecionadaId = apostaId;
-  
-  // 1. Chamamos o novo endpoint que você criou no Backend e no Service
-  this.apostaService.getApostasParaEdicao(this.rodadaId!, apostaId).subscribe({
-    next: (res) => {
-      if (res.success && res.data) {
-        this.apostaAtual = undefined;
-        this.palpites.clear();
-        this.jogosDaApostaAtual = [];
+  onApostaSelected(apostaId: string): void {
+    this.apostaSelecionadaId = apostaId;
+    this.apostaService.getApostasParaEdicao(this.rodadaId!, apostaId).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.apostaAtual = undefined;
+          this.palpites.clear();
+          this.jogosDaApostaAtual = [];
 
-        setTimeout(() => {
-          // 2. Tratamento para Preservação de Referência do .NET ($values)
-          const listaPalpites = (res.data as any)?.$values || res.data;
-          
-          // 3. Define a aposta atual (buscando no array local apenas para metadados como podeEditar)
-          const apostaLocal = this.apostasUsuarioRodada.find(a => a.id === apostaId);
-          this.apostaAtual = { ...apostaLocal, podeEditar: apostaLocal?.podeEditar === true };
+          setTimeout(() => {
+            const listaPalpites = (res.data as any)?.$values || res.data;
+            const apostaLocal = this.apostasUsuarioRodada.find(a => a.id === apostaId);
+            this.apostaAtual = { ...apostaLocal, podeEditar: apostaLocal?.podeEditar === true };
 
-          listaPalpites.forEach((p: any) => {
-            // 4. Preenche o formulário usando os nomes do DTO de Edição (C#)
-            this.palpites.push(this.fb.group({
-              id: [p.id],
-              jogoId: [p.idJogo], // Nome no ApostaJogoEdicaoDto
-              placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
-              placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
-            }));
+            listaPalpites.forEach((p: any) => {
+              this.palpites.push(this.fb.group({
+                id: [p.id],
+                jogoId: [p.idJogo],
+                placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
+                placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
+              }));
 
-            // 5. NORMALIZAÇÃO: Mapeia o DTO de Edição para as variáveis do HTML
-            this.jogosDaApostaAtual.push({
-              ...p,
-              equipeCasaNome: p.equipeMandante, // Mapeia EquipeMandante do DTO
-              equipeVisitanteNome: p.equipeVisitante,
-              equipeCasaEscudoUrl: p.escudoMandante || 'logobolao.png',
-              equipeVisitanteEscudoUrl: p.escudoVisitante || 'logobolao.png',
-              estadioNome: p.estadioNome || 'Estádio não informado',
-              dataHora: p.dataJogo,
-              diaSemana: p.diaSemana
+              this.jogosDaApostaAtual.push({
+                ...p,
+                equipeCasaNome: p.equipeMandante,
+                equipeVisitanteNome: p.equipeVisitante,
+                equipeCasaEscudoUrl: p.escudoMandante || 'logobolao.png',
+                equipeVisitanteEscudoUrl: p.escudoVisitante || 'logobolao.png',
+                estadioNome: p.estadioNome || 'Estádio não informado',
+                dataHora: p.dataJogo,
+                diaSemana: p.diaSemana
+              });
             });
-          });
-          
-          this.apostaForm.markAsPristine();
-        }, 50);
+            this.apostaForm.markAsPristine();
+          }, 50);
+        }
       }
-    },
-    error: (err) => console.error('Erro ao carregar dados recheados:', err)
-  });
-}
+    });
+  }
 
-
-validarRegraMinima(): boolean {
+  validarRegraMinima(): boolean {
     if (!this.palpites || this.palpites.length === 0) return false;
     const valores = this.palpites.getRawValue();
     let contador = 0;
@@ -292,97 +276,55 @@ validarRegraMinima(): boolean {
     return contador >= 3;
   }
 
-  /*
-  criarNovaApostaAvulsa(): void {
-  // 1. Define o custo real que será enviado (Proteção contra valor 0)
-  const custoFinal = this.custoAposta > 0 ? this.custoAposta : 10;
+  async criarNovaAposta() {
+    // 1. ✅ BLOQUEIO DE SEGURANÇA PARA VISITANTES
+    if (!this.authService.estaLogado()) {
+      this.snackBar.open('🚀 Cadastre-se para registrar palpites reais!', 'CRIAR CONTA', {
+        duration: 5000,
+        panelClass: ['snackbar-info']
+      }).onAction().subscribe(() => {
+        this.router.navigate(['/auth/register']);
+      });
+      return; // ✅ Impede abertura do confirm/dialog
+    }
 
-  // 2. Validação de saldo baseada no custo real
-  if (this.apostadorSaldo !== null && this.apostadorSaldo < custoFinal) {
-    this.showSnackBar('Saldo insuficiente para criar uma nova cartela.', 'Fechar', 'warning');
-    return;
-  }
+    // 2. ✅ SUBSTITUIÇÃO DO CONFIRM PELO MATDIALOG
+    const dialogRef = this.dialog.open(ConfirmacaoApostaDialogComponent, {
+      width: '380px',
+      data: { valor: 10.00, rodada: this.rodadaId },
+      panelClass: 'dark-dialog-container' // ✅ Mantém o tema escuro
+    });
 
-  const request: CriarApostaAvulsaRequestDto = {
-    campeonatoId: this.campeonatoId || '',
-    rodadaId: this.rodadaId!,
-    apostadorId: this.userId!,
-    custoAposta: custoFinal // Garante valor > 0 para o backend
-  };
-
-  this.isSaving = true;
-  this.apostaService.criarNovaApostaAvulsa(request).pipe(
-    finalize(() => this.isSaving = false)
-  ).subscribe({
-    next: (res) => {
-      if (res.success) {
-        this.showSnackBar('Aposta criada e valor debitado!', 'Fechar', 'success');
-        
-        // 3. Atualiza o saldo local usando o custoFinal que foi de fato debitado
-        if (this.apostadorSaldo !== null) {
-          this.apostadorSaldo -= custoFinal;
-        }
-
-        // 4. Recarrega os dados e foca na nova aposta
-        this.loadAllIntegratedData().subscribe(() => {
-          if (res.data?.id) {
-            this.selecionarApostaParaEdicao(res.data.id);
-          }
-        });
-      } else {
-        this.showSnackBar(res.message || 'Erro ao criar aposta.', 'Fechar', 'error');
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.executarCriacaoAposta();
       }
-    },
-    error: (err) => {
-      console.error('Erro na criação:', err);
-      this.showSnackBar('Erro de comunicação com o servidor.', 'Fechar', 'error');
-    }
-  });
-}
-*/
-
-  selecionarApostaParaEdicao(apostaId: string): void {
-    const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
-    if (aposta) {
-      this.onApostaSelected(aposta.id);
-      setTimeout(() => {
-        if (this.apostaAtual) this.apostaAtual.podeEditar = true;
-        document.getElementById('grid-palpites')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
+    });
   }
 
-async criarNovaAposta() {
-  const mensagem = "Realmente deseja criar uma nova aposta avulsa para esta Rodada, no valor de R$ 10,00?";
-  if (!confirm(mensagem)) return;
+  private executarCriacaoAposta(): void {
+    this.loading = true;
+    const request: CriarApostaAvulsaRequestDto = {
+      campeonatoId: this.campeonatoId || '',
+      rodadaId: this.rodadaId!,
+      apostadorId: this.userId!,
+      custoAposta: 10
+    };
 
-  this.loading = true; // Ativa a trava de clique duplo
-
-  // CORREÇÃO: Usando 'this.' para referenciar as propriedades da classe
-  const request: CriarApostaAvulsaRequestDto = {
-    campeonatoId: this.campeonatoId || '',
-    rodadaId: this.rodadaId!,
-    apostadorId: this.userId!, // No Jeff e Zé, usamos o ID recuperado no loadAllIntegratedData
-    custoAposta: 10
-  };
-
-  this.apostaService.criarNovaApostaAvulsa(request).subscribe({
-    next: (res) => {
-      this.showSnackBar("Aposta criada com sucesso!", 'Fechar', 'success');
-      
-      // RESET DO GRID: Limpa palpites na memória antes de recarregar
-      this.palpites.clear();
-      this.jogosDaApostaAtual = [];
-      
-      this.loadAllIntegratedData().subscribe();
-    },
-    error: (err) => {
-      this.loading = false;
-      this.showSnackBar("Erro ao criar aposta.", 'Fechar', 'error');
-    },
-    complete: () => this.loading = false
-  });
-}
+    this.apostaService.criarNovaApostaAvulsa(request).subscribe({
+      next: () => {
+        this.showSnackBar("Aposta criada com sucesso!", 'Fechar', 'success');
+        this.palpites.clear();
+        this.jogosDaApostaAtual = [];
+        this.loadAllIntegratedData().subscribe();
+      },
+      error: () => {
+        this.loading = false;
+        this.showSnackBar("Erro ao criar aposta.", 'Fechar', 'error');
+      },
+      complete: () => this.loading = false
+    });
+  }
 
   salvarApostas(): void {
     if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar) return;
@@ -403,11 +345,11 @@ async criarNovaAposta() {
     this.apostaService.salvarApostas(dadosParaSalvar).subscribe({
       next: (res) => {
         if (res.success) {
-          alert("Palpites salvos com sucesso!");
+          this.showSnackBar("Palpites salvos com sucesso!");
           this.loadAllIntegratedData().subscribe();
         }
       },
-      error: () => alert("Erro ao conectar com o servidor.")
+      error: () => this.showSnackBar("Erro ao salvar palpites.", 'Fechar', 'error')
     });
   }
 

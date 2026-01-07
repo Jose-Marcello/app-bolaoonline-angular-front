@@ -13,6 +13,8 @@ export interface ApostaRodadaDto {
   rodadaId: string;
   identificadorAposta: string | null;
   podeEditar: boolean;
+  // Data em que o registro foi criado (Adesão ou Clique em Nova Avulsa)
+  dataCriacao: Date;
   dataHoraSubmissao: string | null;
   ehApostaCampeonato: boolean;
   ehApostaIsolada: boolean;

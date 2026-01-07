@@ -23,6 +23,7 @@ export class ApostadorService {
     );
   }
 
+
   getPontuacaoTotalDoApostador(campeonatoId: string, apostadorId: string): Observable<ApiResponse<number>> {
     const url = `${environment.apiUrl}/api/ApostadorCampeonato/GetPontuacaoTotalDoApostador?campeonatoId=${campeonatoId}&apostadorId=${apostadorId}`;
     return this.http.get<ApiResponse<number>>(url).pipe(
