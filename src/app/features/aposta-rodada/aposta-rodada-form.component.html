@@ -11,15 +11,16 @@
   </div>
   <div style="background: #020617; border: 1px solid #334155; border-radius: 6px; padding: 10px; text-align: center;">
     <h1 style="font-size: 11px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; margin: 0; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-      {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO' }} 
+      {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO' }}
     </h1>
   </div>
 </div>
 
 <div style="padding: 12px; background: #94a3b8; min-height: 100vh; display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px;">
+  
   <div style="background: #020617; border-radius: 12px; border: 1px solid #475569; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
     <div style="padding: 12px; border-bottom: 1px solid #1e293b; background: #0f172a;">
-      <h3 style="font-size: 12px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; font-style: italic;">1. Seleção de Rodada em Aposta</h3>
+      <h3 style="font-size: 12px; font-weight: 900; color: white; text-transform: uppercase; margin: 0; font-style: italic;">1. Rodadas em Aposta</h3>
     </div>
     <div style="padding: 12px; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;">
       <div *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)"
@@ -52,76 +53,64 @@
     </div>
   </div>
 
- <button mat-raised-button 
-        class="btn-criar-avulsa-custom"
-        [disabled]="loading" 
-        (click)="criarNovaAposta()">
-  
-  <mat-icon *ngIf="!loading">add_shopping_cart</mat-icon>
-  <mat-spinner *ngIf="loading" diameter="20" class="spinner-branco"></mat-spinner>
-  
-  <span class="texto-botao">
-    {{ loading ? 'PROCESSANDO...' : 'CRIAR NOVA APOSTA AVULSA' }}
-  </span>
-</button>
+  <button mat-raised-button class="btn-criar-avulsa-custom" [disabled]="loading" (click)="criarNovaAposta()">
+    <mat-icon *ngIf="!loading">add_shopping_cart</mat-icon>
+    <mat-spinner *ngIf="loading" diameter="20" class="spinner-branco"></mat-spinner>
+    <span class="texto-botao">{{ loading ? 'PROCESSANDO...' : 'CRIAR NOVA APOSTA AVULSA' }}</span>
+  </button>
 
   <div *ngIf="jogosDaApostaAtual.length > 0" style="width: 100%; display: flex; justify-content: center; margin-top: 32px; position: relative; z-index: 20; margin-bottom: -4px;">
-   <div style="width: 100%; background: #334155; border-bottom: 3px solid #1e293b; border-radius: 12px 12px 0 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; font-style: italic;">Visualizando -></span>
-      <h2 style="font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; margin: 0;">{{ apostaAtual?.identificadorAposta || 'CONFERIR CONFRONTOS' }}</h2>
-    </div>
-    <div [style.background]="apostaAtual?.podeEditar ? '#064e3b' : '#1e293b'" style="padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
-      <span style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase;">{{ apostaAtual?.podeEditar ? 'EDIÇÃO' : 'CONSULTA' }}</span>
+    <div style="width: 100%; background: #334155; border-bottom: 3px solid #1e293b; border-radius: 12px 12px 0 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; font-style: italic;">Visualizando -></span>
+        <h2 style="font-size: 16px; font-weight: 900; color: white; text-transform: uppercase; margin: 0;">{{ apostaAtual?.identificadorAposta || 'CONFERIR CONFRONTOS' }}</h2>
+      </div>
+      <div [style.background]="apostaAtual?.podeEditar ? '#064e3b' : '#1e293b'" style="padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
+        <span style="font-size: 10px; font-weight: 900; color: white; text-transform: uppercase;">{{ apostaAtual?.podeEditar ? 'EDIÇÃO' : 'CONSULTA' }}</span>
+      </div>
     </div>
   </div>
-</div>
 
   <div *ngIf="jogosDaApostaAtual.length > 0" style="width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
     <form [formGroup]="apostaForm" style="padding: 16px; padding-top: 24px;">
       <div formArrayName="palpites" style="display: flex; flex-direction: column; gap: 18px;">
-        <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i" 
+        <div *ngFor="let ctrl of palpites.controls; let i = index" [formGroupName]="i"
              style="background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 14px;">
           
           <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
              <p style="font-size: 14px; font-weight: 900; color: #818cf8; text-transform: uppercase; margin: 0;">
-                 {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ jogosDaApostaAtual[i]?.dataHora | date:'dd/MM' }} 
-                <span *ngIf="jogosDaApostaAtual[i]?.dataHora">ÀS {{ jogosDaApostaAtual[i]?.dataHora | date:'HH:mm' }}</span>
+                {{ jogosDaApostaAtual[i]?.diaSemana }}, {{ (jogosDaApostaAtual[i]?.dataHora || jogosDaApostaAtual[i]?.dataJogo) | date:'dd/MM' }}
+                <span *ngIf="jogosDaApostaAtual[i]?.dataHora">ÀS {{ (jogosDaApostaAtual[i]?.dataHora || jogosDaApostaAtual[i]?.dataJogo) | date:'HH:mm' }}</span>
              </p>
-  
-             <p *ngIf="jogosDaApostaAtual[i]?.estadioNome" 
-                 style="font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin: 4px 0 0 0;">
-                    {{ jogosDaApostaAtual[i]?.estadioNome }}
+             <p *ngIf="jogosDaApostaAtual[i]?.estadioNome" style="font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; margin: 4px 0 0 0;">
+                {{ jogosDaApostaAtual[i]?.estadioNome }}
              </p>
           </div>
+
           <div style="display: grid; grid-template-columns: 1fr 130px 1fr; align-items: center; gap: 8px;">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-            
-              <img [src]="baseUrlImagens + (jogosDaApostaAtual[i]?.equipeCasaEscudoUrl || 'logo-bolao.png')" 
-                   onerror="this.src='assets/images/logo-bolao.png'" 
+              <img [src]="baseUrlImagens + (jogosDaApostaAtual[i]?.equipeCasaEscudoUrl || jogosDaApostaAtual[i]?.escudoMandante || 'logobolao.png')"
+                   onerror="this.src='assets/images/logobolao.png'"
                    style="width: 48px; height: 48px; object-fit: contain;">
-
               <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase;">
-                {{ jogosDaApostaAtual[i]?.equipeCasaNome }}
+                {{ jogosDaApostaAtual[i]?.equipeCasaNome || jogosDaApostaAtual[i]?.equipeMandante }}
               </span>
             </div>
 
             <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
               <input type="number" formControlName="placarApostaCasa" [readonly]="!apostaAtual?.podeEditar"
-                     style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;"> 
-              <span style="color: rgba(255,255,255,0.4); font-size: 18px; font-weight: 900;">X</span> 
+                     style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;">
+              <span style="color: rgba(255,255,255,0.4); font-size: 18px; font-weight: 900;">X</span>
               <input type="number" formControlName="placarApostaVisita" [readonly]="!apostaAtual?.podeEditar"
                      style="width: 55px; height: 48px; background: white; color: #020617; text-align: center; font-size: 26px; font-weight: 900; border-radius: 8px; border: none;">
             </div>
 
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-              
-             <img [src]="baseUrlImagens + (jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl || 'logo-bolao.png')" 
-                  onerror="this.src='assets/images/logo-bolao.png'" 
-                  style="width: 48px; height: 48px; object-fit: contain;">
-             
+              <img [src]="baseUrlImagens + (jogosDaApostaAtual[i]?.equipeVisitanteEscudoUrl || jogosDaApostaAtual[i]?.escudoVisitante || 'logobolao.png')"
+                   onerror="this.src='assets/images/logobolao.png'"
+                   style="width: 48px; height: 48px; object-fit: contain;">
               <span style="font-size: 12px; font-weight: 900; color: white; text-align: center; text-transform: uppercase;">
-                {{ jogosDaApostaAtual[i]?.equipeVisitanteNome }}
+                {{ jogosDaApostaAtual[i]?.equipeVisitanteNome || jogosDaApostaAtual[i]?.equipeVisitante }}
               </span>
             </div>
           </div>
@@ -129,7 +118,7 @@
       </div>
 
       <div *ngIf="apostaAtual?.podeEditar" style="margin-top: 24px; padding-top: 20px; border-top: 2px solid #1e293b; display: flex; flex-direction: column; gap: 12px; align-items: center;">
-        <button (click)="salvarApostas()" 
+        <button (click)="salvarApostas()"
                 [disabled]="apostaForm.invalid || !validarRegraMinima()"
                 [style.background]="(apostaForm.invalid || !validarRegraMinima()) ? '#334155' : '#059669'"
                 style="width: 100%; max-width: 320px; height: 54px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; color: white;">

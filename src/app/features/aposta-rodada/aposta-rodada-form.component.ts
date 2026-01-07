@@ -71,6 +71,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
 
   apostaForm!: FormGroup;
   baseUrlImagens: string = environment.imagesUrl;
+  
   private subscriptions = new Subscription();
 
   constructor(
@@ -230,32 +231,57 @@ private loadAllIntegratedData(): Observable<any> {
     });
   }
 
-  onApostaSelected(apostaId: string): void {
-    this.apostaSelecionadaId = apostaId;
-    const aposta = this.apostasUsuarioRodada.find(a => a.id === apostaId);
-    if (aposta) {
-      this.apostaAtual = undefined;
-      this.palpites.clear();
-      this.jogosDaApostaAtual = [];
-      setTimeout(() => {
-        this.apostaAtual = { ...aposta, podeEditar: aposta.podeEditar === true };
-        const pCollection = aposta.palpites as any;
-        const listaPalpites = pCollection?.$values || (Array.isArray(pCollection) ? pCollection : []);
-        listaPalpites.forEach((p: any) => {
-          this.palpites.push(this.fb.group({
-            id: [p.id],
-            jogoId: [p.jogoId || p.jogo?.id],
-            placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
-            placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
-          }));
-          this.jogosDaApostaAtual.push(p.jogo);
-        });
-        this.apostaForm.markAsPristine();
-      }, 50);
-    }
-  }
+onApostaSelected(apostaId: string): void {
+  this.apostaSelecionadaId = apostaId;
+  
+  // 1. Chamamos o novo endpoint que você criou no Backend e no Service
+  this.apostaService.getApostasParaEdicao(this.rodadaId!, apostaId).subscribe({
+    next: (res) => {
+      if (res.success && res.data) {
+        this.apostaAtual = undefined;
+        this.palpites.clear();
+        this.jogosDaApostaAtual = [];
 
-  validarRegraMinima(): boolean {
+        setTimeout(() => {
+          // 2. Tratamento para Preservação de Referência do .NET ($values)
+          const listaPalpites = (res.data as any)?.$values || res.data;
+          
+          // 3. Define a aposta atual (buscando no array local apenas para metadados como podeEditar)
+          const apostaLocal = this.apostasUsuarioRodada.find(a => a.id === apostaId);
+          this.apostaAtual = { ...apostaLocal, podeEditar: apostaLocal?.podeEditar === true };
+
+          listaPalpites.forEach((p: any) => {
+            // 4. Preenche o formulário usando os nomes do DTO de Edição (C#)
+            this.palpites.push(this.fb.group({
+              id: [p.id],
+              jogoId: [p.idJogo], // Nome no ApostaJogoEdicaoDto
+              placarApostaCasa: [p.placarApostaCasa, [Validators.required]],
+              placarApostaVisita: [p.placarApostaVisita, [Validators.required]]
+            }));
+
+            // 5. NORMALIZAÇÃO: Mapeia o DTO de Edição para as variáveis do HTML
+            this.jogosDaApostaAtual.push({
+              ...p,
+              equipeCasaNome: p.equipeMandante, // Mapeia EquipeMandante do DTO
+              equipeVisitanteNome: p.equipeVisitante,
+              equipeCasaEscudoUrl: p.escudoMandante || 'logobolao.png',
+              equipeVisitanteEscudoUrl: p.escudoVisitante || 'logobolao.png',
+              estadioNome: p.estadioNome || 'Estádio não informado',
+              dataHora: p.dataJogo,
+              diaSemana: p.diaSemana
+            });
+          });
+          
+          this.apostaForm.markAsPristine();
+        }, 50);
+      }
+    },
+    error: (err) => console.error('Erro ao carregar dados recheados:', err)
+  });
+}
+
+
+validarRegraMinima(): boolean {
     if (!this.palpites || this.palpites.length === 0) return false;
     const valores = this.palpites.getRawValue();
     let contador = 0;
