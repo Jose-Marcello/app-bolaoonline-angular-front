@@ -35,6 +35,7 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
   rodadaId: string | null = null;
   apostadorCampeonatoId: string | null = null;
   userId: string | null = null;
+  apostaSelecionadaId: string | null = null;
 
   rodadasCorrentes: any[] = [];
   rodadaSelecionada: any = null;
@@ -75,6 +76,12 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
 
   loadAllIntegratedData(): Observable<any> {
     this.isLoading = true;
+    
+    // Reset inicial para evitar resquícios visuais de rodadas anteriores
+    this.apostasUsuarioRodada = [];
+    this.jogosDaApostaAtual = [];
+    this.apostaSelecionadaId = null;
+
     return forkJoin({
       rodadas: this.rodadaService.getRodadasCorrentes(this.campeonatoId!).pipe(
         map(res => (res.data as any)?.$values || res.data || []),
@@ -85,27 +92,55 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
         catchError(() => of(null))
       ),
       apostas: this.apostaService.obterApostasPorRodada(this.rodadaId!, this.apostadorCampeonatoId).pipe(
-        map(res => (res.data as any)?.$values || res.data || []),
-        catchError(() => of([]))
-      )
+  map(res => {
+    // 1. Extrai os dados tratando o formato do JSON (com ou sem $values)
+    const dados = (res.data as any)?.$values || res.data || [];
+    
+    // 2. Filtro radical: Só aceita apostas com ID válido e que não seja o GUID vazio
+    return dados.filter((a: any) => 
+      a.id && a.id !== '00000000-0000-0000-0000-000000000000'
+    );
+  }),
+  catchError(() => of([])) // catchError fica fora do map, tratando o pipe
+)
     }).pipe(
       tap(({ rodadas, apostador, apostas }) => {
         this.rodadasCorrentes = rodadas;
         this.rodadaSelecionada = this.rodadasCorrentes.find(r => r.id === this.rodadaId) || this.rodadasCorrentes[0];
         
-        if (apostador) this.userId = apostador.id;
+        if (apostador) {
+          this.userId = apostador.id;
+        }
+
         this.apostasUsuarioRodada = apostas;
 
-        if (this.apostasUsuarioRodada.length > 0) {
+        // LÓGICA DE TRATAMENTO PARA RODADAS SEM APOSTA (Ex: Jeff na Rodada 1)
+        if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
+          // CASO 1: EXISTEM APOSTAS
+          // Prioriza a aposta do campeonato, senão pega a primeira da lista
           const inicial = this.apostasUsuarioRodada.find((a: any) => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
           this.onApostaSelected(inicial.id);
         } else {
+          // CASO 2: NÃO EXISTEM APOSTAS (Modo Consulta Pura)
           this.apostaAtual = null;
-          this.carregarResultadosApenasConsulta().subscribe(jogos => this.jogosDaApostaAtual = jogos);
+          this.apostaSelecionadaId = null; // Garante que nenhuma cartela fantasma seja marcada
+          
+          // Carrega apenas os jogos e resultados oficiais para o grid
+          this.carregarResultadosApenasConsulta().subscribe({
+            next: (jogos) => {
+              this.jogosDaApostaAtual = jogos;
+              this.isLoading = false;
+            },
+            error: () => {
+              this.isLoading = false;
+            }
+          });
         }
-      })
+      }),
+      // Finaliza o loading caso o fluxo principal termine (com ou sem erro)
+      finalize(() => this.isLoading = false)
     );
-  }
+}
 
   onApostaSelected(apostaId: string): void {
     this.apostaAtual = this.apostasUsuarioRodada.find((a: any) => a.id === apostaId);

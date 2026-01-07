@@ -57,6 +57,16 @@
       </div>
     </div>
 
+    <div *ngIf="apostasUsuarioRodada.length === 0" 
+     class="bg-[#0f172a] rounded-xl border border-[#1e293b] overflow-hidden shadow-xl mb-4">
+  <div class="p-4 text-center">
+    <span class="text-[11px] font-black text-indigo-400 uppercase tracking-widest leading-relaxed">
+      Nenhuma aposta realizada para esta rodada. <br>
+      <span class="text-slate-400 font-bold italic lowercase">Exibindo apenas resultados oficiais.</span>
+    </span>
+  </div>
+</div>
+
     <div *ngIf="apostaAtual || rodadaId" class="grid grid-cols-2 gap-3">
       <button (click)="navegarParaRankingRodada()" class="btn-nova-cartela-dash !bg-blue-600 !m-0 shadow-lg !text-[10px]">
         <mat-icon>leaderboard</mat-icon> RANKING RODADA
@@ -75,11 +85,13 @@
             {{ apostaAtual ? apostaAtual.identificadorAposta : 'CONSULTA GERAL' }}
           </h2>
         </div>
+
         <div class="bg-slate-900/50 px-3 py-1 rounded border border-white/10">
           <span class="text-[10px] font-black text-emerald-400 uppercase">
             {{ apostaAtual ? apostaAtual.pontuacaoTotalRodada + ' PONTOS' : 'NÃO JOGOU' }}
           </span>
         </div>
+
       </div>
       
       <div class="p-3 space-y-4">
