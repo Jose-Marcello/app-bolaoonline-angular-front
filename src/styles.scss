@@ -1,13 +1,14 @@
-/* 1. DIRETIVAS DE INJEÇÃO DO TAILWIND */
+/* 1. DIRETIVAS DE BASE */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 2. ESTILOS GLOBAIS - PADRÃO DO ANGULAR MATERIAL */
-
-/* 👈 ESTA LINHA ESTAVA FALTANDO! */
-/* Adiciona o tema de cores pré-construído (Indigo/Pink) para os componentes Mat- */
 @import '@angular/material/prebuilt-themes/indigo-pink.css'; 
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* 2. RESET E FUNDO GLOBAL */
+html, body { 
+  height: 100% !important; 
+  margin: 0 !important; 
+  background-color: #020617 !important; 
+  font-family: 'Roboto', sans-serif !important;
+}

@@ -1,3 +1,50 @@
+
+/* --- ADICIONAR ESTE BLOCO PARA O SCROLL HORIZONTAL --- */
+
+.campeonatos-wrapper {
+  margin: 15px 0;
+  width: 100%;
+  overflow: hidden; /* Garante que nada vaze para fora do layout principal */
+}
+
+.campeonatos-slider {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important; /* OBRIGA os cards a ficarem em uma única linha */
+  
+  overflow-x: auto !important;   /* Habilita o scroll horizontal */
+  overflow-y: hidden !important;
+  
+  gap: 12px;
+  padding: 10px 5px;
+  
+  /* Suavidade para o toque no Samsung A56 */
+  -webkit-overflow-scrolling: touch; 
+  scroll-behavior: smooth;
+
+  /* Esconde a barra de rolagem (visual de App nativo) */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none; 
+}
+
+.card-campeonato {
+  /* O PULO DO GATO: flex-shrink 0 impede o card de encolher */
+  flex: 0 0 145px !important; 
+  width: 145px !important;
+  
+  background-color: #1e293b;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #334155;
+  
+  transition: transform 0.2s;
+  &:active { transform: scale(0.95); }
+}
+
+
+
 .card-saldo-final {
   background-color: #0f172a !important; /* Grafite Escuro */
   border-radius: 16px;

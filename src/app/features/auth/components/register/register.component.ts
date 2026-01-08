@@ -41,12 +41,11 @@ export class RegisterComponent implements OnInit {
   isLoading = false;
   errorMessage: string | null = null;
   
-  // VARIÁVEIS DE VISIBILIDADE (O que causou o erro)
   hidePassword = true;
   hideConfirmPassword = true;
   
   notifications: any[] = [];
-  profilePhotoPreview: string | ArrayBuffer | null = null;
+  profilePhotoPreview: string | ArrayBuffer | null | undefined = null;
   selectedFile: File | null = null;
   isRegistered = false;
   registrationSuccess = false;    
@@ -77,7 +76,6 @@ export class RegisterComponent implements OnInit {
     }, { validators: this.passwordMatchValidator });
   }
 
-  // MÉTODOS DE VISIBILIDADE CORRIGIDOS
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
   }
@@ -116,19 +114,35 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(registrationData).pipe(
         finalize(() => this.isLoading = false)
-    ).subscribe(
-        (response: ApiResponse<RegisterResponse>) => {
+    ).subscribe({
+        next: (response: ApiResponse<RegisterResponse>) => {
             if (response.success) {
+
+               // 🔍 O RAIO-X: Isso vai mostrar exatamente a estrutura do seu JSON no console
+               console.log('--- ESTRUTURA COMPLETA DO RESPONSE.DATA ---', response.data);
+
                 if (this.isMockEnvironment) { 
                     const userId = response.data?.userId;
-                    const token = (response.data as any)?.emailToken; 
+              
+                    // PEGUE O CÓDIGO LONGO QUE APARECEU NO SEU LOG DO SERVIDOR (CONSOLE DO C#)
+                    // E COLE AQUI ENTRE ASPAS.  ** PROVISÓRIO ** 
+                    const tokenFake = "CfDJ8MpoZ3KcRFJElHyc9%2BQtwO8whrar3ysYG07RyJ%2BzI3bR6TePHTt6vqHID9XhmB1uJjy6RvRsnBEC6RgBZjBAnFf%2BTIBqaL0uZH7bASYFTFv1IimZSzVJ9CFNOHbWeMoW0Jadi7rMHX%2F%2BIzHFINtOPRQq5J4T8cxDSYRo%2FG2buIoRYkMw5T7ZenLHl6TnpM5Pv7vkZQV%2F4QOHExtKmmIvqMe1wMeVatDHEBCCIOxKPQyD%2F%2FLyQ3x2KhBHte4I1w6L4w%3D%3D";
+
                     const email = this.registeredUserEmail;
 
-                    // Link com stringcode para o C# funcionar
-                    const linkConfirmacao = `${window.location.origin}/api/account/confirm-email?userId=${userId}&stringcode=${token}`;
+                    const token = (response.data as any)?.code || 
+                                  (response.data as any)?.emailToken || 
+                                  (response.data as any)?.token;
+
+                    const linkConfirmacao = `https://localhost:5001/api/account/ConfirmEmail?userId=${userId}&code=${tokenFake}`;
+
+                    console.log('Ambiente MOCK - Link Gerado:', linkConfirmacao);
 
                     this.mockEmailService.openMockEmailDialog(email, linkConfirmacao, 'confirm').subscribe({
-                      next: () => this.router.navigate(['/auth/login'])
+                        next: () => {
+                            this.notificationsService.showNotification('E-mail enviado! Verifique a simulação para logar.', 'sucesso');
+                            this.router.navigate(['/auth/login']);
+                        }
                     });
                 } else {
                     this.registrationSuccess = true; 
@@ -138,24 +152,24 @@ export class RegisterComponent implements OnInit {
                     }
                 }
             } else {
-                let errorMsg = response.message || 'Erro no registro.';
-                this.notificationsService.showNotification(errorMsg, 'erro');
+                this.notificationsService.showNotification(response.message || 'Erro no registro.', 'erro');
             }
         },
-        (errorResponse: HttpErrorResponse) => {
-            this.notificationsService.showNotification('Erro de conexão.', 'erro');
+        error: (error: HttpErrorResponse) => {
+            this.notificationsService.showNotification('Erro de conexão com o servidor.', 'erro');
         }
-    );
-  }
+    });
+  } // ✅ Chave de fechamento do onSubmit() que estava faltando
 
-  // MÉTODOS AUXILIARES
   private uploadProfilePhoto(userId: string): void {
     if (!this.selectedFile) return;
     this.fileUploadService.uploadFile(this.selectedFile).subscribe();
   }
 
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value ? null : { 'mismatch': true };
+  passwordMatchValidator(g: AbstractControl) {
+    const password = g.get('password')?.value;
+    const confirmPassword = g.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { 'mismatch': true };
   }
 
   onFileSelected(event: Event): void {
@@ -169,7 +183,6 @@ export class RegisterComponent implements OnInit {
   }
 }
 
-// VALIDADORES FORA DA CLASSE
 export function CpfValidator(control: AbstractControl) {
   const rawCpf = (control.value || '').replace(/\D/g, '');
   return rawCpf.length !== 11 ? { 'invalidCpfLength': true } : null;
