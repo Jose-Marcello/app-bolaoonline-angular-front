@@ -1,240 +1,50 @@
-/* ESTILO CONSOLIDADO - LÁZARO V6
-   Blindagem total com :host ::ng-deep para dominar o Angular Material
-*/
-
 :host ::ng-deep {
   .tela-apostas-v6 {
-    background-color: #020617 !important;
-    padding: 16px !important;
-    min-height: 100vh !important;
-    display: block !important;
-    font-family: 'Roboto', sans-serif !important;
+    background: #020617 !important; padding: 16px !important; min-height: 100vh !important; color: #fff;
+    
+    // Agrupando elementos comuns
+    .btn-voltar-v6, .btn-salvar-v6, .btn-novo-amber-v6 { border: none !important; text-transform: uppercase !important; font-weight: 900 !important; cursor: pointer; }
 
-    /* --- 1. CABEÇALHO (VOLTAR E SALDO) --- */
     .header-v6 {
-      .linha-superior {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        margin-bottom: 20px !important;
-      }
-      
-      .btn-voltar-v6 { 
-        background-color: #00a86b !important; 
-        color: #ffffff !important; 
-        border: none !important; 
-        border-radius: 6px !important; 
-        padding: 8px 14px !important; 
-        display: inline-flex !important; 
-        align-items: center !important; 
-        gap: 8px !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
-        span { font-size: 11px !important; font-weight: 800 !important; text-transform: uppercase !important; }
-      }
-
-      .saldo-v6 {
-        text-align: right !important;
-        .label-mini { font-size: 8px !important; color: #94a3b8 !important; text-transform: uppercase !important; display: block; }
-        .valor-v6 { font-size: 14px !important; color: #10b981 !important; font-weight: 900 !important; }
-      }
-
-      .faixa-campeonato-v6 { 
-        background: #1e293b !important; 
-        padding: 10px 12px !important; 
-        border-radius: 10px !important; 
-        border: 1px solid rgba(255, 255, 255, 0.08) !important; 
-        text-align: center !important; 
-        h1 { 
-          font-size: 10px !important; 
-          font-weight: 900 !important; 
-          color: #ffffff !important; 
-          text-transform: uppercase !important; 
-          margin: 0 !important; 
-          letter-spacing: 0.5px !important;
-        } 
-      }
+      .linha-superior { display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 20px !important; }
+      .btn-voltar-v6 { background: #00a86b !important; color: #fff !important; border-radius: 6px !important; padding: 8px 14px !important; font-size: 11px !important; }
+      .valor-v6 { color: #10b981 !important; font-size: 14px !important; }
+      .faixa-campeonato-v6 { background: #1e293b !important; padding: 10px !important; border-radius: 10px !important; text-align: center !important; h1 { font-size: 10px !important; margin: 0 !important; } }
     }
 
-    /* --- 2. SEÇÕES (ESTRUTURA DAS CAIXAS ESCURAS) --- */
     .secao-v6 {
-      background: #0f172a !important; 
-      border-radius: 16px !important; 
-      border: 1px solid rgba(255, 255, 255, 0.05) !important; 
-      margin-top: 24px !important; 
-      overflow: hidden !important;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
-
-      .titulo-secao-v6 { 
-        background: rgba(255, 255, 255, 0.03) !important; 
-        padding: 12px 16px !important; 
-        display: flex !important; 
-        align-items: center !important; 
-        gap: 8px !important; 
-        mat-icon { font-size: 18px !important; color: #818cf8 !important; } 
-        h3 { font-size: 11px !important; color: #94a3b8 !important; font-weight: 900 !important; text-transform: uppercase !important; margin: 0 !important; } 
-      }
+      background: #0f172a !important; border-radius: 16px !important; border: 1px solid rgba(255,255,255,0.05) !important; margin-top: 24px !important;
+      .titulo-secao-v6 { padding: 12px 16px !important; display: flex !important; align-items: center !important; gap: 8px !important; h3 { font-size: 11px !important; color: #94a3b8 !important; margin: 0 !important; } }
     }
 
-    /* --- 3. RODADAS (SCROLL HORIZONTAL COM GLOW) --- */
     .scroll-horizontal-v6 {
-      display: flex !important; 
-      gap: 12px !important; 
-      padding: 16px !important; 
-      overflow-x: auto !important;
-      &::-webkit-scrollbar { display: none !important; }
-
+      display: flex !important; gap: 12px !important; padding: 16px !important; overflow-x: auto !important;
       .item-rodada-v6 {
-        min-width: 85px !important; 
-        padding: 10px !important; 
-        border-radius: 12px !important; 
-        background: #1e293b !important; 
-        border: 2px solid #334155 !important; 
-        text-align: center !important;
-        .num-rodada { display: block; font-size: 20px; font-weight: 900; color: #ffffff; }
-        .txt-rodada, .data-rodada { display: block; font-size: 8px; color: #94a3b8; text-transform: uppercase; }
-
-        &.ativa { 
-          background: #4f46e5 !important; 
-          border-color: #818cf8 !important; 
-          box-shadow: 0 0 15px rgba(79, 70, 229, 0.4) !important;
-          .num-rodada { color: #ffffff !important; }
-          .txt-rodada, .data-rodada { color: #c7d2fe !important; }
-        }
+        min-width: 85px !important; padding: 10px !important; border-radius: 12px !important; background: #1e293b !important; text-align: center !important;
+        .num-rodada { display: block; font-size: 20px; font-weight: 900; }
+        &.ativa { background: #4f46e5 !important; box-shadow: 0 0 15px rgba(79, 70, 229, 0.4) !important; }
       }
     }
 
-    /* --- 4. CARTELAS E BOTÃO AMBER --- */
-    .lista-cartelas-v6 {
-      padding: 16px !important; 
-      display: flex !important; 
-      flex-direction: column !important; 
-      gap: 10px !important;
-
-      .card-cartela-v6 {
-        background: #1e293b !important; 
-        border-radius: 12px !important; 
-        padding: 14px !important; 
-        border: 2px solid transparent !important;
-        display: flex !important; 
-        align-items: center !important;
-
-        &.selecionada { 
-          border-color: #4f46e5 !important; 
-          background: rgba(79, 70, 229, 0.1) !important; 
-          .icon-check { color: #818cf8 !important; }
-        }
-
-        .topo-cartela { 
-          display: flex !important; 
-          align-items: center !important; 
-          width: 100% !important; 
-          gap: 10px !important;
-          .icon-check { font-size: 20px !important; color: #94a3b8 !important; }
-          .id-aposta { font-size: 11px !important; font-weight: 800; color: #ffffff; }
-          .badge-v6 { 
-            margin-left: auto !important; font-size: 8px !important; padding: 4px 8px !important; border-radius: 4px !important; font-weight: 900;
-            &.camp { background: #4f46e5 !important; } 
-            &.avul { background: #d97706 !important; }
-          }
-        }
-      }
+    .card-cartela-v6 {
+      background: #1e293b !important; border-radius: 12px !important; padding: 14px !important; display: flex !important; align-items: center !important; margin: 0 16px 10px !important;
+      &.selecionada { border: 2px solid #4f46e5 !important; background: rgba(79, 70, 229, 0.1) !important; }
     }
 
-    .wrapper-btn { padding: 0 16px 20px 16px !important; display: flex !important; justify-content: center !important; }
-    .btn-novo-v6 { 
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; 
-      color: #ffffff !important; border-radius: 30px !important; padding: 10px 24px !important; 
-      font-weight: 900 !important; border: none !important; display: flex !important; gap: 8px !important;
-      font-size: 11px !important; text-transform: uppercase !important;
-    }
+    .btn-novo-amber-v6 { background: linear-gradient(135deg, #f59e0b, #d97706) !important; color: #000 !important; border-radius: 30px !important; padding: 12px 24px !important; font-size: 11px !important; margin: 10px auto 20px !important; display: flex !important; }
 
-    /* --- 5. FACHADA (BANNER COM DATA DE ENVIO) --- */
-    .banner-fachada-v6 {
-      background: #0f172a !important; 
-      border-radius: 12px !important; 
-      padding: 12px 16px !important; 
-      display: flex !important; 
-      justify-content: space-between !important; 
-      align-items: center !important; 
-      margin-top: 24px !important; 
-      border: 1px solid rgba(255, 255, 255, 0.05) !important;
-
-      .info-principal-v6 {
-        display: flex !important; flex-direction: column !important; gap: 4px !important;
-        .identificador-wrapper {
-          display: flex !important; align-items: center !important; gap: 6px !important;
-          h2 { font-size: 13px !important; color: #ffffff !important; font-weight: 900 !important; margin: 0; text-transform: uppercase; }
-          .seta-v6 { color: #818cf8 !important; font-size: 18px !important; }
-        }
-        .data-envio-v6 {
-          display: flex !important; align-items: center !important; gap: 4px !important;
-          color: #64748b !important; font-size: 9px !important; font-weight: 700 !important;
-          mat-icon { font-size: 12px !important; width: 12px !important; height: 12px !important; }
-        }
-      }
-
-      .badge-status-v6 {
-        font-size: 9px !important; padding: 4px 10px !important; border-radius: 6px !important; font-weight: 900 !important;
-        &.edit { background: rgba(16, 185, 129, 0.2) !important; color: #10b981 !important; border: 1px solid #10b981 !important; }
-      }
-    }
-
-    /* --- 6. GRID DE CONFRONTOS (ESCUDOS E INPUTS) --- */
     .card-confronto-v6 {
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important; 
-      border-radius: 14px !important; padding: 16px !important; margin-top: 12px !important; 
-      border: 1px solid rgba(255, 255, 255, 0.05) !important;
-
-      .info-jogo-v6 { 
-        display: flex !important; flex-direction: column !important; align-items: center !important; margin-bottom: 16px !important;
-        .data-hora-v6 { font-size: 10px !important; color: #818cf8 !important; font-weight: 800 !important; }
-        .estadio-v6 { font-size: 9px !important; color: #64748b !important; font-style: italic !important; }
-      }
-
-      .grid-confronto-v6 {
-        display: flex !important; justify-content: space-between !important; align-items: center !important;
-        .time-v6 { 
-          width: 30% !important; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 6px !important;
-          img { width: 38px !important; height: 38px !important; object-fit: contain !important; }
-          span { font-size: 10px !important; font-weight: 900 !important; color: #ffffff !important; text-align: center !important; }
-        }
-        .placar-v6 {
-          width: 40% !important; display: flex !important; justify-content: center !important; align-items: center !important; gap: 6px !important;
-          input { 
-            width: 48px !important; height: 44px !important; background-color: #ffffff !important; 
-            color: #020617 !important; font-size: 24px !important; font-weight: 900 !important; 
-            text-align: center !important; border-radius: 10px !important; border: 2px solid #4f46e5 !important;
-          }
-          .divisor-v6 { font-size: 18px !important; font-weight: 900 !important; color: #818cf8 !important; }
-        }
-      }
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important; border-radius: 14px !important; padding: 16px !important; margin-top: 12px !important;
+      .grid-confronto-v6 { display: flex !important; justify-content: space-between !important; align-items: center !important; }
+      .time-v6 { width: 30% !important; text-align: center !important; img { width: 38px !important; margin-bottom: 4px !important; } span { font-size: 10px !important; font-weight: 900 !important; } }
+      .placar-v6 { display: flex !important; gap: 4px !important; input { width: 46px !important; height: 44px !important; background: #fff !important; color: #000 !important; border-radius: 8px !important; text-align: center !important; font-size: 22px !important; font-weight: 900 !important; border: 2px solid #4f46e5 !important; } }
     }
 
-    /* --- 7. RODAPÉ E BOTÃO SALVAR (FONTE BLACK) --- */
-  .footer-v6 {
-    margin-top: 30px !important;
-    padding-bottom: 40px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 12px !important;
+    .footer-v6 { 
+      margin-top: 30px !important; padding-bottom: 40px !important; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 12px !important;
+      .data-envio-rodape-v6 { color: #94a3b8 !important; font-size: 11px !important; display: flex !important; align-items: center !important; gap: 6px !important; }
+    }
+    
+    .btn-salvar-v6 { width: 100% !important; height: 56px !important; background: linear-gradient(90deg, #4f46e5, #818cf8) !important; color: #fff !important; border-radius: 14px !important; font-size: 16px !important; }
   }
-
-.data-envio-rodape-v6 {
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  color: #94a3b8 !important; /* Cinza suave para não brigar com o botão */
-  font-size: 11px !important;
-  font-weight: 700 !important;
-}
-
-.data-envio-rodape-v6 mat-icon {
-  font-size: 16px !important;
-  width: 16px !important;
-  height: 16px !important;
-  color: #818cf8 !important; /* Roxo para combinar com o tema */
-}
-    }
-  
 }
