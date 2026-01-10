@@ -8,25 +8,38 @@
           <span class="valor-saldo-verde">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
         </div>
         <div class="flex gap-2">
-          <button (click)="navigateToDepositar()" class="btn-financeiro btn-pix-blue">+ PIX</button>
-          <button (click)="informarEmDesenvolvimento()" class="btn-financeiro btn-sacar-gray">SACAR</button>
+          <button (click)="navigateToDepositar()" class="btn-financeiro btn-pix-blue cursor-pointer">+ PIX</button>
+          <button (click)="informarEmDesenvolvimento()" class="btn-financeiro btn-sacar-gray cursor-pointer">SACAR</button>
         </div>
       </div>
 
       <nav class="menu-navegacao-central" *ngIf="campeonatosDisponiveis?.length > 0">
-        <div class="opcao-menu-item" (click)="navegarParaApostasRodada(campeonatosDisponiveis[0].id)">
+        <div class="opcao-menu-item cursor-pointer" (click)="navegarParaApostasRodada(campeonatosDisponiveis[0].id)">
           <div class="circulo-wrapper icon-apostar"><mat-icon>sports_soccer</mat-icon></div>
           <span class="label-menu">APOSTAR</span>
         </div>
-        <div class="opcao-menu-item" (click)="verRodadasCorrentes(campeonatosDisponiveis[0].id)">
+        <div class="opcao-menu-item cursor-pointer" (click)="verRodadasCorrentes(campeonatosDisponiveis[0].id)">
           <div class="circulo-wrapper icon-resultados"><mat-icon>leaderboard</mat-icon></div>
           <span class="label-menu">RESULTADOS</span>
         </div>
-        <div class="opcao-menu-item" (click)="verRodadasFinalizadas(campeonatosDisponiveis[0].id)">
+        <div class="opcao-menu-item cursor-pointer" (click)="verRodadasFinalizadas(campeonatosDisponiveis[0].id)">
           <div class="circulo-wrapper icon-historico"><mat-icon>history</mat-icon></div>
           <span class="label-menu">HISTÓRICO</span>
         </div>
       </nav>
+
+      <section class="py-2">
+        <div class="rotulo-informativo-amber cursor-pointer" 
+             (click)="navegarParaApostasRodada(campeonatosDisponiveis[0]?.id)">
+          <div class="flex items-center gap-3">
+            <div class="circulo-info"><mat-icon>bolt</mat-icon></div>
+            <p class="texto-rotulo-premium">
+              Aposte no <strong>CAMPEONATO</strong> ou em <strong>RODADA AVULSA</strong> - VEJA AS REGRAS
+            </p>
+          </div>
+          <mat-icon style="color: #fff">keyboard_arrow_right</mat-icon>
+        </div>
+      </section>
 
       <section class="secao-campeonatos-grafite">
         <div class="header-secao-fluxo px-5 mb-2 flex justify-between items-center">
@@ -43,7 +56,7 @@
               
               <div class="card-inner-header">
                 <div class="logo-box-camp">
-                  <img [src]="getCampeonatoLogo(camp.nome)" class="img-camp-logo">
+                  <img [src]="getCampeonatoLogo(camp.nome)" class="img-camp-logo" alt="Logo">
                 </div>
                 <div class="title-box-camp">
                   <h2 class="nome-camp-ouro-normal">{{ camp.nome }}</h2>
@@ -84,7 +97,9 @@
               </div>
 
               <div class="px-4 pb-4" *ngIf="!camp.aderidoPeloUsuario">
-                <button (click)="abrirModalAdesao(camp)" class="btn-aderir-camp">ADERIR AO CAMPEONATO</button>
+                <button (click)="abrirModalAdesao(camp)" class="btn-aderir-camp cursor-pointer">
+                  ADERIR AO CAMPEONATO
+                </button>
               </div>
             </article>
           </div>
@@ -97,6 +112,7 @@
           <img [src]="fotoAtual" class="img-banner-mkt">
         </div>
       </footer>
+
     </div>
   </main>
 </div>

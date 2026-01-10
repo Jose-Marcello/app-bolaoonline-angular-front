@@ -23,9 +23,8 @@ import { ConfirmacaoAdesaoModalComponent } from '../../components/confirmacao-ad
 import { isPreservedCollection } from '../../../shared/models/api-response.model';
 
 // Modelos
-import { CampeonatoDto } from '../../../features/campeonato/models/campeonato-dto.model';
-import { RodadaDto } from '../../../features/rodada/model/rodada-dto.model';
 import { ApostadorDto } from '../../../features/apostador/models/apostador-dto.model';
+import { RodadaDto } from '../../../features/rodada/model/rodada-dto.model';
 
 function unwrap<T>(data: any): T {
   if (!data) return data;
@@ -51,19 +50,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   apostador: ApostadorDto | null = null;
   apostadorSaldo: number | null = null;
   campeonatosDisponiveis: any[] = [];
-  
-  // Objeto que armazena os totais por ID de campeonato
   campeonatoTotais: { [key: string]: any } = {};
-  
   usuarioLogado: boolean = false;
 
-  // Galeria de Marketing
+  // Galeria Marketing
   indiceAtual = 0;
   fotos: string[] = Array.from({ length: 11 }, (_, i) => `assets/marketing/parceiros/EspMar-foto${i + 1}.jpeg`);
   fotoAtual: string = this.fotos[0];
   intervaloGaleria: any;
 
-  // Controle de Arraste (Slider)
+  // Slider Slider
   isMouseDown = false;
   startX = 0;
   scrollLeft = 0;
@@ -103,7 +99,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadDashboardData(): void {
     this.isLoading = true;
-    
     const inicializarFluxo$ = this.usuarioLogado 
       ? this.apostadorService.getDadosApostador().pipe(
           catchError(() => of({ success: false, data: null })),
@@ -128,9 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (campeonatos.length === 0) return of([]);
 
         const detalhamentoTarefas = campeonatos.map(camp => {
-          // Inicialização para evitar erro visual no template
           this.campeonatoTotais[camp.id] = { quantApostadoresVinculados: 0, valorArrecadado: 0, premioAvulsoRodada: 0 };
-
           return forkJoin({
             emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
             correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
@@ -145,13 +138,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
               camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas?.data) || [];
               
               if (res.totais?.data) {
-                const dados = res.totais.data;
+                const d = res.totais.data;
                 this.campeonatoTotais[camp.id] = {
-                  ...dados,
-                  // Mapeamento dos campos do Backend C# para o Template
-                  quantApostadoresVinculados: dados.quantApostadoresVinculados || 0,
-                  valorArrecadado: dados.valorArrecadado || 0,
-                  premioAvulsoRodada: dados.premioAvulsoRodada || 0
+                  quantApostadoresVinculados: d.quantApostadoresVinculados || 0,
+                  valorArrecadado: d.valorArrecadado || 0,
+                  premioAvulsoRodada: d.premioAvulsoRodada || 0
                 };
               }
             })
@@ -165,7 +156,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- MÉTODOS DE APOIO ---
+  // --- LÓGICAS DE NAVEGAÇÃO CORRIGIDAS ---
+// 1. APOSTAR (Corrigido para 'apostas-rodada/:campeonatoId/:rodadaId')
+  navegarParaApostasRodada(campeonatoId: string) {
+    const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
+    
+    if (camp && camp.rodadasEmAposta?.length > 0) {
+      const rodadaId = camp.rodadasEmAposta[0].id;
+      // Navegação exata conforme app.routes.ts
+      this.router.navigate(['/apostas-rodada', campeonatoId, rodadaId]);
+    } else {
+      this.snackBar.open('Não há rodadas abertas para este campeonato.', 'OK', { duration: 3000 });
+    }
+  }
+
+  // 2. RESULTADOS (Corrigido para 'apostas-resultados/:campeonatoId/:rodadaId')
+  verRodadasCorrentes(campeonatoId: string) {
+    const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
+    
+    if (camp && camp.rodadasCorrentes?.length > 0) {
+      const rodadaId = camp.rodadasCorrentes[0].id;
+      this.router.navigate(['/apostas-resultados', campeonatoId, rodadaId]);
+    } else {
+      this.snackBar.open('Não há resultados parciais disponíveis no momento.', 'OK', { duration: 3000 });
+    }
+  }
+
+  // 3. HISTÓRICO (Usando o Ranking do Campeonato como fallback)
+  verRodadasFinalizadas(campeonatoId: string) {
+    // Como no seu arquivo não vi uma rota de 'histórico' pura, 
+    // a melhor ponte é o Ranking do Campeonato:
+    this.router.navigate(['/dashboard/ranking/campeonato', campeonatoId]);
+  }
+
+  // 4. BANNER AMBER (Regras do Bolão)
+  navegarParaRegras() {
+    this.router.navigate(['/dashboard/regrasDoBolao']);
+  }
+  
+  abrirModalAdesao(camp: any) {
+    if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
+    const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
+      width: '400px',
+      data: { campeonato: camp, apostador: this.apostador }
+    });
+    dialogRef.afterClosed().subscribe(result => { if (result) this.loadDashboardData(); });
+  }
+
+  // --- APOIO ---
+
   getCampeonatoLogo(nome: string): string {
     const logos: { [key: string]: string } = {
       'Campeonato Brasileiro 2025 - 1o Turno': 'assets/images/logocampeonatobrasileiro_2025.png',
@@ -182,7 +221,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, 4000);
   }
 
-  // Lógica do Slider de Campeonatos
   startDragging(e: MouseEvent) {
     this.isMouseDown = true;
     this.startX = e.pageX - this.sliderViewport.nativeElement.offsetLeft;
@@ -191,18 +229,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   stopDragging() { this.isMouseDown = false; }
   moveEvent(e: MouseEvent) {
     if (!this.isMouseDown) return;
-    e.preventDefault();
     const x = e.pageX - this.sliderViewport.nativeElement.offsetLeft;
-    const walk = (x - this.startX) * 2; 
-    this.sliderViewport.nativeElement.scrollLeft = this.scrollLeft - walk;
+    this.sliderViewport.nativeElement.scrollLeft = this.scrollLeft - (x - this.startX) * 2;
   }
 
-  // Navegação e Outros
   navigateToDepositar() { this.router.navigate(['/dashboard/financeiro/depositar']); }
   informarEmDesenvolvimento() { this.snackBar.open('Em desenvolvimento!', 'OK', { duration: 3000 }); }
-  
-  navegarParaApostasRodada(id: string) { /* Lógica de navegação */ }
-  verRodadasCorrentes(id: string) { /* Lógica de navegação */ }
-  verRodadasFinalizadas(id: string) { /* Lógica de navegação */ }
-  abrirModalAdesao(camp: any) { /* Lógica de modal */ }
 }
