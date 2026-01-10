@@ -1,111 +1,102 @@
+<div class="min-h-screen dashboard-root">
+  <main class="app-container-moldura mx-auto">
+    <div class="p-4 space-y-6">
 
-<div *ngIf="!usuarioLogado" 
-     style="width: 100%; background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-  
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-      <mat-icon style="color: white; font-size: 18px; width: 18px; height: 18px;">visibility</mat-icon>
-    </div>
-    <div>
-      <p style="margin: 0; color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-        Você está em Modo Consulta
-      </p>
-      <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 9px; font-weight: 500;">
-        Explore as rodadas e conheça nossa plataforma!
-      </p>
-    </div>
-  </div>
-
-  <button (click)="convidarParaCadastro()" 
-          style="background: white; color: #4f46e5; border: none; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"
-          onmouseover="this.style.transform='scale(1.05)'" 
-          onmouseout="this.style.transform='scale(1)'">
-    Criar Conta Grátis
-  </button>
-</div>
-
-<div class="min-h-screen flex flex-col font-sans dashboard-root" style="background-color: #cbd5e1 !important;">
-
-  <main class="flex-1 p-3 max-w-lg mx-auto w-full space-y-4">
-
-    <div class="card-saldo-final" style="background-color: #0f172a !important; border-radius: 16px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-      <div class="flex flex-col">
-        <span style="font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Saldo Disponível</span>
-        <span style="font-size: 1.3rem; font-weight: 900; color: #ffffff !important;">
-          {{ (apostadorSaldo || 0) | currency:'BRL' }}
-        </span>
-      </div>
-
-      <div class="flex gap-2">
-        <button (click)="navigateToDepositar()" style="background-color: #4f46e5 !important; color: white !important; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; border: none; cursor: pointer;">+ PIX</button>
-        <button (click)="informarEmDesenvolvimento()" style="background-color: #334155 !important; color: white !important; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; border: none; cursor: pointer;">SACAR</button>
-      </div>
-    </div>
-
-    <section *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-container" style="background-color: #334155 !important; border-radius: 1.5rem; overflow: hidden; border: 1px solid #475569; display: block; width: 100%; margin-bottom: 1rem;">
-      
-      <div class="card-header-dark" style="background-color: #0f172a !important; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center;">
-        <div class="flex items-center gap-2" style="max-width: 80%;">
-          <img [src]="getCampeonatoLogo(camp.nome)" style="width: 22px; height: 22px; object-fit: contain;">
-          <h2 style="color: #f1f5f9 !important; font-weight: 800 !important; font-size: 10px !important; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">
-            {{ camp.nome }}
-          </h2>
+      <div class="caixa-saldo-destaque">
+        <div class="flex flex-col">
+          <span class="label-saldo-topo-white">Saldo Disponível</span>
+          <span class="valor-saldo-verde">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
         </div>
-        <span *ngIf="camp.aderidoPeloUsuario" 
-              style="background: #10b981; color: white; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 900; text-transform: uppercase;">
-                           Ativo
-</span>
-      </div>
-
-      <div class="p-3" style="display: flex; flex-direction: column; gap: 12px;">
-        
-        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
-          
-          <span *ngIf="camp.aderidoPeloUsuario" class="stamp-label-final" 
-                style="background-color: #22c55e !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">
-            Apostando no Campeonato! 🏆
-          </span>
-          
-          <span *ngIf="!camp.aderidoPeloUsuario" class="stamp-label-final" 
-                style="background-color: #f97316 !important; color: #000 !important; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 6px; transform: rotate(-2deg); text-transform: uppercase; display: inline-block;">
-            Apostar no Campeonato?
-          </span>
-
-         <button *ngIf="!camp.aderidoPeloUsuario" (click)="abrirModalAdesao(camp)" 
-                style="width: 100%; padding: 16px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #6366f1 !important; color: #ffffff !important; font-size: 14px !important; font-weight: 900 !important; cursor: pointer; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); margin-top: 4px;">
-                   🚀 ENTRAR NO CAMPEONATO
-        </button>
-
-          <div style="position: relative; width: 100%;">
-          <button (click)="navegarParaApostasRodada(camp.id)" 
-              style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #d1fae5 !important; color: #065f46 !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
-              Rodadas em Aposta ({{ camp.rodadasEmAposta?.length || 0 }})
-          </button>
-  
-         <span *ngIf="!camp.aderidoPeloUsuario" 
-             style="position: absolute; top: -8px; right: 10px; background: #059669; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid #064e3b;">
-                   Disponível Avulsa !!
-         </span>
+        <div class="flex gap-2">
+          <button (click)="navigateToDepositar()" class="btn-financeiro btn-pix-blue">+ PIX</button>
+          <button (click)="informarEmDesenvolvimento()" class="btn-financeiro btn-sacar-gray">SACAR</button>
         </div>
       </div>
-        
-        <button (click)="verRodadasCorrentes(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #dbeafe !important; color: #1e40af !important; font-size: 13px !important; font-weight: 800 !important; cursor: pointer;">
-          Rodadas Correntes ({{ camp.rodadasCorrentes?.length || 0 }})
-        </button>
 
-        <button (click)="verRodadasFinalizadas(camp.id)" style="width: 100%; padding: 14px 0; border-radius: 1rem; border: none; text-transform: uppercase; background-color: #f1f5f9 !important; color: #475569 !important; font-size: 11px !important; font-weight: 700 !important; cursor: pointer;">
-          Rodadas Finalizadas ({{ camp.rodadasFinalizadas?.length || 0 }})
-        </button>
-      </div>
-    </section>
+      <nav class="menu-navegacao-central" *ngIf="campeonatosDisponiveis?.length > 0">
+        <div class="opcao-menu-item" (click)="navegarParaApostasRodada(campeonatosDisponiveis[0].id)">
+          <div class="circulo-wrapper icon-apostar"><mat-icon>sports_soccer</mat-icon></div>
+          <span class="label-menu">APOSTAR</span>
+        </div>
+        <div class="opcao-menu-item" (click)="verRodadasCorrentes(campeonatosDisponiveis[0].id)">
+          <div class="circulo-wrapper icon-resultados"><mat-icon>leaderboard</mat-icon></div>
+          <span class="label-menu">RESULTADOS</span>
+        </div>
+        <div class="opcao-menu-item" (click)="verRodadasFinalizadas(campeonatosDisponiveis[0].id)">
+          <div class="circulo-wrapper icon-historico"><mat-icon>history</mat-icon></div>
+          <span class="label-menu">HISTÓRICO</span>
+        </div>
+      </nav>
 
-    <div style="text-align: center; padding: 5px 0; width: 100%;">
-      <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" style="max-width: 130px; height: auto; margin: 8px auto; display: block;" alt="Espaço Mar">
+      <section class="secao-campeonatos-grafite">
+        <div class="header-secao-fluxo px-5 mb-2 flex justify-between items-center">
+          <h3 class="titulo-grafite-destaque">CAMPEONATOS ATIVOS</h3>
+          <div class="fluxo-hint"><span>arraste</span> <mat-icon>arrow_forward</mat-icon></div>
+        </div>
+
+        <div class="slider-viewport-scroll" #sliderViewport
+             (mousedown)="startDragging($event)" (mouseleave)="stopDragging()" 
+             (mouseup)="stopDragging()" (mousemove)="moveEvent($event)">
+          
+          <div class="slider-trilho-track">
+            <article *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-foco">
+              
+              <div class="card-inner-header">
+                <div class="logo-box-camp">
+                  <img [src]="getCampeonatoLogo(camp.nome)" class="img-camp-logo">
+                </div>
+                <div class="title-box-camp">
+                  <h2 class="nome-camp-ouro-normal">{{ camp.nome }}</h2>
+                  <span class="premio-txt-fake">
+                    PRÊMIO ACUMULADO: {{ (campeonatoTotais[camp.id]?.valorArrecadado || 0) | currency:'BRL' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="painel-dashboard-interno p-4">
+                <div class="status-adesao-line text-center mb-4">
+                  <span [class]="camp.aderidoPeloUsuario ? 'stamp green' : 'stamp orange'">
+                    {{ camp.aderidoPeloUsuario ? 'ADESÃO CONFIRMADA 🏆' : 'ADESÃO PENDENTE' }}
+                  </span>
+                </div>
+
+                <div class="grid-metricas-dashboard">
+                  <div class="rect azul"><small>RODADAS</small><b>{{ camp.numRodadas || 0 }}</b></div>
+                  <div class="rect cinza"><small>JOGADAS</small><b>{{ camp.rodadasFinalizadas?.length || 0 }}</b></div>
+                  <div class="rect verde"><small>ATIVAS</small><b>{{ camp.rodadasCorrentes?.length || 0 }}</b></div>
+                  <div class="rect vermelho"><small>FALTAM</small><b>{{ (camp.numRodadas || 0) - (camp.rodadasFinalizadas?.length || 0) }}</b></div>
+                  <div class="rect ouro"><small>NA RODADA</small><b>{{ camp.rodadasEmAposta?.length || 0 }}</b></div>
+                  
+                  <div class="rect indigo">
+                    <small>APOSTADORES</small>
+                    <b>{{ campeonatoTotais[camp.id]?.quantApostadoresVinculados || 0 }}</b>
+                  </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700">
+                  <div class="flex justify-between items-center">
+                    <span class="text-[9px] text-slate-400 font-bold uppercase">Prêmio p/ Rodada (Avulso):</span>
+                    <span class="text-xs text-green-400 font-black">
+                        {{ (campeonatoTotais[camp.id]?.premioAvulsoRodada || 0) | currency:'BRL' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-4 pb-4" *ngIf="!camp.aderidoPeloUsuario">
+                <button (click)="abrirModalAdesao(camp)" class="btn-aderir-camp">ADERIR AO CAMPEONATO</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <footer class="marketing-footer-area">
+        <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="logo-mkt-final">
+        <div class="banner-promocional" *ngIf="fotoAtual">
+          <img [src]="fotoAtual" class="img-banner-mkt">
+        </div>
+      </footer>
     </div>
-
-    <div *ngIf="fotoAtual" style="border-radius: 1.5rem; overflow: hidden; background: white; padding: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      <img [src]="fotoAtual" style="width: 100%; border-radius: 1rem; display: block;" alt="Parceiro">
-    </div>
-
   </main>
 </div>

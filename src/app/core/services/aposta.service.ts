@@ -142,12 +142,14 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
    * @param campeonatoId O ID do campeonato.
    * @returns Um Observable com o DTO de totais do campeonato.
    */
+ 
   obterTotaisCampeonato(campeonatoId: string): Observable<ApiResponse<ApostasCampeonatoTotaisDto>> {
-    return this.http.get<ApiResponse<ApostasCampeonatoTotaisDto>>(`${this.apiUrl}/totais-campeonato/${campeonatoId}`)
-      .pipe(
-        catchError(this.handleError)
-      );
+    // Ajuste a URL para bater no Controller de Campeonato, conforme combinamos
+    return this.http.get<ApiResponse<ApostasCampeonatoTotaisDto>>(
+    `${this.apiUrl}/campeonatos/${campeonatoId}/totais`
+    );
   }
+
 
   // Altere o método para receber os dois IDs necessários
   obterJogosComPalpites(apostaId: string, rodadaId: string): Observable<ApiResponse<any>> {

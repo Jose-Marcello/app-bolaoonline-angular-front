@@ -1,5 +1,27 @@
-/* src/app/components/dashboard-layout/dashboard-layout.component.scss */
-.mat-sidenav {
-    background-color: #F5F5DC !important; /* Use !important para garantir a sobreposição */
-    opacity: 1 !important; /* Garante que não há opacidade definida */
+:host ::ng-deep {
+  /* 1. MANTER O HEADER ESCURO */
+  mat-toolbar {
+    background-color: #0f172a !important; 
+  }
+
+  /* 2. OURO PARA TUDO... EXCETO O LOGO */
+  /* Adicione a classe 'logo-container' na div ou span que envolve seu logo no HTML */
+  mat-toolbar span:not(.logo-container), 
+  mat-toolbar mat-icon:not(.logo-icon),
+  .user-name {
+    color: #FFD700 !important; /* Amarelo Ouro */
+  }
+
+  /* 3. LOGO COM COR ORIGINAL */
+  /* Forçamos o logo a ignorar qualquer cor herdada */
+  .logo-icon, .logo-container mat-icon {
+    color: unset !important; 
+    filter: none !important;
+  }
+
+  /* 4. BOTÃO SAIR EM VERDE (como combinado) */
+  .btn-sair, .logout-icon {
+    color: #4ade80 !important; 
+    font-weight: 900 !important;
+  }
 }

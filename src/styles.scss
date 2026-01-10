@@ -5,10 +5,17 @@
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css'; 
 
-/* 2. RESET E FUNDO GLOBAL */
-html, body { 
-  height: 100% !important; 
-  margin: 0 !important; 
-  background-color: #020617 !important; 
-  font-family: 'Roboto', sans-serif !important;
+
+html, body {
+  /* O segredo: min-height em vez de height */
+  min-height: 100% !important; 
+  height: auto !important; /* Permite que o body estique com o conteúdo */
+  margin: 0;
+  padding: 0;
+  background-color: #020617 !important; /* Cor de segurança para o fundo */
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
 }

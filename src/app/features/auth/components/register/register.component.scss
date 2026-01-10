@@ -89,3 +89,41 @@
     color: white !important;
     font-weight: bold;
 }
+:host {
+  /* CRIA O FUNDO FIXO ATRÁS DE TUDO */
+  display: block !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  background-image: url('/assets/img/background-bolao.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important; 
+  background-repeat: no-repeat !important;
+  background-color: #020617 !important;
+}
+
+:host ::ng-deep {
+  .container-register {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 40px 16px !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    /* Removemos o background daqui para não dar conflito */
+    background: transparent !important; 
+  }
+
+  .card-register {
+    width: 100% !important;
+    max-width: 450px !important;
+    background: rgba(15, 23, 42, 0.95) !important; 
+    backdrop-filter: blur(10px) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 30px !important;
+    margin-bottom: 60px !important; /* Espaço extra no fim */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  }
+
+}

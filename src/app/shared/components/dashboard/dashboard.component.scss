@@ -1,84 +1,62 @@
+/* --- ESTRUTURA --- */
+.dashboard-root { background-color: #020617; min-height: 100vh; }
+.app-container-moldura { max-width: 480px; background-color: #1e293b; min-height: 100vh; margin: 0 auto; border-radius: 0 0 32px 32px; overflow: hidden; }
 
-/* --- ADICIONAR ESTE BLOCO PARA O SCROLL HORIZONTAL --- */
+/* FINANCEIRO */
+.caixa-saldo-destaque { background: #0f172a; border-radius: 20px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
+.label-saldo-topo-white { color: #ffffff !important; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+.valor-saldo-verde { color: #22c55e !important; font-size: 1.2rem; font-weight: 900; }
+.btn-financeiro { border: none; padding: 8px 14px; border-radius: 12px; font-size: 9px; font-weight: 900; &.btn-pix-blue { background: #4f46e5; color: #fff; } &.btn-sacar-gray { background: #334155; color: #e2e8f0; border: 1px solid #475569; } }
 
-.campeonatos-wrapper {
-  margin: 15px 0;
-  width: 100%;
-  overflow: hidden; /* Garante que nada vaze para fora do layout principal */
+/* MENU CIRCULAR */
+.menu-navegacao-central { display: flex; justify-content: space-around; padding: 10px 0; }
+.circulo-wrapper {
+  width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #1e293b;
+  &.icon-apostar { border: 2px solid #3b82f6; mat-icon { color: #3b82f6; } }
+  &.icon-resultados { border: 2px solid #10b981; mat-icon { color: #10b981; } }
+  &.icon-historico { border: 2px solid #64748b; mat-icon { color: #64748b; } }
+}
+.label-menu { color: #fff; font-size: 9px; font-weight: 900; margin-top: 5px; }
+
+/* RÓTULO AMBER */
+.rotulo-informativo-amber {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); border-radius: 14px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+  .texto-rotulo-premium { color: #fff; font-size: 10.5px; margin: 0; line-height: 1.3; font-weight: 500; strong { font-weight: 900; color: #000; opacity: 0.8; } }
+  .circulo-info { background: rgba(255,255,255,0.2); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; mat-icon { font-size: 14px; color: #fff; } }
 }
 
-.campeonatos-slider {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important; /* OBRIGA os cards a ficarem em uma única linha */
-  
-  overflow-x: auto !important;   /* Habilita o scroll horizontal */
-  overflow-y: hidden !important;
-  
-  gap: 12px;
-  padding: 10px 5px;
-  
-  /* Suavidade para o toque no Samsung A56 */
-  -webkit-overflow-scrolling: touch; 
-  scroll-behavior: smooth;
+/* SEÇÃO GRAFITE */
+.secao-campeonatos-grafite { background: #0f172a; border-radius: 25px; padding: 15px 0; }
+.titulo-grafite-destaque { color: #ffffff !important; font-size: 12px; font-weight: 900; letter-spacing: 0.5px; }
+.fluxo-hint { color: #f59e0b; font-size: 9px; display: flex; align-items: center; gap: 4px; mat-icon { font-size: 14px; } }
 
-  /* Esconde a barra de rolagem (visual de App nativo) */
-  &::-webkit-scrollbar {
-    display: none;
+/* SLIDE */
+.slider-viewport-scroll { width: 100%; overflow-x: hidden; cursor: grab; user-select: none; &:active { cursor: grabbing; } @media (max-width: 768px) { overflow-x: auto; scroll-snap-type: x mandatory; } }
+.slider-trilho-track { display: flex; flex-wrap: nowrap; width: max-content; padding: 0 40px; }
+
+/* CARD E NOME */
+.card-campeonato-foco { width: 310px; flex-shrink: 0; scroll-snap-align: center; background: #1e293b; border-radius: 20px; border: 1px solid #334155; margin-right: 15px; overflow: hidden; }
+.card-inner-header { padding: 15px; display: flex; align-items: center; background: rgba(0,0,0,0.25); min-height: 85px; }
+.logo-box-camp { width: 55px; height: 55px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; .img-camp-logo { max-width: 40px; max-height: 40px; object-fit: contain; } }
+.nome-camp-ouro-normal { color: #FFD700; font-size: 12.5px; font-weight: 900; line-height: 1.2; text-transform: none !important; }
+.premio-txt-fake { color: #22c55e; font-size: 9px; font-weight: 800; }
+
+/* GRID DE MÉTRICAS */
+.grid-metricas-dashboard {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  .rect {
+    background: #f8fafc; border-radius: 8px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center;
+    small { font-size: 6.5px; color: #64748b; font-weight: 900; margin-bottom: 2px; text-transform: uppercase; white-space: nowrap; }
+    b { font-size: 14px; color: #1e293b; font-weight: 900; }
+    &.azul { border-bottom: 3px solid #3b82f6; }
+    &.ouro { border-bottom: 3px solid #fbbf24; background: #fffbeb; }
+    &.verde { border-bottom: 3px solid #22c55e; }
+    &.vermelho { border-bottom: 3px solid #ef4444; }
+    &.indigo { border-bottom: 3px solid #6366f1; }
+    &.cinza { border-bottom: 3px solid #64748b; }
   }
-  scrollbar-width: none; 
 }
 
-.card-campeonato {
-  /* O PULO DO GATO: flex-shrink 0 impede o card de encolher */
-  flex: 0 0 145px !important; 
-  width: 145px !important;
-  
-  background-color: #1e293b;
-  border-radius: 12px;
-  padding: 12px;
-  border: 1px solid #334155;
-  
-  transition: transform 0.2s;
-  &:active { transform: scale(0.95); }
-}
-
-
-
-.card-saldo-final {
-  background-color: #0f172a !important; /* Grafite Escuro */
-  border-radius: 16px;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #1e293b;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  margin-bottom: 8px;
-}
-
-.label-saldo-topo {
-  font-size: 9px;
-  font-weight: 900;
-  color: #94a3b8;
-  text-transform: uppercase;
-  margin-bottom: -2px;
-}
-
-.valor-saldo-foco {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: #ffffff !important;
-}
-
-.btn-acao-saldo {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 10px;
-  font-weight: 900;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-pix { background-color: #4f46e5 !important; color: white !important; }
-.btn-sacar { background-color: #334155 !important; color: white !important; }
+.stamp { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 9px; font-weight: 900; &.green { background: #10b981; color: #fff; } &.orange { background: #f59e0b; color: #fff; } }
+.btn-aderir-camp { width: 100%; background: #FFD700; color: #000; padding: 12px; border-radius: 10px; font-weight: 900; border: none; text-transform: uppercase; }
+.marketing-footer-area { text-align: center; padding: 20px; .logo-mkt-final { max-width: 80px; opacity: 0.6; } .img-banner-mkt { width: 100%; border-radius: 15px; margin-top: 10px; } }
