@@ -18,13 +18,13 @@ import { AuthService } from '../../../features/auth/services/auth.service';
 import { CampeonatoService } from '../../../core/services/campeonato.service';
 import { RodadaService } from '../../../core/services/rodada.service';
 import { ApostadorService } from '../../../core/services/apostador.service';
-import { ApostaService } from '../../../core/services/aposta.service';
 import { ConfirmacaoAdesaoModalComponent } from '../../components/confirmacao-adesao-modal/confirmacao-adesaoModal.component';
 import { isPreservedCollection } from '../../../shared/models/api-response.model';
 
 // Modelos
 import { ApostadorDto } from '../../../features/apostador/models/apostador-dto.model';
 import { RodadaDto } from '../../../features/rodada/model/rodada-dto.model';
+import { ApostasCampeonatoTotaisDto } from '../../../features/campeonato/models/apostas-campeonato-totais-dto.model';
 
 function unwrap<T>(data: any): T {
   if (!data) return data;
@@ -50,8 +50,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   apostador: ApostadorDto | null = null;
   apostadorSaldo: number | null = null;
   campeonatosDisponiveis: any[] = [];
-  campeonatoTotais: { [key: string]: any } = {};
   usuarioLogado: boolean = false;
+  
+  // Dicionário para armazenar os totais de cada campeonato no slider
+  campeonatoTotais: { [key: string]: ApostasCampeonatoTotaisDto } = {};
 
   // Galeria Marketing
   indiceAtual = 0;
@@ -59,7 +61,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   fotoAtual: string = this.fotos[0];
   intervaloGaleria: any;
 
-  // Slider Slider
+  // Slider Mouse Drag
   isMouseDown = false;
   startX = 0;
   scrollLeft = 0;
@@ -71,7 +73,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private campeonatoService: CampeonatoService,
     private rodadaService: RodadaService,
     private apostadorService: ApostadorService,
-    private apostaService: ApostaService,
     private router: Router,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
@@ -99,13 +100,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadDashboardData(): void {
     this.isLoading = true;
+    
+    // 1. Busca dados do apostador se logado
     const inicializarFluxo$ = this.usuarioLogado 
       ? this.apostadorService.getDadosApostador().pipe(
           catchError(() => of({ success: false, data: null })),
           tap(response => {
             if (response?.success && response.data) {
-              const data = isPreservedCollection<ApostadorDto>(response.data) 
-                          ? response.data.$values[0] : response.data as ApostadorDto;
+              const data = unwrap<ApostadorDto>(response.data);
               if (data) {
                 this.apostador = data;
                 this.apostadorSaldo = data.saldo?.valor || 0;
@@ -115,6 +117,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         )
       : of({ success: true, data: null });
 
+    // 2. Busca campeonatos e depois seus detalhes em paralelo
     inicializarFluxo$.pipe(
       switchMap(() => this.campeonatoService.getAvailableCampeonatos(this.apostador?.usuarioId || '')),
       map(response => unwrap<any[]>(response.data) || []),
@@ -123,27 +126,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (campeonatos.length === 0) return of([]);
 
         const detalhamentoTarefas = campeonatos.map(camp => {
-          this.campeonatoTotais[camp.id] = { quantApostadoresVinculados: 0, valorArrecadado: 0, premioAvulsoRodada: 0 };
           return forkJoin({
             emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
             correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
             finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
-            totais: this.usuarioLogado 
-                    ? this.apostaService.obterTotaisCampeonato(camp.id).pipe(catchError(() => of({ success: false, data: null })))
-                    : of({ success: true, data: null })
+            // CHAMA O NOVO MÉTODO DO CONTROLLER C#
+            totais: this.campeonatoService.obterTotaisDashboard(camp.id).pipe(catchError(() => of({ success: false, data: null })))
           }).pipe(
             tap(res => {
               camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta?.data) || [];
               camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes?.data) || [];
               camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas?.data) || [];
               
-              if (res.totais?.data) {
-                const d = res.totais.data;
-                this.campeonatoTotais[camp.id] = {
-                  quantApostadoresVinculados: d.quantApostadoresVinculados || 0,
-                  valorArrecadado: d.valorArrecadado || 0,
-                  premioAvulsoRodada: d.premioAvulsoRodada || 0
-                };
+              if (res.totais?.success && res.totais.data) {
+                // Alimenta o dicionário com os nomes de campos corretos da Interface
+                this.campeonatoTotais[camp.id] = res.totais.data;
               }
             })
           );
@@ -152,28 +149,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }),
       finalize(() => { this.isLoading = false; })
     ).subscribe({
-      error: () => { this.isLoading = false; }
+      error: (err) => { 
+        console.error('Erro ao carregar dashboard:', err);
+        this.isLoading = false; 
+      }
     });
   }
 
-  // --- LÓGICAS DE NAVEGAÇÃO CORRIGIDAS ---
-// 1. APOSTAR (Corrigido para 'apostas-rodada/:campeonatoId/:rodadaId')
   navegarParaApostasRodada(campeonatoId: string) {
     const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
-    
     if (camp && camp.rodadasEmAposta?.length > 0) {
       const rodadaId = camp.rodadasEmAposta[0].id;
-      // Navegação exata conforme app.routes.ts
       this.router.navigate(['/apostas-rodada', campeonatoId, rodadaId]);
     } else {
       this.snackBar.open('Não há rodadas abertas para este campeonato.', 'OK', { duration: 3000 });
     }
   }
 
-  // 2. RESULTADOS (Corrigido para 'apostas-resultados/:campeonatoId/:rodadaId')
   verRodadasCorrentes(campeonatoId: string) {
     const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
-    
     if (camp && camp.rodadasCorrentes?.length > 0) {
       const rodadaId = camp.rodadasCorrentes[0].id;
       this.router.navigate(['/apostas-resultados', campeonatoId, rodadaId]);
@@ -182,14 +176,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 3. HISTÓRICO (Usando o Ranking do Campeonato como fallback)
   verRodadasFinalizadas(campeonatoId: string) {
-    // Como no seu arquivo não vi uma rota de 'histórico' pura, 
-    // a melhor ponte é o Ranking do Campeonato:
     this.router.navigate(['/dashboard/ranking/campeonato', campeonatoId]);
   }
 
-  // 4. BANNER AMBER (Regras do Bolão)
   navegarParaRegras() {
     this.router.navigate(['/dashboard/regrasDoBolao']);
   }
@@ -202,8 +192,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe(result => { if (result) this.loadDashboardData(); });
   }
-
-  // --- APOIO ---
 
   getCampeonatoLogo(nome: string): string {
     const logos: { [key: string]: string } = {
@@ -221,16 +209,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, 4000);
   }
 
+  // Slider Mouse Drag corrigido para usar sliderViewport
   startDragging(e: MouseEvent) {
     this.isMouseDown = true;
-    this.startX = e.pageX - this.sliderViewport.nativeElement.offsetLeft;
-    this.scrollLeft = this.sliderViewport.nativeElement.scrollLeft;
+    const slider = e.currentTarget as HTMLElement;
+    this.startX = e.pageX - slider.offsetLeft;
+    this.scrollLeft = slider.scrollLeft;
   }
+
   stopDragging() { this.isMouseDown = false; }
+
   moveEvent(e: MouseEvent) {
     if (!this.isMouseDown) return;
-    const x = e.pageX - this.sliderViewport.nativeElement.offsetLeft;
-    this.sliderViewport.nativeElement.scrollLeft = this.scrollLeft - (x - this.startX) * 2;
+    e.preventDefault();
+    const slider = e.currentTarget as HTMLElement;
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - this.startX) * 2; 
+    slider.scrollLeft = this.scrollLeft - walk;
   }
 
   navigateToDepositar() { this.router.navigate(['/dashboard/financeiro/depositar']); }

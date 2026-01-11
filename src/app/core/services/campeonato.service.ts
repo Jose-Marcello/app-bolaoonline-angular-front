@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { CampeonatoDto } from '../../features/campeonato/models/campeonato-dto.model';
 import { ApiResponse } from '../../shared/models/api-response.model';
 import { VincularApostadorCampeonatoDto } from '../../features/campeonato/models/vincular-apostador-campeonato.model';
+import { ApostasCampeonatoTotaisDto } from '../../features/campeonato/models/apostas-campeonato-totais-dto.model';
 // import { BaseService } from '@core/services/base.service'; // <<-- REMOVIDO -->>
 
 @Injectable({
@@ -87,4 +88,24 @@ getById(id: string)
     // Retorna um Observable com o erro para que o componente possa tratá-lo
     return throwError(() => new Error(errorMessage));
   }
+
+
+/**
+   * Obtém os totais do dashboard para um campeonato específico.
+   * Chamada: GET api/campeonato/{id}/totais
+   */
+  obterTotaisDashboard(id: string): Observable<ApiResponse<ApostasCampeonatoTotaisDto>> {
+    console.log(`[CampeonatoService] obterTotaisDashboard: Buscando totais para campeonatoId: ${id}`);
+    
+    // IMPORTANTE: A rota deve bater com [Route("api/[controller]")] e [HttpGet("{id}/totais")]
+    return this.http.get<ApiResponse<ApostasCampeonatoTotaisDto>>(`${this.apiUrl}/api/Campeonato/${id}/totais`)
+      .pipe(
+        map(response => {
+          console.log('[CampeonatoService] Totais recebidos:', response);
+          return response;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
 }

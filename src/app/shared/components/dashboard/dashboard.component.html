@@ -1,118 +1,170 @@
-<div class="min-h-screen dashboard-root">
-  <main class="app-container-moldura mx-auto">
-    <div class="p-4 space-y-6">
+<div class="min-h-screen dashboard-root bg-[#020617]">
+  <main class="app-container-moldura mx-auto p-4 space-y-5">
 
-      <div class="caixa-saldo-destaque">
-        <div class="flex flex-col">
-          <span class="label-saldo-topo-white">Saldo Disponível</span>
-          <span class="valor-saldo-verde">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
+    <div class="caixa-saldo-destaque p-4 rounded-2xl bg-slate-900/40 border border-white/5 flex justify-between items-center shadow-2xl">
+      <div class="flex flex-col">
+        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">SALDO DISPONÍVEL</span>
+        <span class="text-2xl font-[900] text-[#00ff00]">{{ (apostadorSaldo || 0) | currency:'BRL' }}</span>
+      </div>
+      <div class="flex gap-2">
+        <button (click)="navigateToDepositar()" class="px-5 py-2.5 bg-blue-600 text-white text-[10px] font-black rounded-xl shadow-lg active:scale-90 transition-all">+ PIX</button>
+        <button (click)="informarEmDesenvolvimento()" class="px-4 py-2 bg-slate-700/50 text-white text-[10px] font-black rounded-xl">SACAR</button>
+      </div>
+    </div>
+
+    <section class="py-1">
+      <div class="rotulo-informativo-amber flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 cursor-pointer shadow-xl" (click)="navegarParaRegras()">
+        <div class="flex items-center gap-3">
+          <div class="bg-black/20 p-1.5 rounded-full flex items-center justify-center">
+            <mat-icon class="text-black scale-110 font-bold">bolt</mat-icon>
+          </div>
+          <p class="text-[14px] font-[900] text-black uppercase italic tracking-tighter leading-none">
+            Apostas no CAMPEONATO e em RODADAS AVULSAS
+          </p>
         </div>
-        <div class="flex gap-2">
-          <button (click)="navigateToDepositar()" class="btn-financeiro btn-pix-blue cursor-pointer">+ PIX</button>
-          <button (click)="informarEmDesenvolvimento()" class="btn-financeiro btn-sacar-gray cursor-pointer">SACAR</button>
+        <mat-icon class="text-black scale-110 font-bold">keyboard_arrow_right</mat-icon>
+      </div>
+    </section>
+
+    <nav class="flex justify-around items-center px-2 py-4" *ngIf="campeonatosDisponiveis?.length > 0">
+      <div class="cursor-pointer text-center group" (click)="navegarParaApostasRodada(campeonatosDisponiveis[0].id)">
+        <div class="w-16 h-16 bg-blue-600/15 rounded-full flex items-center justify-center border-2 border-blue-500/40 shadow-2xl group-active:scale-90 transition-all">
+          <mat-icon class="text-blue-400 scale-[1.4]">sports_soccer</mat-icon>
+        </div>
+        <span class="block text-[12px] font-[900] text-slate-200 mt-2 tracking-widest uppercase">APOSTAR</span>
+      </div>
+      <div class="cursor-pointer text-center group" (click)="verRodadasCorrentes(campeonatosDisponiveis[0].id)">
+        <div class="w-16 h-16 bg-emerald-600/15 rounded-full flex items-center justify-center border-2 border-emerald-500/40 shadow-2xl group-active:scale-90 transition-all">
+          <mat-icon class="text-emerald-400 scale-[1.4]">leaderboard</mat-icon>
+        </div>
+        <span class="block text-[12px] font-[900] text-slate-200 mt-2 tracking-widest uppercase">RESULTADOS</span>
+      </div>
+      <div class="cursor-pointer text-center group" (click)="verRodadasFinalizadas(campeonatosDisponiveis[0].id)">
+        <div class="w-16 h-16 bg-slate-600/15 rounded-full flex items-center justify-center border-2 border-slate-500/40 shadow-2xl group-active:scale-90 transition-all">
+          <mat-icon class="text-slate-400 scale-[1.4]">history</mat-icon>
+        </div>
+        <span class="block text-[12px] font-[900] text-slate-200 mt-2 tracking-widest uppercase">HISTÓRICO</span>
+      </div>
+    </nav>
+
+    <section class="space-y-4">
+      <div class="px-5 mb-4 flex justify-between items-center">
+        <h3 class="text-[15px] font-[900] text-white uppercase tracking-[3px] border-l-4 border-amber-500 pl-3">CAMPEONATOS ATIVOS</h3>
+        <div class="flex items-center gap-1 text-amber-500 animate-pulse">
+          <span class="text-[11px] font-black uppercase">arraste</span>
+          <mat-icon class="scale-75">arrow_forward</mat-icon>
         </div>
       </div>
 
-      <nav class="menu-navegacao-central" *ngIf="campeonatosDisponiveis?.length > 0">
-        <div class="opcao-menu-item cursor-pointer" (click)="navegarParaApostasRodada(campeonatosDisponiveis[0].id)">
-          <div class="circulo-wrapper icon-apostar"><mat-icon>sports_soccer</mat-icon></div>
-          <span class="label-menu">APOSTAR</span>
-        </div>
-        <div class="opcao-menu-item cursor-pointer" (click)="verRodadasCorrentes(campeonatosDisponiveis[0].id)">
-          <div class="circulo-wrapper icon-resultados"><mat-icon>leaderboard</mat-icon></div>
-          <span class="label-menu">RESULTADOS</span>
-        </div>
-        <div class="opcao-menu-item cursor-pointer" (click)="verRodadasFinalizadas(campeonatosDisponiveis[0].id)">
-          <div class="circulo-wrapper icon-historico"><mat-icon>history</mat-icon></div>
-          <span class="label-menu">HISTÓRICO</span>
-        </div>
-      </nav>
-
-      <section class="py-2">
-        <div class="rotulo-informativo-amber cursor-pointer" 
-             (click)="navegarParaApostasRodada(campeonatosDisponiveis[0]?.id)">
-          <div class="flex items-center gap-3">
-            <div class="circulo-info"><mat-icon>bolt</mat-icon></div>
-            <p class="texto-rotulo-premium">
-              Aposte no <strong>CAMPEONATO</strong> ou em <strong>RODADA AVULSA</strong> - VEJA AS REGRAS
-            </p>
-          </div>
-          <mat-icon style="color: #fff">keyboard_arrow_right</mat-icon>
-        </div>
-      </section>
-
-      <section class="secao-campeonatos-grafite">
-        <div class="header-secao-fluxo px-5 mb-2 flex justify-between items-center">
-          <h3 class="titulo-grafite-destaque">CAMPEONATOS ATIVOS</h3>
-          <div class="fluxo-hint"><span>arraste</span> <mat-icon>arrow_forward</mat-icon></div>
-        </div>
-
-        <div class="slider-viewport-scroll" #sliderViewport
-             (mousedown)="startDragging($event)" (mouseleave)="stopDragging()" 
-             (mouseup)="stopDragging()" (mousemove)="moveEvent($event)">
+      <div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar pb-8 px-6" 
+           style="gap: 24px; scroll-behavior: smooth; cursor: grab;"
+           #sliderViewport
+           (mousedown)="startDragging($event)" (mouseleave)="stopDragging()" 
+           (mouseup)="stopDragging()" (mousemove)="moveEvent($event)">
+        
+        <article *ngFor="let camp of campeonatosDisponiveis" 
+                 class="snap-center shrink-0 w-[88%] bg-slate-900/90 rounded-[40px] border border-white/5 shadow-2xl overflow-hidden flex flex-col">
           
-          <div class="slider-trilho-track">
-            <article *ngFor="let camp of campeonatosDisponiveis" class="card-campeonato-foco">
-              
-              <div class="card-inner-header">
-                <div class="logo-box-camp">
-                  <img [src]="getCampeonatoLogo(camp.nome)" class="img-camp-logo" alt="Logo">
-                </div>
-                <div class="title-box-camp">
-                  <h2 class="nome-camp-ouro-normal">{{ camp.nome }}</h2>
-                  <span class="premio-txt-fake">
-                    PRÊMIO ACUMULADO: {{ (campeonatoTotais[camp.id]?.valorArrecadado || 0) | currency:'BRL' }}
-                  </span>
-                </div>
+          <div class="p-5 bg-slate-800/40 flex flex-col items-center text-center space-y-3">
+            <img [src]="getCampeonatoLogo(camp.nome)" class="w-10 h-10 object-contain drop-shadow-xl">
+            <div class="space-y-1">
+              <h2 class="text-[10px] font-black text-white/90 leading-tight tracking-[2px]">{{ camp.nome }}</h2>
+              <div *ngIf="camp.aderidoPeloUsuario" 
+                   style="color: #00ff00; border: 1.5px solid #00ff00; transform: rotate(-5deg); box-shadow: 0 0 10px #00ff00; background: rgba(0, 255, 0, 0.05);"
+                   class="px-2 py-0.5 text-[7px] font-black inline-block rounded-sm uppercase">
+                VÍNCULO ATIVO 🏆
               </div>
-
-              <div class="painel-dashboard-interno p-4">
-                <div class="status-adesao-line text-center mb-4">
-                  <span [class]="camp.aderidoPeloUsuario ? 'stamp green' : 'stamp orange'">
-                    {{ camp.aderidoPeloUsuario ? 'ADESÃO CONFIRMADA 🏆' : 'ADESÃO PENDENTE' }}
-                  </span>
-                </div>
-
-                <div class="grid-metricas-dashboard">
-                  <div class="rect azul"><small>RODADAS</small><b>{{ camp.numRodadas || 0 }}</b></div>
-                  <div class="rect cinza"><small>JOGADAS</small><b>{{ camp.rodadasFinalizadas?.length || 0 }}</b></div>
-                  <div class="rect verde"><small>ATIVAS</small><b>{{ camp.rodadasCorrentes?.length || 0 }}</b></div>
-                  <div class="rect vermelho"><small>FALTAM</small><b>{{ (camp.numRodadas || 0) - (camp.rodadasFinalizadas?.length || 0) }}</b></div>
-                  <div class="rect ouro"><small>NA RODADA</small><b>{{ camp.rodadasEmAposta?.length || 0 }}</b></div>
-                  
-                  <div class="rect indigo">
-                    <small>APOSTADORES</small>
-                    <b>{{ campeonatoTotais[camp.id]?.quantApostadoresVinculados || 0 }}</b>
-                  </div>
-                </div>
-
-                <div class="mt-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700">
-                  <div class="flex justify-between items-center">
-                    <span class="text-[9px] text-slate-400 font-bold uppercase">Prêmio p/ Rodada (Avulso):</span>
-                    <span class="text-xs text-green-400 font-black">
-                        {{ (campeonatoTotais[camp.id]?.premioAvulsoRodada || 0) | currency:'BRL' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="px-4 pb-4" *ngIf="!camp.aderidoPeloUsuario">
-                <button (click)="abrirModalAdesao(camp)" class="btn-aderir-camp cursor-pointer">
-                  ADERIR AO CAMPEONATO
-                </button>
-              </div>
-            </article>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <footer class="marketing-footer-area">
-        <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" class="logo-mkt-final">
-        <div class="banner-promocional" *ngIf="fotoAtual">
-          <img [src]="fotoAtual" class="img-banner-mkt">
-        </div>
-      </footer>
+          <div class="painel-dashboard-interno p-5 space-y-5 flex-grow">
+            
+            <div class="grid grid-cols-3 gap-2">
+              <div class="bg-slate-800/60 p-2.5 rounded-2xl text-center shadow-md border border-white/5">
+                <span class="text-[9px] text-slate-400 font-[900] uppercase tracking-tighter">RODADAS</span>
+                <b class="block text-[18px] text-white font-[900] leading-none mt-1">{{ camp.numRodadas || 0 }}</b>
+              </div>
+              <div class="bg-amber-500/10 p-2.5 rounded-2xl text-center shadow-md border border-amber-500/20">
+                <span class="text-[9px] text-amber-500 font-[900] uppercase tracking-tighter">RD. EM APOSTA</span>
+                <b class="block text-[18px] text-amber-500 font-[900] leading-none mt-1">{{ campeonatoTotais[camp.id]?.rodadasEmApostaIds || '---' }}</b>
+              </div>
+              <div class="bg-emerald-500/10 p-2.5 rounded-2xl text-center shadow-md border border-emerald-500/20">
+                <span class="text-[9px] text-emerald-500 font-[900] uppercase tracking-tighter">RD. CORRENTE</span>
+                <b class="block text-[18px] text-emerald-500 font-[900] leading-none mt-1">{{ campeonatoTotais[camp.id]?.rodadaCorrenteId || '---' }}</b>
+              </div>
+              <div class="bg-slate-800/60 p-2.5 rounded-2xl text-center shadow-md border border-white/5">
+                <span class="text-[9px] text-slate-400 font-[900] uppercase tracking-tighter">FINALIZADAS</span>
+                <b class="block text-[18px] text-white font-[900] leading-none mt-1">{{ camp.rodadasFinalizadas?.length || 0 }}</b>
+              </div>
+              <div class="bg-red-500/10 p-2.5 rounded-2xl text-center shadow-md border border-red-500/20 col-span-2">
+                <span class="text-[9px] text-red-500 font-[900] uppercase tracking-tighter">FALTAM</span>
+                <b class="block text-[18px] text-white font-[900] leading-none mt-1">{{ (camp.numRodadas || 0) - (camp.rodadasFinalizadas?.length || 0) }}</b>
+              </div>
+            </div>
 
-    </div>
+            <div class="bg-slate-800/60 p-4 rounded-3xl border border-white/5 shadow-inner">
+              <h4 class="mat-h4 text-slate-300">Apostas no Campeonato</h4>
+              <div class="grid grid-cols-3 text-center">
+                <div class="flex flex-col border-r border-white/10">
+                  <span class="text-[7px] text-slate-400 font-bold uppercase">Vinc.</span>
+                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.quantVinculados || 0) }}</b>
+                </div>
+                <div class="flex flex-col border-r border-white/10">
+                  <span class="text-[7px] text-slate-400 font-bold uppercase">Arrecadado</span>
+                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.arrecadacaoVinculados || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[7px] text-red-500 font-bold uppercase">Prêmio</span>
+                  <b class="text-[13px] text-red-500 font-[900]">{{ (campeonatoTotais[camp.id]?.premioFinalCampeonato || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-800/60 p-4 rounded-3xl border border-emerald-500/20 shadow-inner">
+              <h4 class="mat-h4 text-emerald-500">Apostas Avulsas -> Rodada Corrente: {{ campeonatoTotais[camp.id]?.rodadaCorrenteId || '---' }}</h4>
+              <div class="grid grid-cols-3 text-center">
+                <div class="flex flex-col border-r border-white/10">
+                  <span class="text-[7px] text-emerald-600 font-bold uppercase">Qtd</span>
+                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.quantApostasCorrentes || 0) }}</b>
+                </div>
+                <div class="flex flex-col border-r border-white/10">
+                  <span class="text-[7px] text-emerald-600 font-bold uppercase">Arrecadado</span>
+                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.arrecadacaoCorrente || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[7px] text-emerald-500 font-bold uppercase">Prêmio</span>
+                  <b class="text-[13px] text-emerald-500 font-[900]">{{ (campeonatoTotais[camp.id]?.premioCorrente || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-800/60 p-4 rounded-3xl border border-blue-500/20 shadow-inner">
+              <h4 class="mat-h4 text-blue-500">Apostas Avulsas -> Rodada em Apostas: {{ (campeonatoTotais[camp.id]?.rodadasEmApostaIds || '---') }}</h4>
+              <div class="grid grid-cols-3 text-center">
+                <div class="flex flex-col border-r border-white/10">
+                  <span class="text-[7px] text-blue-600 font-bold uppercase">Qtd</span>
+                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.quantApostasAvulsas || 0) }}</b>
+                </div>
+                <div class="flex flex-col border-r border-white/10">
+                  <span class="text-[7px] text-blue-600 font-bold uppercase">Arrecadado</span>
+                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.arrecadacaoAvulsaRodada || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[7px] text-blue-400 font-bold uppercase">Est. Prêmio</span>
+                  <b class="text-[13px] text-blue-400 font-[900]">{{ (campeonatoTotais[camp.id]?.premioLiquidoRodada || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0 mt-auto" *ngIf="!camp.aderidoPeloUsuario">
+            <button (click)="abrirModalAdesao(camp)" 
+                    class="w-full py-4 bg-gradient-to-r from-amber-400 to-orange-600 text-white text-[12px] font-[900] rounded-2xl shadow-xl active:scale-95 transition-all uppercase tracking-[2px]">
+              ADERIR AO CAMPEONATO
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
   </main>
 </div>
