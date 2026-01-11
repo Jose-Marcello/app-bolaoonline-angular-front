@@ -160,16 +160,17 @@
 
 .painel-dashboard-interno {
   h4.mat-h4 {
-    /* Estilos fixados conforme image_b4a890.jpg */
     font: 200 11px / 24px Roboto, sans-serif !important;
     letter-spacing: .03125em !important;
     margin: 0 0 12px !important;
     text-transform: uppercase;
     font-weight: 900 !important;
-    border-bottom: 1px solid;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 4px;
   }
-  .bg-campeonato h4 { color: #a8a29e; border-color: #e7e5e4; }
-  .bg-corrente h4 { color: #15803d; border-color: #bbf7d0; }
-  .bg-em-aposta h4 { color: #1d4ed8; border-color: #d1d9e6; }
+}
+
+.bg-slate-800\/60 {
+    background-color: rgba(30, 41, 59, 0.6) !important;
+    backdrop-filter: blur(8px);
 }

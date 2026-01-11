@@ -48,3 +48,31 @@
     .btn-salvar-v6 { width: 100% !important; height: 56px !important; background: linear-gradient(90deg, #4f46e5, #818cf8) !important; color: #fff !important; border-radius: 14px !important; font-size: 16px !important; }
   }
 }
+
+.continer-jogo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: rgba(30, 41, 59, 0.6); // Grafite padrão
+  border-radius: 1.5rem;
+}
+
+.escudo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px; // Largura fixa para manter o alinhamento
+}
+
+.img-escudo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain; // Impede que a imagem estique ou corte
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
+
+  @media (max-width: 640px) {
+    width: 40px; // Redução sutil para telas de celular
+    height: 40px;
+  }
+}

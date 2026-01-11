@@ -1,5 +1,5 @@
 <div class="min-h-screen dashboard-root bg-[#020617]">
-  <main class="app-container-moldura mx-auto p-4 space-y-5">
+  <main class="app-container-moldura mx-auto p-4 space-y-6">
 
     <div class="caixa-saldo-destaque p-4 rounded-2xl bg-slate-900/40 border border-white/5 flex justify-between items-center shadow-2xl">
       <div class="flex flex-col">
@@ -13,17 +13,29 @@
     </div>
 
     <section class="py-1">
-      <div class="rotulo-informativo-amber flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 cursor-pointer shadow-xl" (click)="navegarParaRegras()">
-        <div class="flex items-center gap-3">
-          <div class="bg-black/20 p-1.5 rounded-full flex items-center justify-center">
-            <mat-icon class="text-black scale-110 font-bold">bolt</mat-icon>
-          </div>
-          <p class="text-[14px] font-[900] text-black uppercase italic tracking-tighter leading-none">
-            Apostas no CAMPEONATO e em RODADAS AVULSAS
-          </p>
+       <div class="rotulo-informativo-amber flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 cursor-pointer shadow-xl active:scale-95 transition-all" 
+       (click)="navegarParaRegras()">
+    
+      <div class="flex items-center gap-3">
+        <div class="bg-black/20 p-1.5 rounded-full flex items-center justify-center">
+          <mat-icon class="text-black scale-110 font-bold">bolt</mat-icon>
         </div>
-        <mat-icon class="text-black scale-110 font-bold">keyboard_arrow_right</mat-icon>
+        <div class="flex flex-col">
+           <p class="text-[13px] font-[900] text-black uppercase italic tracking-tighter leading-none">
+              Apostas no CAMPEONATO e em RODADAS AVULSAS
+           </p>
+           <span class="text-[9px] font-black text-black/60 uppercase tracking-widest mt-1">
+             Clique para ver as regras
+           </span>
+        </div>
       </div>
+
+      <div class="flex items-center gap-1 bg-black/10 px-2 py-1 rounded-lg">
+        <span class="text-[10px] font-black text-black uppercase">REGRAS</span>
+        <mat-icon class="text-black scale-90 font-bold">keyboard_arrow_right</mat-icon>
+      </div>
+    </div>
+  
     </section>
 
     <nav class="flex justify-around items-center px-2 py-4" *ngIf="campeonatosDisponiveis?.length > 0">
@@ -78,45 +90,18 @@
           </div>
 
           <div class="painel-dashboard-interno p-5 space-y-5 flex-grow">
-            
             <div class="grid grid-cols-3 gap-2">
-              <div class="bg-slate-800/60 p-2.5 rounded-2xl text-center shadow-md border border-white/5">
+              <div class="bg-slate-800/60 p-2.5 rounded-2xl text-center border border-white/5">
                 <span class="text-[9px] text-slate-400 font-[900] uppercase tracking-tighter">RODADAS</span>
-                <b class="block text-[18px] text-white font-[900] leading-none mt-1">{{ camp.numRodadas || 0 }}</b>
+                <b class="block text-[18px] text-white font-[900] leading-none mt-1">19</b>
               </div>
-              <div class="bg-amber-500/10 p-2.5 rounded-2xl text-center shadow-md border border-amber-500/20">
+              <div class="bg-amber-500/10 p-2.5 rounded-2xl text-center border border-amber-500/20">
                 <span class="text-[9px] text-amber-500 font-[900] uppercase tracking-tighter">RD. EM APOSTA</span>
                 <b class="block text-[18px] text-amber-500 font-[900] leading-none mt-1">{{ campeonatoTotais[camp.id]?.rodadasEmApostaIds || '---' }}</b>
               </div>
-              <div class="bg-emerald-500/10 p-2.5 rounded-2xl text-center shadow-md border border-emerald-500/20">
+              <div class="bg-emerald-500/10 p-2.5 rounded-2xl text-center border border-emerald-500/20">
                 <span class="text-[9px] text-emerald-500 font-[900] uppercase tracking-tighter">RD. CORRENTE</span>
                 <b class="block text-[18px] text-emerald-500 font-[900] leading-none mt-1">{{ campeonatoTotais[camp.id]?.rodadaCorrenteId || '---' }}</b>
-              </div>
-              <div class="bg-slate-800/60 p-2.5 rounded-2xl text-center shadow-md border border-white/5">
-                <span class="text-[9px] text-slate-400 font-[900] uppercase tracking-tighter">FINALIZADAS</span>
-                <b class="block text-[18px] text-white font-[900] leading-none mt-1">{{ camp.rodadasFinalizadas?.length || 0 }}</b>
-              </div>
-              <div class="bg-red-500/10 p-2.5 rounded-2xl text-center shadow-md border border-red-500/20 col-span-2">
-                <span class="text-[9px] text-red-500 font-[900] uppercase tracking-tighter">FALTAM</span>
-                <b class="block text-[18px] text-white font-[900] leading-none mt-1">{{ (camp.numRodadas || 0) - (camp.rodadasFinalizadas?.length || 0) }}</b>
-              </div>
-            </div>
-
-            <div class="bg-slate-800/60 p-4 rounded-3xl border border-white/5 shadow-inner">
-              <h4 class="mat-h4 text-slate-300">Apostas no Campeonato</h4>
-              <div class="grid grid-cols-3 text-center">
-                <div class="flex flex-col border-r border-white/10">
-                  <span class="text-[7px] text-slate-400 font-bold uppercase">Vinc.</span>
-                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.quantVinculados || 0) }}</b>
-                </div>
-                <div class="flex flex-col border-r border-white/10">
-                  <span class="text-[7px] text-slate-400 font-bold uppercase">Arrecadado</span>
-                  <b class="text-[13px] text-white font-[900]">{{ (campeonatoTotais[camp.id]?.arrecadacaoVinculados || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
-                </div>
-                <div class="flex flex-col">
-                  <span class="text-[7px] text-red-500 font-bold uppercase">Prêmio</span>
-                  <b class="text-[13px] text-red-500 font-[900]">{{ (campeonatoTotais[camp.id]?.premioFinalCampeonato || 0) | currency:'BRL':'symbol':'1.0-0' }}</b>
-                </div>
               </div>
             </div>
 
@@ -156,15 +141,36 @@
               </div>
             </div>
           </div>
-
-          <div class="p-5 pt-0 mt-auto" *ngIf="!camp.aderidoPeloUsuario">
-            <button (click)="abrirModalAdesao(camp)" 
-                    class="w-full py-4 bg-gradient-to-r from-amber-400 to-orange-600 text-white text-[12px] font-[900] rounded-2xl shadow-xl active:scale-95 transition-all uppercase tracking-[2px]">
-              ADERIR AO CAMPEONATO
-            </button>
-          </div>
         </article>
       </div>
     </section>
+
+   <section class="px-4 pb-20">
+  <div class="max-w-[92%] mx-auto space-y-0 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"> 
+    
+    <div class="bg-slate-900/95 rounded-t-[45px] border-t border-x border-white/10 p-8 flex justify-center items-center">
+      <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" 
+           alt="Espaço Mar"
+           class="h-24 w-auto object-contain rounded-xl shadow-2xl brightness-125 transition-transform hover:scale-105 duration-500">
+    </div>
+
+    <div class="relative w-full overflow-hidden rounded-b-[45px] border border-white/10 bg-slate-900/80 backdrop-blur-xl">
+      <div class="flex items-center justify-center min-h-[280px] p-4 bg-gradient-to-b from-black/20 to-transparent">
+        <img [src]="fotoAtual" 
+             class="w-full h-auto max-h-[450px] object-contain rounded-3xl shadow-inner transition-all duration-1000">
+      </div>
+      
+      <div class="bg-slate-950 p-4 text-center border-t border-white/5">
+        <div class="flex items-center justify-center gap-3">
+          <span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]"></span>
+          <span class="text-[11px] font-[900] text-slate-400 uppercase tracking-[6px]">Publicidade & Parceiros</span>
+          <span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
   </main>
 </div>

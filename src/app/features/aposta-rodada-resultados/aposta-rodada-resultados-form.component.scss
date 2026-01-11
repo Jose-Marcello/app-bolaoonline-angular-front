@@ -104,3 +104,30 @@
   font-size: 0.8rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
+
+/* LIMITADOR DE LARGURA PARA TELAS GRANDES */
+.moldura-centralizada {
+  width: 100%;
+  max-width: 600px; // Largura ideal para palpites e tabelas
+  margin: 0 auto;   // Centraliza no monitor grande
+  display: block;
+}
+
+/* AJUSTE DO FUNDO GLOBAL (Elimina o branco) */
+.fundo-sistema-dark {
+  background-color: #020617 !important;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.escudo-time-enquadrado {
+  width: 3.5rem;   // Tamanho fixo para não empurrar o placar
+  height: 3.5rem;
+  object-contain: contain !important; // Garante que a imagem apareça toda
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+  
+  @media (max-width: 640px) {
+    width: 2.5rem; // Diminui um pouco no celular
+    height: 2.5rem;
+  }
+}
