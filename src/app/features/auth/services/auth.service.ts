@@ -88,6 +88,15 @@ export class AuthService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/resend-confirmation-email`, { email });
   }
 
+
+  // Adicione no auth.service.ts, junto aos outros métodos de e-mail
+confirmEmail(userId: string, code: string): Observable<ApiResponse<any>> {
+  // O endpoint deve bater com o que seu backend C# espera (geralmente /ConfirmEmail)
+  return this.http.get<ApiResponse<any>>(`${this.apiUrlAuth}/ConfirmEmail`, {
+    params: { userId, code }
+  });
+}
+
 // ====================================================================
   // 📧 MÉTODOS DE SUPORTE
   // ====================================================================

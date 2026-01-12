@@ -117,26 +117,22 @@ export class RegisterComponent implements OnInit {
     ).subscribe({
         next: (response: ApiResponse<RegisterResponse>) => {
             if (response.success) {
+                console.log('--- REGISTRO BEM SUCEDIDO ---', response.data);
+                const userId = response.data?.userId;
+                const email = this.registeredUserEmail;
 
-               // 🔍 O RAIO-X: Isso vai mostrar exatamente a estrutura do seu JSON no console
-               console.log('--- ESTRUTURA COMPLETA DO RESPONSE.DATA ---', response.data);
+                if (this.isMockEnvironment && userId) { 
+                    // 🚀 AUTO-CONFIRMAÇÃO PARA A DEMO
+                    // Usamos um token fictício que seu backend deve aceitar no modo Mock
+                    const tokenParaDemo = "token_automatico_demo";
 
-                if (this.isMockEnvironment) { 
-                    const userId = response.data?.userId;
-              
-                    // PEGUE O CÓDIGO LONGO QUE APARECEU NO SEU LOG DO SERVIDOR (CONSOLE DO C#)
-                    // E COLE AQUI ENTRE ASPAS.  ** PROVISÓRIO ** 
-                    const tokenFake = "CfDJ8MpoZ3KcRFJElHyc9%2BQtwO8whrar3ysYG07RyJ%2BzI3bR6TePHTt6vqHID9XhmB1uJjy6RvRsnBEC6RgBZjBAnFf%2BTIBqaL0uZH7bASYFTFv1IimZSzVJ9CFNOHbWeMoW0Jadi7rMHX%2F%2BIzHFINtOPRQq5J4T8cxDSYRo%2FG2buIoRYkMw5T7ZenLHl6TnpM5Pv7vkZQV%2F4QOHExtKmmIvqMe1wMeVatDHEBCCIOxKPQyD%2F%2FLyQ3x2KhBHte4I1w6L4w%3D%3D";
+                    this.authService.confirmEmail(userId, tokenParaDemo).subscribe({
+                        next: () => console.log('DEMO: Usuário ativado no banco com sucesso.'),
+                        error: (err) => console.warn('DEMO: Erro na ativação automática, verifique o backend.', err)
+                    });
 
-                    const email = this.registeredUserEmail;
-
-                    const token = (response.data as any)?.code || 
-                                  (response.data as any)?.emailToken || 
-                                  (response.data as any)?.token;
-
-                    const linkConfirmacao = `https://localhost:5001/api/account/ConfirmEmail?userId=${userId}&code=${tokenFake}`;
-
-                    console.log('Ambiente MOCK - Link Gerado:', linkConfirmacao);
+                    // Link visual para o Modal de E-mail Mock
+                    const linkConfirmacao = `${window.location.protocol}//${window.location.host}/api/account/ConfirmEmail?userId=${userId}&code=${tokenParaDemo}`;
 
                     this.mockEmailService.openMockEmailDialog(email, linkConfirmacao, 'confirm').subscribe({
                         next: () => {
@@ -145,11 +141,13 @@ export class RegisterComponent implements OnInit {
                         }
                     });
                 } else {
+                    // Fluxo Real
                     this.registrationSuccess = true; 
                     this.isRegistered = true;
                     if (this.selectedFile && response.data?.userId) {
                         this.uploadProfilePhoto(response.data.userId);
                     }
+                    this.notificationsService.showNotification('Cadastro realizado! Verifique seu e-mail.', 'sucesso');
                 }
             } else {
                 this.notificationsService.showNotification(response.message || 'Erro no registro.', 'erro');
@@ -159,7 +157,7 @@ export class RegisterComponent implements OnInit {
             this.notificationsService.showNotification('Erro de conexão com o servidor.', 'erro');
         }
     });
-  } // ✅ Chave de fechamento do onSubmit() que estava faltando
+}
 
   private uploadProfilePhoto(userId: string): void {
     if (!this.selectedFile) return;
