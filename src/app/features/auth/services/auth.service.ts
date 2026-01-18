@@ -52,10 +52,11 @@ export class AuthService {
   login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
   console.log('1. Iniciando login...');
   
+  // Alteração: Chaves em minúsculo (camelCase)
   const payload = {
-    Email: credentials.email,
-    Password: credentials.password,
-    IsPersistent: credentials.isPersistent || false
+    email: credentials.email,
+    password: credentials.password,
+    isPersistent: credentials.isPersistent || false
   };
 
   console.log('2. Payload mapeado para o C#:', payload);
