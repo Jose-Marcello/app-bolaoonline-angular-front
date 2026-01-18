@@ -108,6 +108,10 @@ export class AuthService {
   );
 }
 
+  register(registrationData: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
+  }
+
   logout(): void {
     this.clearSession();
     this.router.navigate(['/login']);
