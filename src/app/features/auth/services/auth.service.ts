@@ -52,7 +52,6 @@ export class AuthService {
   login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
   console.log('1. Iniciando login...');
   
-  // Mapeamos para os nomes que o C# (ASP.NET Identity) espera:
   const payload = {
     Email: credentials.email,
     Password: credentials.password,
@@ -62,35 +61,52 @@ export class AuthService {
   console.log('2. Payload mapeado para o C#:', payload);
 
   return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login`, payload).pipe(
-    tap((response: ApiResponse<LoginResponse>) => {
-      console.log('3. Resposta do servidor:', response);
+    tap((response: any) => { // Usamos 'any' temporariamente para capturar variações de Case
+      console.log('3. Resposta bruta do servidor:', response);
       
-      if (response.success && response.data?.token) {
-        const data = response.data;
-        
-        localStorage.setItem(this.AUTH_TOKEN_KEY, data.token);
-        if (data.email) localStorage.setItem(this.USER_EMAIL_KEY, data.email);
+      // 1. Normalização: O C# pode retornar 'data' ou 'Data' / 'token' ou 'Token'
+      const resData = response.data || response.Data;
+      const success = response.success || response.Success;
 
-        // Lembra de usar userId (conforme sua interface)
-        if (data.userId) {
-          localStorage.setItem(this.USER_DATA_KEY, JSON.stringify({ id: data.userId }));
+      if (success && resData) {
+        // Busca as propriedades independentemente de estarem em camelCase ou PascalCase
+        const token = resData.token || resData.Token;
+        const email = resData.email || resData.Email;
+        const userId = resData.userId || resData.UserId || resData.id || resData.Id;
+
+        if (token) {
+          console.log('4. Token encontrado, persistindo dados...');
+          
+          localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+          
+          if (email) {
+            localStorage.setItem(this.USER_EMAIL_KEY, email);
+          }
+
+          if (userId) {
+            localStorage.setItem(this.USER_DATA_KEY, JSON.stringify({ id: userId }));
+          }
+
+          // Atualiza o estado da aplicação
+          this._isAuthenticated.next(true); 
+          const claims = this.getStoredClaims();
+          this._currentUser.next(claims);
+          
+          console.log('5. Login processado com sucesso. Claims:', claims);
+        } else {
+          console.error('❌ Erro: Resposta de sucesso, mas token não encontrado no objeto data.', resData);
         }
-
-        this._isAuthenticated.next(true); 
-        this._currentUser.next(this.getStoredClaims());
+      } else {
+        console.warn('⚠️ Resposta da API indica falha ou estrutura inválida:', response);
       }
     }),
     catchError(error => {
-      console.error('❌ ERRO NO LOGIN:', error);
+      // Se cair aqui, o erro pode ser 0 (CORS), 401 (Senha) ou 500 (Erro no Banco)
+      console.error('❌ ERRO CRÍTICO NO LOGIN:', error);
       return this.handleError(error);
     })
   );
 }
-
-
-  register(registrationData: any): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
-  }
 
   logout(): void {
     this.clearSession();
