@@ -49,65 +49,67 @@ export class AuthService {
   // 🔑 MÉTODOS DE AUTENTICAÇÃO
   // ====================================================================
 
-  login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
+login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
   console.log('1. Iniciando login...');
   
-  // Alteração: Chaves em minúsculo (camelCase)
+  // Garantimos que a URL não tenha barras duplas acidentais
+  const url = `${this.apiUrlAuth}/login`.replace(/([^:]\/)\/+/g, "$1");
+  
+  // Montamos o payload exatamente como o DTO C#
   const payload = {
-    email: credentials.email,
-    password: credentials.password,
-    isPersistent: credentials.isPersistent || false
+    Email: credentials.email.trim(),
+    Password: credentials.password,
+    IsPersistent: !!credentials.isPersistent
   };
 
-  console.log('2. Payload mapeado para o C#:', payload);
+  console.log('2. Enviando para:', url);
+  console.log('3. Payload:', payload);
 
-  return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login`, payload).pipe(
-    tap((response: any) => { // Usamos 'any' temporariamente para capturar variações de Case
-      console.log('3. Resposta bruta do servidor:', response);
+  return this.http.post<ApiResponse<LoginResponse>>(url, payload, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  }).pipe(
+    tap((response: any) => {
+      console.log('4. Resposta recebida:', response);
       
-      // 1. Normalização: O C# pode retornar 'data' ou 'Data' / 'token' ou 'Token'
-      const resData = response.data || response.Data;
-      const success = response.success || response.Success;
+      // Normalização de chaves (C# PascalCase vs JS camelCase)
+      const success = response.success ?? response.Success;
+      const data = response.data ?? response.Data;
 
-      if (success && resData) {
-        // Busca as propriedades independentemente de estarem em camelCase ou PascalCase
-        const token = resData.token || resData.Token;
-        const email = resData.email || resData.Email;
-        const userId = resData.userId || resData.UserId || resData.id || resData.Id;
+      if (success && data) {
+        const token = data.token ?? data.Token;
+        const email = data.email ?? data.Email;
+        const userId = data.userId ?? data.UserId ?? data.id ?? data.Id;
 
         if (token) {
-          console.log('4. Token encontrado, persistindo dados...');
-          
           localStorage.setItem(this.AUTH_TOKEN_KEY, token);
-          
-          if (email) {
-            localStorage.setItem(this.USER_EMAIL_KEY, email);
-          }
-
+          if (email) localStorage.setItem(this.USER_EMAIL_KEY, email);
           if (userId) {
             localStorage.setItem(this.USER_DATA_KEY, JSON.stringify({ id: userId }));
           }
 
-          // Atualiza o estado da aplicação
           this._isAuthenticated.next(true); 
-          const claims = this.getStoredClaims();
-          this._currentUser.next(claims);
-          
-          console.log('5. Login processado com sucesso. Claims:', claims);
-        } else {
-          console.error('❌ Erro: Resposta de sucesso, mas token não encontrado no objeto data.', resData);
+          this._currentUser.next(this.getStoredClaims());
+          console.log('✅ Login processado com sucesso.');
         }
-      } else {
-        console.warn('⚠️ Resposta da API indica falha ou estrutura inválida:', response);
       }
     }),
-    catchError(error => {
-      // Se cair aqui, o erro pode ser 0 (CORS), 401 (Senha) ou 500 (Erro no Banco)
-      console.error('❌ ERRO CRÍTICO NO LOGIN:', error);
+    catchError((error: HttpErrorResponse) => {
+      console.error('❌ ERRO NO LOGIN (Status):', error.status);
+      console.error('❌ ERRO NO LOGIN (Detalhes):', error.error);
+      
+      // Se o status for 400 e não houver corpo, o problema é infra ou Interceptor
+      if (error.status === 400 && !error.error) {
+        console.warn('⚠️ O Azure rejeitou a requisição antes de processar. Verifique se há um Interceptor alterando os Headers.');
+      }
+
       return this.handleError(error);
     })
   );
-}
+}  
+  
 
   register(registrationData: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
