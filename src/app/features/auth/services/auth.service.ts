@@ -65,7 +65,8 @@ login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
   console.log('2. Enviando para:', url);
   console.log('3. Payload:', payload);
 
-  return this.http.post<ApiResponse<LoginResponse>>(url, payload, {
+  return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login/`, payload, {
+  //return this.http.post<ApiResponse<LoginResponse>>(url, payload, {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
