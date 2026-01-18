@@ -2,22 +2,21 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-  // 1. Busca a chave correta que definimos no AuthService
+  // 1. LISTA NEGRA: Não adicionar token em rotas de autenticação
+  // Isso evita que o Azure bloqueie a requisição de login por causa de headers
+  if (req.url.includes('/api/account/login') || req.url.includes('/api/account/register')) {
+    return next(req);
+  }
+
   const token = localStorage.getItem('authToken');
 
-  // Log discreto para debug, apenas em desenvolvimento
-  // console.log(`[HTTP Interceptor] Requisitando: ${req.url}`);
-
-  if (token) {
-    // 2. Anexa o token apenas se ele existir (Modo Apostador)
+  // 2. Só anexa se o token for uma string válida e tiver tamanho real
+  if (token && token.length > 10) { 
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
-  } else {
-    // 3. Modo Visitante: A requisição segue "limpa" para as rotas [AllowAnonymous]
-    // console.warn('[HTTP Interceptor] Sem token: Acesso como Visitante.');
   }
 
   return next(req);
