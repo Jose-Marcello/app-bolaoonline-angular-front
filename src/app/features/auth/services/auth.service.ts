@@ -18,11 +18,12 @@ import { ApiResponse } from '../../../shared/models/api-response.model';
 export class AuthService {
   
   private apiUrlBase = environment.apiUrl;
-  private apiUrlAuth = `${this.apiUrlBase}/api/account`; // Padronizado com /account
+  private apiUrlAuth = `${this.apiUrlBase}/api/account`;
   
-  // Chaves padronizadas para todo o sistema
+  // Chaves padronizadas
   private readonly AUTH_TOKEN_KEY = 'authToken';
   private readonly USER_EMAIL_KEY = 'userEmail';
+  private readonly USER_DATA_KEY = 'usuario'; // Chave para o objeto com ID
 
   private _isAuthReady = new BehaviorSubject<boolean>(false);
   private _isAuthenticated = new BehaviorSubject<boolean>(this.hasValidToken());
@@ -48,11 +49,16 @@ export class AuthService {
     return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login`, credentials).pipe(
       tap((response: ApiResponse<LoginResponse>) => {
         if (response.success && response.data?.token) {
-          const receivedToken = response.data.token;
-          const email = response.data.email;
+          const data = response.data;
           
-          localStorage.setItem(this.AUTH_TOKEN_KEY, receivedToken);
-          if (email) localStorage.setItem(this.USER_EMAIL_KEY, email);
+          // 1. Salva o Token e Email
+          localStorage.setItem(this.AUTH_TOKEN_KEY, data.token);
+          if (data.email) localStorage.setItem(this.USER_EMAIL_KEY, data.email);
+
+          // 2. CRUCIAL: Salva o ID explicitamente para evitar erro 400 no dashboard
+          if (data.userId) {
+            localStorage.setItem(this.USER_DATA_KEY, JSON.stringify({ id: data.userId }));
+          }
 
           this._isAuthenticated.next(true); 
           this._currentUser.next(this.getStoredClaims());
@@ -66,13 +72,17 @@ export class AuthService {
     );
   }
 
+  register(registrationData: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
+  }
+
   logout(): void {
     this.clearSession();
     this.router.navigate(['/login']);
   }
 
   // ====================================================================
-  // 📧 RECUPERAÇÃO E SUPORTE
+  // 📧 MÉTODOS DE E-MAIL E SUPORTE
   // ====================================================================
 
   forgotPassword(email: string): Observable<ApiResponse<any>> {
@@ -88,31 +98,42 @@ export class AuthService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/resend-confirmation-email`, { email });
   }
 
+  confirmEmail(userId: string, code: string): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrlAuth}/ConfirmEmail`, {
+      params: { userId, code }
+    });
+  }
 
-  // Adicione no auth.service.ts, junto aos outros métodos de e-mail
-confirmEmail(userId: string, code: string): Observable<ApiResponse<any>> {
-  // O endpoint deve bater com o que seu backend C# espera (geralmente /ConfirmEmail)
-  return this.http.get<ApiResponse<any>>(`${this.apiUrlAuth}/ConfirmEmail`, {
-    params: { userId, code }
-  });
-}
-
-// ====================================================================
-  // 📧 MÉTODOS DE SUPORTE
+  // ====================================================================
+  // 🛠️ AUXILIARES DE ESTADO E TOKEN
   // ====================================================================
 
-  // Adicione este método de volta para curar o erro da imagem 2
+  getUsuarioId(): string | null {
+    // Tenta primeiro o objeto 'usuario' (mais confiável em Staging)
+    const storedUser = localStorage.getItem(this.USER_DATA_KEY);
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user.id) return user.id.toString();
+    }
+    // Backup: Tenta extrair das claims do token
+    const claims = this.getStoredClaims();
+    return claims ? claims.uid : null;
+  }
+
   getStoredUserEmail(): string {
     return localStorage.getItem(this.USER_EMAIL_KEY) || '';
   }
 
+  obterToken(): string | null {
+    return localStorage.getItem(this.AUTH_TOKEN_KEY);
+  }
+
   private hasValidToken(): boolean {
-    const token = localStorage.getItem(this.AUTH_TOKEN_KEY);
-    return !!token;
+    return !!this.obterToken();
   }
 
   public getStoredClaims(): UserClaims | null {
-    const token = localStorage.getItem(this.AUTH_TOKEN_KEY); 
+    const token = this.obterToken(); 
     if (!token) return null;
 
     try {
@@ -124,14 +145,13 @@ confirmEmail(userId: string, code: string): Observable<ApiResponse<any>> {
 
       const payload = JSON.parse(jsonPayload);
       
-      // Retorno corrigido para curar o erro da imagem 1
       return {
         uid: payload.nameid || payload.sub,
         nome: payload.apelido || payload.unique_name,
         email: payload.email,
         displayName: payload.apelido || '', 
         authToken: token,
-        refreshToken: '', // Preenchido para satisfazer a interface
+        refreshToken: '',
         tokenExpiration: payload.exp ? new Date(payload.exp * 1000) : new Date()
       } as UserClaims;
     } catch (error) {
@@ -140,13 +160,10 @@ confirmEmail(userId: string, code: string): Observable<ApiResponse<any>> {
     }
   }
 
-  // ====================================================================
-  // 🛠️ AUXILIARES DE ESTADO
-  // ====================================================================
- 
   public clearSession(): void { 
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(this.USER_EMAIL_KEY);
+    localStorage.removeItem(this.USER_DATA_KEY);
     this._isAuthenticated.next(false);
     this._currentUser.next(null);
   }
@@ -154,39 +171,16 @@ confirmEmail(userId: string, code: string): Observable<ApiResponse<any>> {
   private handleError(error: HttpErrorResponse): Observable<never> {
     let msg = 'Ocorreu um erro na autenticação.';
     if (error.status === 401) msg = 'Usuário ou senha inválidos.';
+    if (error.status === 0) msg = 'Servidor inacessível. Verifique sua conexão.';
     this.notificationsService.showNotification(msg, 'erro');
     return throwError(() => error);
   }
 
-getUsuarioId(): string | null {
-  // Ajuste conforme onde você guarda o ID (ex: localStorage ou uma variável privada)
-  const user = JSON.parse(localStorage.getItem('usuario') || '{}');
-  return user.id || null;
-}
-
-  // No seu auth.service.ts
-register(registrationData: any): Observable<ApiResponse<any>> {
-  // Como definimos apiUrlAuth como `${this.apiUrlBase}/api/account`
-  // Esta chamada resultará em .../api/account/register
-  return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
-}
-
-obterToken(): string | null {
-    // 'token' deve ser o exato nome que você usou no momento do login (localStorage.setItem('token', ...))
-    return localStorage.getItem(this.AUTH_TOKEN_KEY);
-  }
-
-  // Dica extra: um método simples para retornar um booleano
   estaLogado(): boolean {
-    const token = this.obterToken();
-    // Retorna true se o token existe e não está vazio
     return this.hasValidToken();
   }
 
-  // Permite que componentes verifiquem se devem exibir o modo consulta
   isVisitor(): boolean {
      return !this.hasValidToken();
   }
-
 }
-
