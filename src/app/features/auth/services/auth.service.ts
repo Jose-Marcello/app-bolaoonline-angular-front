@@ -45,33 +45,55 @@ export class AuthService {
   // 🔑 MÉTODOS DE AUTENTICAÇÃO
   // ====================================================================
 
+ // ====================================================================
+  // 🔑 MÉTODOS DE AUTENTICAÇÃO
+  // ====================================================================
+
   login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
+    // LOGS DE RASTREIO - Para ver no Console do Navegador
+    console.log('1. Iniciando processo de login...');
+    console.log('2. URL de destino:', `${this.apiUrlAuth}/login`);
+    console.log('3. Dados enviados (credentials):', credentials);
+
     return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login`, credentials).pipe(
       tap((response: ApiResponse<LoginResponse>) => {
+        console.log('4. Resposta bruta do servidor:', response);
+
         if (response.success && response.data?.token) {
           const data = response.data;
           
-          // 1. Salva o Token e Email
+          // Salvando Token e Email
           localStorage.setItem(this.AUTH_TOKEN_KEY, data.token);
           if (data.email) localStorage.setItem(this.USER_EMAIL_KEY, data.email);
 
-          // 2. CRUCIAL: Salva o ID explicitamente para evitar erro 400 no dashboard
+          // Salvando o userId (campo correto da sua interface)
           if (data.userId) {
+            console.log('5. Salvando userId no localStorage:', data.userId);
             localStorage.setItem(this.USER_DATA_KEY, JSON.stringify({ id: data.userId }));
           }
 
           this._isAuthenticated.next(true); 
           this._currentUser.next(this.getStoredClaims());
+          console.log('6. Fluxo de login concluído com sucesso!');
         } else {
+          console.warn('⚠️ Login retornou sucesso=false ou sem token:', response);
           this.clearSession();
           const errorMessage = response.message || 'Credenciais inválidas.';
           this.notificationsService.showNotification(errorMessage, 'erro');
         }
       }),
-      catchError(error => this.handleError(error))
+      catchError(error => {
+        // Se a requisição não aparece na aba REDE, o erro vai cair aqui:
+        console.error('❌ ERRO CRÍTICO NO HTTP (Interceptor ou Rede):', error);
+        console.error('Status do Erro:', error.status);
+        console.error('Mensagem:', error.message);
+        
+        return this.handleError(error);
+      })
     );
   }
 
+  
   register(registrationData: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
   }
