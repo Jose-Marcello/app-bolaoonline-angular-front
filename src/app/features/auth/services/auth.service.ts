@@ -52,6 +52,35 @@ export class AuthService {
 login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
   console.log('1. Iniciando login...');
   
+  const url = `${this.apiUrlAuth}/login`.replace(/([^:]\/)\/+/g, "$1");
+  
+  const payload = {
+    Email: credentials.email.trim(),
+    Password: credentials.password,
+    IsPersistent: !!credentials.isPersistent
+  };
+
+  console.log('2. Enviando para:', url);
+
+  // REGRAS DE OURO PARA AZURE CONTAINER APPS:
+  // 1. Removemos os headers manuais (o Angular injeta o JSON correto sozinho)
+  // 2. Garantimos que nenhum interceptor suje a rota (você já fez isso no JWT Interceptor)
+  return this.http.post<ApiResponse<LoginResponse>>(url, payload).pipe(
+    tap((response: any) => {
+      // ... resto do seu código de sucesso ...
+    }),
+    catchError((error: HttpErrorResponse) => {
+      console.error('❌ ERRO NO LOGIN (Status):', error.status);
+      return this.handleError(error);
+    })
+  );
+}
+
+
+/*
+login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
+  console.log('1. Iniciando login...');
+  
   // Garantimos que a URL não tenha barras duplas acidentais
   const url = `${this.apiUrlAuth}/login`.replace(/([^:]\/)\/+/g, "$1");
   
@@ -110,7 +139,7 @@ login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
     })
   );
 }  
-  
+  */
 
   register(registrationData: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
