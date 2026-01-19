@@ -8,8 +8,19 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const token = localStorage.getItem('authToken');
 
+
+const token = localStorage.getItem('authToken'); // Verifique se é 'authToken' mesmo!
+
+if (token) {
+  req = req.clone({
+    setHeaders: {
+      Authorization: `Bearer ${token.replace(/"/g, '')}` // Remove aspas se houver
+    }
+  });
+}
+ 
+/*
   // 2. Só anexa se o token for uma string válida e tiver tamanho real
   if (token && token.length > 10) { 
     req = req.clone({
@@ -18,6 +29,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       }
     });
   }
+    */
 
   return next(req);
 };

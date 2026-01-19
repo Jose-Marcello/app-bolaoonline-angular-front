@@ -62,47 +62,9 @@ login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
 
   console.log('2. Enviando para:', url);
 
-  // REGRAS DE OURO PARA AZURE CONTAINER APPS:
-  // 1. Removemos os headers manuais (o Angular injeta o JSON correto sozinho)
-  // 2. Garantimos que nenhum interceptor suje a rota (você já fez isso no JWT Interceptor)
   return this.http.post<ApiResponse<LoginResponse>>(url, payload).pipe(
     tap((response: any) => {
-      // ... resto do seu código de sucesso ...
-    }),
-    catchError((error: HttpErrorResponse) => {
-      console.error('❌ ERRO NO LOGIN (Status):', error.status);
-      return this.handleError(error);
-    })
-  );
-}
-
-
-/*
-login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
-  console.log('1. Iniciando login...');
-  
-  // Garantimos que a URL não tenha barras duplas acidentais
-  const url = `${this.apiUrlAuth}/login`.replace(/([^:]\/)\/+/g, "$1");
-  
-  // Montamos o payload exatamente como o DTO C#
-  const payload = {
-    Email: credentials.email.trim(),
-    Password: credentials.password,
-    IsPersistent: !!credentials.isPersistent
-  };
-
-  console.log('2. Enviando para:', url);
-  console.log('3. Payload:', payload);
-
-  //return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrlAuth}/login/`, payload, {    
-  return this.http.post<ApiResponse<LoginResponse>>(url, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-  }).pipe(
-    tap((response: any) => {
-      console.log('4. Resposta recebida:', response);
+      console.log('3. Resposta recebida:', response);
       
       // Normalização de chaves (C# PascalCase vs JS camelCase)
       const success = response.success ?? response.Success;
@@ -114,32 +76,27 @@ login(credentials: LoginRequestDto): Observable<ApiResponse<LoginResponse>> {
         const userId = data.userId ?? data.UserId ?? data.id ?? data.Id;
 
         if (token) {
-          localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+          // AQUI ESTÁ O SEGREDO: Usar as chaves padronizadas que você definiu no topo do arquivo
+          localStorage.setItem(this.AUTH_TOKEN_KEY, token); // Salva como 'authToken'
           if (email) localStorage.setItem(this.USER_EMAIL_KEY, email);
           if (userId) {
             localStorage.setItem(this.USER_DATA_KEY, JSON.stringify({ id: userId }));
           }
 
+          // Atualiza os estados para o sistema saber que VOCÊ LOGOU
           this._isAuthenticated.next(true); 
           this._currentUser.next(this.getStoredClaims());
-          console.log('✅ Login processado com sucesso.');
+          console.log('✅ Token salvo e sessão iniciada!');
         }
       }
     }),
     catchError((error: HttpErrorResponse) => {
       console.error('❌ ERRO NO LOGIN (Status):', error.status);
-      console.error('❌ ERRO NO LOGIN (Detalhes):', error.error);
-      
-      // Se o status for 400 e não houver corpo, o problema é infra ou Interceptor
-      if (error.status === 400 && !error.error) {
-        console.warn('⚠️ O Azure rejeitou a requisição antes de processar. Verifique se há um Interceptor alterando os Headers.');
-      }
-
       return this.handleError(error);
     })
   );
-}  
-  */
+}
+
 
   register(registrationData: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrlAuth}/register`, registrationData);
