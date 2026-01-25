@@ -1,12 +1,10 @@
 export const environment = {
   production: true,
   // URL do backend que está no ACA do Azured:
- //apiUrl:'https://env-bolao-qa.gentlerock-116715ed.brazilsouth.azurecontainerapps.io',
- apiUrl:'',
- //apiUrl: 'https://localhost:5001',
- 
- imagesUrl: '/assets/images/',
+ //apiUrl:'https://aca-bolao-backend.bluebay-3fff5721.brazilsouth.azurecontainerapps.io',
+  apiUrl: 'http://localhost:8080',   //execução local
 
+  imagesUrl: '/assets/images/',
  isMockEnabled: true
   
 };

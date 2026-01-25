@@ -33,6 +33,8 @@ export class AuthService {
   public currentUser$ = this._currentUser.asObservable();  
   public isAuthReady$ = this._isAuthReady.asObservable();
 
+  
+
   constructor(
     private http: HttpClient,
     private router: Router,

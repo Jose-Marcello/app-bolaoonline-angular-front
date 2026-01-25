@@ -13,45 +13,37 @@
     </div>
 
     <section class="py-1">
-       <div class="rotulo-informativo-amber flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 cursor-pointer shadow-xl active:scale-95 transition-all" 
-       (click)="navegarParaRegras()">
-    
-      <div class="flex items-center gap-3">
-        <div class="bg-black/20 p-1.5 rounded-full flex items-center justify-center">
-          <mat-icon class="text-black scale-110 font-bold">bolt</mat-icon>
+      <div class="rotulo-informativo-amber flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 cursor-pointer shadow-xl active:scale-95 transition-all" (click)="navegarParaRegras()">
+        <div class="flex items-center gap-3">
+          <div class="bg-black/20 p-1.5 rounded-full flex items-center justify-center">
+            <mat-icon class="text-black scale-110 font-bold">bolt</mat-icon>
+          </div>
+          <div class="flex flex-col">
+            <p class="text-[13px] font-[900] text-black uppercase italic tracking-tighter leading-none">Apostas no CAMPEONATO e em RODADAS AVULSAS</p>
+            <span class="text-[9px] font-black text-black/60 uppercase tracking-widest mt-1">Clique para ver as regras</span>
+          </div>
         </div>
-        <div class="flex flex-col">
-           <p class="text-[13px] font-[900] text-black uppercase italic tracking-tighter leading-none">
-              Apostas no CAMPEONATO e em RODADAS AVULSAS
-           </p>
-           <span class="text-[9px] font-black text-black/60 uppercase tracking-widest mt-1">
-             Clique para ver as regras
-           </span>
+        <div class="flex items-center gap-1 bg-black/10 px-2 py-1 rounded-lg">
+          <span class="text-[10px] font-black text-black uppercase">REGRAS</span>
+          <mat-icon class="text-black scale-90 font-bold">keyboard_arrow_right</mat-icon>
         </div>
       </div>
-
-      <div class="flex items-center gap-1 bg-black/10 px-2 py-1 rounded-lg">
-        <span class="text-[10px] font-black text-black uppercase">REGRAS</span>
-        <mat-icon class="text-black scale-90 font-bold">keyboard_arrow_right</mat-icon>
-      </div>
-    </div>
-  
     </section>
 
     <nav class="flex justify-around items-center px-2 py-4" *ngIf="campeonatosDisponiveis?.length > 0">
-      <div class="cursor-pointer text-center group" (click)="navegarParaApostasRodada(campeonatosDisponiveis[0].id)">
+      <div class="cursor-pointer text-center group" (click)="navegarParaApostasRodada(campeonatoSelecionadoId)">
         <div class="w-16 h-16 bg-blue-600/15 rounded-full flex items-center justify-center border-2 border-blue-500/40 shadow-2xl group-active:scale-90 transition-all">
           <mat-icon class="text-blue-400 scale-[1.4]">sports_soccer</mat-icon>
         </div>
         <span class="block text-[12px] font-[900] text-slate-200 mt-2 tracking-widest uppercase">APOSTAR</span>
       </div>
-      <div class="cursor-pointer text-center group" (click)="verRodadasCorrentes(campeonatosDisponiveis[0].id)">
+      <div class="cursor-pointer text-center group" (click)="verRodadasCorrentes(campeonatoSelecionadoId)">
         <div class="w-16 h-16 bg-emerald-600/15 rounded-full flex items-center justify-center border-2 border-emerald-500/40 shadow-2xl group-active:scale-90 transition-all">
           <mat-icon class="text-emerald-400 scale-[1.4]">leaderboard</mat-icon>
         </div>
         <span class="block text-[12px] font-[900] text-slate-200 mt-2 tracking-widest uppercase">RESULTADOS</span>
       </div>
-      <div class="cursor-pointer text-center group" (click)="verRodadasFinalizadas(campeonatosDisponiveis[0].id)">
+      <div class="cursor-pointer text-center group" (click)="verRodadasFinalizadas(campeonatoSelecionadoId)">
         <div class="w-16 h-16 bg-slate-600/15 rounded-full flex items-center justify-center border-2 border-slate-500/40 shadow-2xl group-active:scale-90 transition-all">
           <mat-icon class="text-slate-400 scale-[1.4]">history</mat-icon>
         </div>
@@ -63,30 +55,47 @@
       <div class="px-5 mb-4 flex justify-between items-center">
         <h3 class="text-[15px] font-[900] text-white uppercase tracking-[3px] border-l-4 border-amber-500 pl-3">CAMPEONATOS ATIVOS</h3>
         <div class="flex items-center gap-1 text-amber-500 animate-pulse">
-          <span class="text-[11px] font-black uppercase">arraste</span>
+          <span class="text-[11px] font-black uppercase">arraste ou clique</span>
           <mat-icon class="scale-75">arrow_forward</mat-icon>
         </div>
       </div>
 
       <div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar pb-8 px-6" 
-           style="gap: 24px; scroll-behavior: smooth; cursor: grab;"
+           style="gap: 24px; scroll-behavior: smooth;"
            #sliderViewport
            (mousedown)="startDragging($event)" (mouseleave)="stopDragging()" 
            (mouseup)="stopDragging()" (mousemove)="moveEvent($event)">
         
         <article *ngFor="let camp of campeonatosDisponiveis" 
-                 class="snap-center shrink-0 w-[88%] bg-slate-900/90 rounded-[40px] border border-white/5 shadow-2xl overflow-hidden flex flex-col">
+                 (click)="selecionarCampeonato(camp.id)"
+                 [class.border-amber-500]="campeonatoSelecionadoId === camp.id"
+                 [class.ring-2]="campeonatoSelecionadoId === camp.id"
+                 [class.ring-amber-500]="campeonatoSelecionadoId === camp.id"
+                 class="snap-center shrink-0 w-[88%] bg-slate-900/90 rounded-[40px] border border-white/5 shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
           
           <div class="p-5 bg-slate-800/40 flex flex-col items-center text-center space-y-3">
             <img [src]="getCampeonatoLogo(camp.nome)" class="w-10 h-10 object-contain drop-shadow-xl">
             <div class="space-y-1">
               <h2 class="text-[10px] font-black text-white/90 leading-tight tracking-[2px]">{{ camp.nome }}</h2>
+              
               <div *ngIf="camp.aderidoPeloUsuario" 
                    style="color: #00ff00; border: 1.5px solid #00ff00; transform: rotate(-5deg); box-shadow: 0 0 10px #00ff00; background: rgba(0, 255, 0, 0.05);"
                    class="px-2 py-0.5 text-[7px] font-black inline-block rounded-sm uppercase">
                 VÍNCULO ATIVO 🏆
               </div>
+              
+              <button *ngIf="!camp.aderidoPeloUsuario" 
+                      (click)="abrirModalAdesao(camp)" 
+                      class="px-4 py-1.5 bg-indigo-600 text-white text-[10px] font-black rounded-full uppercase shadow-lg mt-1 active:scale-95 transition-all">
+                           ADERIR AGORA 🚀
+              </button>
+
+              <div *ngIf="camp.id === campeonatoSelecionadoId" 
+                class="px-2 py-0.5 text-[8px] font-black rounded-sm bg-amber-500 text-black shadow-[0_0_10px_#f59e0b] uppercase mt-1">
+                 SELECIONADO ⭐
+              </div>
             </div>
+            
           </div>
 
           <div class="painel-dashboard-interno p-5 space-y-5 flex-grow">
@@ -145,32 +154,25 @@
       </div>
     </section>
 
-   <section class="px-4 pb-20">
-  <div class="max-w-[92%] mx-auto space-y-0 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"> 
-    
-    <div class="bg-slate-900/95 rounded-t-[45px] border-t border-x border-white/10 p-8 flex justify-center items-center">
-      <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" 
-           alt="Espaço Mar"
-           class="h-24 w-auto object-contain rounded-xl shadow-2xl brightness-125 transition-transform hover:scale-105 duration-500">
-    </div>
-
-    <div class="relative w-full overflow-hidden rounded-b-[45px] border border-white/10 bg-slate-900/80 backdrop-blur-xl">
-      <div class="flex items-center justify-center min-h-[280px] p-4 bg-gradient-to-b from-black/20 to-transparent">
-        <img [src]="fotoAtual" 
-             class="w-full h-auto max-h-[450px] object-contain rounded-3xl shadow-inner transition-all duration-1000">
-      </div>
-      
-      <div class="bg-slate-950 p-4 text-center border-t border-white/5">
-        <div class="flex items-center justify-center gap-3">
-          <span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]"></span>
-          <span class="text-[11px] font-[900] text-slate-400 uppercase tracking-[6px]">Publicidade & Parceiros</span>
-          <span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]"></span>
+    <section class="px-4 pb-20">
+      <div class="max-w-[92%] mx-auto space-y-0 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"> 
+        <div class="bg-slate-900/95 rounded-t-[45px] border-t border-x border-white/10 p-8 flex justify-center items-center">
+          <img src="assets/marketing/parceiros/logo-espaco-mar.jpeg" alt="Espaço Mar" class="h-24 w-auto object-contain rounded-xl shadow-2xl brightness-125">
+        </div>
+        <div class="relative w-full overflow-hidden rounded-b-[45px] border border-white/10 bg-slate-900/80 backdrop-blur-xl">
+          <div class="flex items-center justify-center min-h-[280px] p-4 bg-gradient-to-b from-black/20 to-transparent">
+            <img [src]="fotoAtual" class="w-full h-auto max-h-[450px] object-contain rounded-3xl shadow-inner transition-all duration-1000">
+          </div>
+          <div class="bg-slate-950 p-4 text-center border-t border-white/5">
+            <div class="flex items-center justify-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]"></span>
+              <span class="text-[11px] font-[900] text-slate-400 uppercase tracking-[6px]">Publicidade & Parceiros</span>
+              <span class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]"></span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-  </div>
-</section>
+    </section>
 
   </main>
 </div>

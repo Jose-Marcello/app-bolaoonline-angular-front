@@ -32,6 +32,7 @@ function unwrap<T>(data: any): T {
   return data as T;
 }
 
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -52,16 +53,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   campeonatosDisponiveis: any[] = [];
   usuarioLogado: boolean = false;
   
-  // Dicionário para armazenar os totais de cada campeonato no slider
-  campeonatoTotais: { [key: string]: ApostasCampeonatoTotaisDto } = {};
+  // === NOVO: CONTROLE DE SELEÇÃO ===
+  campeonatoSelecionadoId: string | null = null;
 
-  // Galeria Marketing
+  campeonatoTotais: { [key: string]: ApostasCampeonatoTotaisDto } = {};
   indiceAtual = 0;
   fotos: string[] = Array.from({ length: 11 }, (_, i) => `assets/marketing/parceiros/EspMar-foto${i + 1}.jpeg`);
   fotoAtual: string = this.fotos[0];
   intervaloGaleria: any;
-
-  // Slider Mouse Drag
   isMouseDown = false;
   startX = 0;
   scrollLeft = 0;
@@ -98,65 +97,72 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.intervaloGaleria) clearInterval(this.intervaloGaleria);
   }
 
-  loadDashboardData(): void {
-    this.isLoading = true;
-    
-    // 1. Busca dados do apostador se logado
-    const inicializarFluxo$ = this.usuarioLogado 
-      ? this.apostadorService.getDadosApostador().pipe(
-          catchError(() => of({ success: false, data: null })),
-          tap(response => {
-            if (response?.success && response.data) {
-              const data = unwrap<ApostadorDto>(response.data);
-              if (data) {
-                this.apostador = data;
-                this.apostadorSaldo = data.saldo?.valor || 0;
-              }
-            }
-          })
-        )
-      : of({ success: true, data: null });
-
-    // 2. Busca campeonatos e depois seus detalhes em paralelo
-    inicializarFluxo$.pipe(
-      switchMap(() => this.campeonatoService.getAvailableCampeonatos(this.apostador?.usuarioId || '')),
-      map(response => unwrap<any[]>(response.data) || []),
-      switchMap(campeonatos => {
-        this.campeonatosDisponiveis = campeonatos;
-        if (campeonatos.length === 0) return of([]);
-
-        const detalhamentoTarefas = campeonatos.map(camp => {
-          return forkJoin({
-            emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
-            correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
-            finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
-            // CHAMA O NOVO MÉTODO DO CONTROLLER C#
-            totais: this.campeonatoService.obterTotaisDashboard(camp.id).pipe(catchError(() => of({ success: false, data: null })))
-          }).pipe(
-            tap(res => {
-              camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta?.data) || [];
-              camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes?.data) || [];
-              camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas?.data) || [];
-              
-              if (res.totais?.success && res.totais.data) {
-                // Alimenta o dicionário com os nomes de campos corretos da Interface
-                this.campeonatoTotais[camp.id] = res.totais.data;
-              }
-            })
-          );
-        });
-        return forkJoin(detalhamentoTarefas);
-      }),
-      finalize(() => { this.isLoading = false; })
-    ).subscribe({
-      error: (err) => { 
-        console.error('Erro ao carregar dashboard:', err);
-        this.isLoading = false; 
-      }
-    });
+  // === NOVO: MÉTODO PARA MARCAR O SELECIONADO ===
+  selecionarCampeonato(id: string) {
+    this.campeonatoSelecionadoId = id;
   }
 
-  navegarParaApostasRodada(campeonatoId: string) {
+  loadDashboardData(): void {
+  this.isLoading = true;
+  
+  // 1. Forçamos a busca do apostador primeiro para garantir o ID
+  const inicializarFluxo$ = this.usuarioLogado 
+    ? this.apostadorService.getDadosApostador().pipe(
+        map(response => {
+          const data = unwrap<ApostadorDto>(response.data);
+          if (data) {
+            this.apostador = data;
+            this.apostadorSaldo = data.saldo?.valor || 0;
+          }
+          return data; // Passa o objeto preenchido para o próximo passo
+        }),
+        catchError(() => of(null))
+      )
+    : of(null);
+
+  // 2. Agora o switchMap garante que o userId já existe antes de buscar campeonatos e rodadas
+  inicializarFluxo$.pipe(
+    switchMap(user => {
+      const userId = user?.usuarioId || this.apostador?.usuarioId || '';
+      return this.campeonatoService.getAvailableCampeonatos(userId);
+    }),
+    map(response => unwrap<any[]>(response.data) || []),
+    switchMap(campeonatos => {
+      this.campeonatosDisponiveis = campeonatos;
+      
+      // Sincroniza a seleção inicial
+      if (campeonatos.length > 0 && !this.campeonatoSelecionadoId) {
+        this.campeonatoSelecionadoId = campeonatos[0].id;
+      }
+
+      if (campeonatos.length === 0) return of([]);
+
+      const detalhamentoTarefas = campeonatos.map(camp => {
+        return forkJoin({
+          emAposta: this.rodadaService.getRodadasEmAposta(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
+          correntes: this.rodadaService.getRodadasCorrentes(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
+          finalizadas: this.rodadaService.getRodadasFinalizadas(camp.id).pipe(catchError(() => of({ success: false, data: [] }))),
+          totais: this.campeonatoService.obterTotaisDashboard(camp.id).pipe(catchError(() => of({ success: false, data: null })))
+        }).pipe(
+          tap(res => {
+            camp.rodadasEmAposta = unwrap<RodadaDto[]>(res.emAposta?.data) || [];
+            camp.rodadasCorrentes = unwrap<RodadaDto[]>(res.correntes?.data) || [];
+            camp.rodadasFinalizadas = unwrap<RodadaDto[]>(res.finalizadas?.data) || [];
+            if (res.totais?.success && res.totais.data) {
+              this.campeonatoTotais[camp.id] = res.totais.data;
+            }
+          })
+        );
+      });
+      return forkJoin(detalhamentoTarefas);
+    }),
+    finalize(() => { this.isLoading = false; })
+  ).subscribe();
+}
+
+  // === NAVEGAÇÃO AGORA USA O ID SELECIONADO DINAMICAMENTE ===
+  navegarParaApostasRodada(campeonatoId: string | null) {
+    if (!campeonatoId) return;
     const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
     if (camp && camp.rodadasEmAposta?.length > 0) {
       const rodadaId = camp.rodadasEmAposta[0].id;
@@ -166,7 +172,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  verRodadasCorrentes(campeonatoId: string) {
+  verRodadasCorrentes(campeonatoId: string | null) {
+    if (!campeonatoId) return;
     const camp = this.campeonatosDisponiveis.find(c => c.id === campeonatoId);
     if (camp && camp.rodadasCorrentes?.length > 0) {
       const rodadaId = camp.rodadasCorrentes[0].id;
@@ -176,21 +183,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  verRodadasFinalizadas(campeonatoId: string) {
+  verRodadasFinalizadas(campeonatoId: string | null) {
+    if (!campeonatoId) return;
     this.router.navigate(['/dashboard/ranking/campeonato', campeonatoId]);
-  }
-
-  navegarParaRegras() {
-    this.router.navigate(['/dashboard/regrasDoBolao']);
-  }
-  
-  abrirModalAdesao(camp: any) {
-    if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
-    const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
-      width: '400px',
-      data: { campeonato: camp, apostador: this.apostador }
-    });
-    dialogRef.afterClosed().subscribe(result => { if (result) this.loadDashboardData(); });
   }
 
   getCampeonatoLogo(nome: string): string {
@@ -209,10 +204,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, 4000);
   }
 
-  // Slider Mouse Drag corrigido para usar sliderViewport
   startDragging(e: MouseEvent) {
     this.isMouseDown = true;
-    const slider = e.currentTarget as HTMLElement;
+    const slider = this.sliderViewport.nativeElement;
     this.startX = e.pageX - slider.offsetLeft;
     this.scrollLeft = slider.scrollLeft;
   }
@@ -222,12 +216,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   moveEvent(e: MouseEvent) {
     if (!this.isMouseDown) return;
     e.preventDefault();
-    const slider = e.currentTarget as HTMLElement;
+    const slider = this.sliderViewport.nativeElement;
     const x = e.pageX - slider.offsetLeft;
     const walk = (x - this.startX) * 2; 
     slider.scrollLeft = this.scrollLeft - walk;
   }
 
   navigateToDepositar() { this.router.navigate(['/dashboard/financeiro/depositar']); }
+  navegarParaRegras() { this.router.navigate(['/dashboard/regrasDoBolao']); }
   informarEmDesenvolvimento() { this.snackBar.open('Em desenvolvimento!', 'OK', { duration: 3000 }); }
+
+  abrirModalAdesao(camp: any) {
+    if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
+    const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
+      width: '400px',
+      data: { campeonato: camp, apostador: this.apostador }
+    });
+    dialogRef.afterClosed().subscribe(result => { if (result) this.loadDashboardData(); });
+  }
 }

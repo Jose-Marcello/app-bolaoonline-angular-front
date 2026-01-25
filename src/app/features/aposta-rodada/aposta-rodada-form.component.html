@@ -65,6 +65,45 @@
 
   /* 7. BOTÃO SALVAR */
   .btn-salvar-v6 { width: 100% !important; height: 56px !important; background: linear-gradient(90deg, #4f46e5, #818cf8) !important; color: white !important; font-weight: 900 !important; border-radius: 14px !important; border: none !important; text-transform: uppercase !important; margin-top: 30px !important; font-size: 16px !important; cursor: pointer; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3); }
+
+/* FEEDBACK DE VALIDAÇÃO */
+  .badge-validacao-v6 {
+    margin: 20px 0;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .status-erro {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border: 1px solid #ef4444 !important;
+    color: #f87171 !important;
+  }
+  .status-sucesso {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border: 1px solid #10b981 !important;
+    color: #34d399 !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    animation: pulse-green 2s infinite;
+  }
+
+  @keyframes pulse-green {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  /* Alteração dinâmica no botão salvar */
+  .btn-bloqueado {
+    background: #334155 !important;
+    color: #64748b !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+  }
+
 </style>
 
 <div class="tela-apostas-v6" [formGroup]="apostaForm">
@@ -148,7 +187,7 @@
           <div class="time-v6">
             <div class="img-container-v6">
               <img [src]="baseUrlImagens + j.equipeCasaEscudoUrl" 
-                   onerror="this.src='assets/img/logobolao.png'">
+                   onerror="this.src='assets/images/logobolao.png'">
             </div>
             <span>{{ j.equipeCasaNome }}</span>
           </div>
@@ -162,21 +201,39 @@
           <div class="time-v6">
             <div class="img-container-v6">
               <img [src]="baseUrlImagens + j.equipeVisitanteEscudoUrl" 
-                   onerror="this.src='assets/img/logobolao.png'">
+                   onerror="this.src='assets/images/logobolao.png'">
             </div>
             <span>{{ j.equipeVisitanteNome }}</span>
           </div>
         </div>
       </div>
 
+     <div class="badge-validacao-v6" 
+       [ngClass]="regraValidada ? 'status-sucesso' : 'status-erro'"
+       *ngIf="apostaAtual?.podeEditar">
+       <div *ngIf="regraValidada">
+          <mat-icon style="vertical-align: middle; font-size: 16px;">check_circle</mat-icon>
+            APOSTA VÁLIDA - PRONTA PARA SALVAR
+       </div>
+       <div *ngIf="!regraValidada">
+           <mat-icon style="vertical-align: middle; font-size: 16px;">warning</mat-icon>
+           APOSTA INVÁLIDA: MÍNIMO 3 (EMPATES OU VISITANTES)
+        </div>
+      </div>
+      
       <footer class="footer-v6" style="padding-bottom: 40px;">
-        <button type="button" 
-            class="btn-salvar-v6" 
-            (click)="salvarApostas()" 
-            [disabled]="apostaForm.invalid || !apostaAtual?.podeEditar">
-            SALVAR APOSTA
-        </button>
-      </footer>
+         <button type="button" 
+                 class="btn-salvar-v6" 
+                 (click)="salvarApostas()" 
+                 [disabled]="!regraValidada || !apostaAtual?.podeEditar || isSaving"
+                 [style.background]="regraValidada ? 'linear-gradient(90deg, #4f46e5, #818cf8)' : '#334155'"
+                 [style.opacity]="regraValidada ? '1' : '0.6'">
+                 <span *ngIf="!isSaving">
+                      {{ regraValidada ? 'SALVAR MEUS PALPITES' : 'REGRA NÃO ATENDIDA' }}
+                 </span>
+                 <mat-spinner *ngIf="isSaving" diameter="24" style="margin: 0 auto;"></mat-spinner>
+            </button>
+         </footer>
     </div>
 
     <div *ngIf="isLoading" style="display:flex; justify-content:center; padding:50px;">

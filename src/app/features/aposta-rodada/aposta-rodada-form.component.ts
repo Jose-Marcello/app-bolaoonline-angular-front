@@ -58,6 +58,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   campeonatoId: string | null = null;
   rodadaId: string | null = null;
   apostadorCampeonatoId: string | null = null;
+  apostadorId: string | null = null;
   rodadaSelecionadaId: string | null = null;
   apostaSelecionadaId: string | null = null; 
   userId: string | null = null;
@@ -187,6 +188,7 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
 
         if (apostador) {
           this.userId = apostador.id;
+          this.apostadorId = apostador.id;
           this.apostadorSaldo = apostador.saldo?.valor || 0;
         }
 
@@ -327,31 +329,50 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   }
 
   salvarApostas(): void {
-    if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar) return;
-    const dadosParaSalvar: SalvarApostaRequestDto = {
-      id: this.apostaAtual.id,
-      campeonatoId: this.campeonatoId,
-      rodadaId: this.rodadaSelecionadaId!,
-      apostadorCampeonatoId: this.apostadorCampeonatoId,
-      ehApostaIsolada: !this.campeonatoId,
-      identificadorAposta: this.apostaAtual.identificadorAposta,
-      ehCampeonato: !!this.campeonatoId,
-      apostasJogos: this.palpites.getRawValue().map((p: any) => ({
-        jogoId: p.jogoId,
-        placarCasa: p.placarApostaCasa,
-        placarVisitante: p.placarApostaVisita
-      }))
-    };
-    this.apostaService.salvarApostas(dadosParaSalvar).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.showSnackBar("Palpites salvos com sucesso!");
-          this.loadAllIntegratedData().subscribe();
-        }
-      },
-      error: () => this.showSnackBar("Erro ao salvar palpites.", 'Fechar', 'error')
-    });
-  }
+  if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar || !this.regraValidada) return;
+  
+  this.isSaving = true;
+
+  const dadosParaSalvar: SalvarApostaRequestDto = {
+    id: this.apostaAtual.id,
+    campeonatoId: this.campeonatoId || null, // Se for vazio, envia null
+    rodadaId: this.rodadaSelecionadaId!,
+    
+    // AJUSTE AQUI: Se for nulo (avulsa), manda o campeonatoId só para passar na validação do C#
+    // O banco vai ignorar se a lógica de EhApostaCampeonato estiver correta
+    apostadorCampeonatoId: this.apostadorCampeonatoId || this.campeonatoId,
+    
+    apostadorId: this.apostadorId,
+    ehApostaIsolada: !this.campeonatoId,
+    identificadorAposta: this.apostaAtual.identificadorAposta,
+    ehCampeonato: !!this.campeonatoId,
+    apostasJogos: this.palpites.getRawValue().map((p: any) => ({
+      jogoId: p.jogoId,
+      placarCasa: p.placarApostaCasa,
+      placarVisitante: p.placarApostaVisita
+    }))
+  };
+
+  console.log('Objeto enviado para o Azure:', dadosParaSalvar);
+
+  this.apostaService.salvarApostas(dadosParaSalvar).pipe(
+    finalize(() => this.isSaving = false)
+  ).subscribe({
+    next: (res) => {
+      if (res.success) {
+        this.showSnackBar("Palpites salvos com sucesso! 🏆");
+        this.loadAllIntegratedData().subscribe();
+      } else {
+        this.showSnackBar(res.message || "Erro ao processar salvamento.", 'Fechar', 'error');
+      }
+    },
+    error: (err) => {
+      console.error('Erro técnico no salvamento:', err);
+      this.showSnackBar("Erro de conexão ou validação no servidor.", 'Fechar', 'error');
+    }
+  });
+}
+
 
   selecionarRodada(id: string) {
     this.rodadaId = id;

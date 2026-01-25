@@ -12,6 +12,7 @@ export interface SalvarApostaRequestDto {
 
   campeonatoId: string | null; 
   apostadorCampeonatoId: string | null;
+  apostadorId: string | null;
 
   
   rodadaId: string;

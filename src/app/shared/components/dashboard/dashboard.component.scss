@@ -174,3 +174,24 @@
     background-color: rgba(30, 41, 59, 0.6) !important;
     backdrop-filter: blur(8px);
 }
+
+.campeonato-card {
+  transition: all 0.3s ease;
+  opacity: 0.7; // Cards não selecionados ficam mais "apagados"
+  
+  &.selected {
+    opacity: 1;
+    border: 2px solid #ffd700; // Destaque em dourado
+    transform: scale(1.05); // Dá um leve destaque de tamanho
+  }
+}
+
+// No seu arquivo .scss
+#sliderViewport {
+  -webkit-overflow-scrolling: touch; // Melhora muito a rolagem no celular (iOS/Android)
+  scroll-snap-type: x mandatory;    // Faz o card "parar" certinho no meio (imã)
+  
+  article {
+    scroll-snap-align: center;      // Alinha o card no centro da tela ao soltar
+  }
+}
