@@ -3,11 +3,15 @@
     "rewrite": "/index.html",
     "exclude": ["/api/*", "/.auth/*"] 
   },
+  "mimeTypes": {
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
+    ".svg": "image/svg+xml"
+  },
   "routes": [
     {
       "route": "/api/*",
-      "allowedRoles": ["anonymous", "authenticated"],
-      "backend": "env-bolao-qa" 
+      "allowedRoles": ["anonymous", "authenticated"]
     }
   ],
   "responseOverrides": {
@@ -16,4 +20,3 @@
     }
   }
 }
-
