@@ -1,12 +1,13 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/api/*", "/.auth/*"] 
+    "exclude": ["/api/*", "/.auth/*", "/assets/*"]
   },
   "mimeTypes": {
     ".js": "application/javascript",
     ".mjs": "application/javascript",
-    ".svg": "image/svg+xml"
+    ".svg": "image/svg+xml",
+    ".webmanifest": "application/manifest+json"
   },
   "routes": [
     {
@@ -18,5 +19,9 @@
     "404": {
       "rewrite": "/index.html"
     }
+  },
+  "globalHeaders": {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Service-Worker-Allowed": "/"
   }
 }
