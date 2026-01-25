@@ -30,7 +30,7 @@ jobs:
           ###### Configurações do Repositório/Build ######
           app_location: "/" # Local do package.json
           api_location: "" 
-          output_location: "dist/bolao-online-app-v6/browser" # Caminho exato do Angular 17
+          output_location: "dist/bolao-v6-final/browser" # Caminho exato do Angular 17
           app_build_command: "npm run build" # Força o build do Angular
           skip_app_build: false # Garante que o GitHub Actions processe o build
           ###### Fim das Configurações ######
@@ -46,3 +46,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_SMOKE_0B3EE3B0F }}
           action: "close"
+
