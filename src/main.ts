@@ -6,6 +6,8 @@ import { routes } from './app/app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; // Importa o array de rotas
 import { withInterceptors } from '@angular/common/http';
 import { jwtInterceptor } from './app/core/interceptors/jwt.interceptor';
+import { provideServiceWorker } from '@angular/service-worker';
+import { isDevMode } from '@angular/core';
 
 
 provideHttpClient(
@@ -18,14 +20,15 @@ provideHttpClient(
 
 bootstrapApplication(AppComponent, {
     providers: [
-        provideRouter(routes),
-        // 🛡️ Configuramos o HttpClient com suporte a Fetch e aos nossos Interceptores
-        provideHttpClient(
-            withFetch(),
-            withInterceptors([jwtInterceptor])
-        ),
-        provideAnimationsAsync()
-    ]
+    provideRouter(routes),
+    // 🛡️ Configuramos o HttpClient com suporte a Fetch e aos nossos Interceptores
+    provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),
+    provideAnimationsAsync(),
+    provideServiceWorker('ngsw-worker.js', {
+        enabled: !isDevMode(),
+        registrationStrategy: 'registerWhenStable:30000'
+    })
+]
 })
 
 /*
