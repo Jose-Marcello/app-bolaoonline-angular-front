@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/bolao-online-app-v6",
+            "outputPath": "dist/bolao-v6-final",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
