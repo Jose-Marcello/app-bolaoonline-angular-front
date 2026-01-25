@@ -127,7 +127,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return this.campeonatoService.getAvailableCampeonatos(userId);
     }),
     map(response => unwrap<any[]>(response.data) || []),
-    switchMap(campeonatos => {
+    switchMap(campeonatos => { 
       this.campeonatosDisponiveis = campeonatos;
       
       // Sincroniza a seleção inicial
