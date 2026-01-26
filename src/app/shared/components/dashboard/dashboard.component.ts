@@ -166,6 +166,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           })
         );
       });
+      this.centralizarSelecionado();
       return forkJoin(detalhamentoTarefas);
     }),
     finalize(() => { this.isLoading = false; })
@@ -208,6 +209,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
     return logos[nome] || 'assets/images/logo-bola.png';
   }
+
+  private centralizarSelecionado() {
+  setTimeout(() => {
+    if (this.sliderViewport && this.campeonatoSelecionadoId) {
+      const viewport = this.sliderViewport.nativeElement;
+      // Busca o elemento HTML do card que tem o ID selecionado
+      const cardSelecionado = viewport.querySelector(`[class*="border-amber-500"]`);
+      
+      if (cardSelecionado) {
+        const offsetLeft = cardSelecionado.offsetLeft;
+        const cardWidth = cardSelecionado.offsetWidth;
+        const viewportWidth = viewport.offsetWidth;
+        
+        // Cálculo para deixar o card exatamente no meio da tela
+        const scrollPos = offsetLeft - (viewportWidth / 2) + (cardWidth / 2);
+        
+        viewport.scrollTo({
+          left: scrollPos,
+          behavior: 'smooth' // Faz aquele deslize elegante
+        });
+      }
+    }
+  }, 300); // Aguarda o Angular renderizar os cards na tela
+}
 
   iniciarCarrossel() {
     this.intervaloGaleria = setInterval(() => {

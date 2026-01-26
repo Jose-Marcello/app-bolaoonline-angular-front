@@ -3,12 +3,18 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/materia
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importante para os avisos
+import { CampeonatoService } from '../../../core/services/campeonato.service'; // Ajuste o caminho conforme seu projeto
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-confirmacao-adesao-modal',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, CurrencyPipe],
+  imports: [
+    CommonModule, MatDialogModule, MatButtonModule, 
+    MatIconModule, CurrencyPipe, MatSnackBarModule
+  ],
   template: `
     <div class="bg-[#0f172a] border border-indigo-500/30 rounded-2xl overflow-hidden shadow-2xl">
       <div class="p-6 text-center border-b border-slate-800">
@@ -16,10 +22,10 @@ import { MatIconModule } from '@angular/material/icon';
           <span class="text-3xl">🏆</span>
         </div>
         <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">
-          Aderir ao Campeonato
+          Aderir ao {{ data.campeonato.nome }}
         </h3>
         <p class="text-slate-400 text-[10px] mt-1 font-bold uppercase tracking-widest">
-          Investimento único: <span class="text-emerald-400 text-sm">R$ 100,00</span>
+          Investimento único: <span class="text-emerald-400 text-sm">{{ (data.campeonato.custoAdesao || 0) | currency:'BRL' }}</span>
         </p>
       </div>
 
@@ -37,11 +43,18 @@ import { MatIconModule } from '@angular/material/icon';
       </div>
 
       <div class="p-4 bg-slate-900/50 flex gap-3">
-        <button mat-button class="flex-1 text-slate-500 font-black uppercase text-[10px] tracking-widest" (click)="onCancelar()">
+        <button mat-button 
+                [disabled]="isAderindo"
+                class="flex-1 text-slate-500 font-black uppercase text-[10px] tracking-widest" 
+                (click)="onCancelar()">
           DESISTIR
         </button>
-        <button mat-raised-button class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase text-[10px] tracking-widest rounded-lg" (click)="onConfirmar()">
-          CONFIRMAR
+        <button mat-raised-button 
+                [disabled]="isAderindo"
+                class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase text-[10px] tracking-widest rounded-lg" 
+                (click)="confirmarAdesao()">
+          <span *ngIf="!isAderindo">CONFIRMAR</span>
+          <span *ngIf="isAderindo">PROCESSANDO...</span>
         </button>
       </div>
     </div>
@@ -52,11 +65,49 @@ import { MatIconModule } from '@angular/material/icon';
   `]
 })
 export class ConfirmacaoAdesaoModalComponent {
+  isAderindo = false;
+
   constructor(
     public dialogRef: MatDialogRef<ConfirmacaoAdesaoModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { campeonatoNome: string }
+    private snackBar: MatSnackBar,
+    private campeonatoService: CampeonatoService,
+    @Inject(MAT_DIALOG_DATA) public data: { campeonato: any, apostador: any }
   ) {}
 
-  onConfirmar(): void { this.dialogRef.close(true); }
-  onCancelar(): void { this.dialogRef.close(false); }
+  onCancelar(): void {
+    this.dialogRef.close(false);
+  }
+
+  confirmarAdesao() {
+    // 🛑 1. Verificação de Custo (Segurança de Dados)
+    if (!this.data.campeonato.custoAdesao || this.data.campeonato.custoAdesao <= 0) {
+      this.snackBar.open('⚠️ Erro: Campeonato sem valor de adesão definido.', 'Entendi', { duration: 5000 });
+      return;
+    }
+
+    // 🛑 2. Verificação de Saldo (Prevenção de Erro 400)
+    const saldoAtual = this.data.apostador?.saldo?.valor || 0;
+    if (saldoAtual < this.data.campeonato.custoAdesao) {
+      this.snackBar.open('❌ Saldo insuficiente para esta adesão.', 'OK', { duration: 5000 });
+      return;
+    }
+
+    this.isAderindo = true;
+    this.campeonatoService.entrarEmCampeonato(this.data.campeonato.id)
+      .pipe(
+        finalize(() => this.isAderindo = false),
+        catchError(err => {
+          // Captura o erro sem deslogar o ZeMarcello
+          const msg = err.error?.message || 'Erro ao processar adesão no servidor.';
+          this.snackBar.open('❌ ' + msg, 'OK', { duration: 5000 });
+          return of(null);
+        })
+      )
+      .subscribe(res => {
+        if (res && res.success) {
+          this.snackBar.open('🏆 Adesão realizada com sucesso!', 'Boa sorte!', { duration: 3000 });
+          this.dialogRef.close(true); // Retorna true para o Dashboard recarregar o saldo
+        }
+      });
+  }
 }
