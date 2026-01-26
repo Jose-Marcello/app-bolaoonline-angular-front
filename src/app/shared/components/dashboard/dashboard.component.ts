@@ -99,8 +99,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // === NOVO: MÉTODO PARA MARCAR O SELECIONADO ===
   selecionarCampeonato(id: string) {
-    this.campeonatoSelecionadoId = id;
-  }
+  this.campeonatoSelecionadoId = id;
+  localStorage.setItem('bolao_ultimo_campeonato_id', id); // Salva a preferência do ZeMarcello
+}
 
   loadDashboardData(): void {
   this.isLoading = true;
@@ -129,6 +130,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     map(response => unwrap<any[]>(response.data) || []),
     switchMap(campeonatos => { 
       this.campeonatosDisponiveis = campeonatos;
+
+       // === LÓGICA DE RECUPERAÇÃO DE MEMÓRIA ===
+      const idSalvo = localStorage.getItem('bolao_ultimo_campeonato_id');
+      const campeonatoAindaExiste = campeonatos.find(c => c.id === idSalvo);
+
+      if (idSalvo && campeonatoAindaExiste) {
+        this.campeonatoSelecionadoId = idSalvo;
+      } else if (campeonatos.length > 0) {
+        this.campeonatoSelecionadoId = campeonatos[0].id;
+      }
+
       
       // Sincroniza a seleção inicial
       if (campeonatos.length > 0 && !this.campeonatoSelecionadoId) {
@@ -227,11 +239,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   informarEmDesenvolvimento() { this.snackBar.open('Em desenvolvimento!', 'OK', { duration: 3000 }); }
 
   abrirModalAdesao(camp: any) {
-    if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
-    const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
-      width: '400px',
-      data: { campeonato: camp, apostador: this.apostador }
-    });
-    dialogRef.afterClosed().subscribe(result => { if (result) this.loadDashboardData(); });
-  }
+  if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
+  
+  const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
+    width: '400px',
+    data: { campeonato: camp, apostador: this.apostador }
+  });
+
+  dialogRef.afterClosed().pipe(
+    catchError(err => {
+      console.error("Erro ao processar adesão:", err);
+      this.snackBar.open('Ops! Ocorreu um erro na adesão, mas você continua logado.', 'OK');
+      return of(null);
+    })
+  ).subscribe(result => { 
+    if (result) {
+      // Recarrega os dados sem perder o campeonato selecionado
+      this.loadDashboardData(); 
+    }
+  });
+}
 }
