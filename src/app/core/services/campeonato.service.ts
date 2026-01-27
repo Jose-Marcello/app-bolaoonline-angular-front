@@ -45,31 +45,18 @@ export class CampeonatoService { // <<-- REMOVIDO extends BaseService -->>
    * @param request Dados para vincular apostador ao campeonato.
    * @returns Um Observable da ApiResponse.
    */
- entrarEmCampeonato(idDoCampeonato: any): Observable<ApiResponse<any>> {
-    console.log('[CampeonatoService] entrarEmCampeonato: Chamando API...');
+ entrarEmCampeonato(request: any): Observable<ApiResponse<any>> {
+  // Se 'request' for uma string ou um objeto, nós garantimos o formato aqui:
+  const id = typeof request === 'string' ? request : (request.campeonatoId || request.id);
+  const payload = { campeonatoId: id }; // O segredo é este objeto
 
-    const headers = new HttpHeaders({
-        'Content-Type': 'application/json'
-    });
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    // 🚀 AQUI ESTÁ O TRUQUE: 
-    // Em vez de passar o 'request' direto, montamos o objeto JSON aqui.
-    // Isso garante que o Payload seja {"campeonatoId": "..."} e não apenas a string.
-    const body = {
-        campeonatoId: idDoCampeonato.campeonatoId || idDoCampeonato 
-    };
-
-    return this.http.post<ApiResponse<any>>(
-        `${this.apiUrl}/api/Campeonato/VincularApostador`, 
-        body, // Enviamos o objeto estruturado
-        { headers }
-    ).pipe(
-        map(response => {
-            console.log('[CampeonatoService] Resposta da API:', response);
-            return response;
-        }),
-        catchError(this.handleError)
-    );
+  return this.http.post<ApiResponse<any>>(
+    `${this.apiUrl}/api/Campeonato/VincularApostador`, 
+    payload, // Enviamos o objeto literal
+    { headers }
+  );
 }
 
   // Adicione este método ao seu CampeonatoService

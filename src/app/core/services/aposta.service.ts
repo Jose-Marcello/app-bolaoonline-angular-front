@@ -112,23 +112,25 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
   }
 
 
-  criarNovaApostaAvulsa(idDaRodada: any): Observable<ApiResponse<ApostaRodadaDto>> {
+ criarNovaApostaAvulsa(requestBody: any): Observable<ApiResponse<ApostaRodadaDto>> {
     const url = `${this.apiUrl}/CriarApostaAvulsa`;
     
-    // 🚀 O SEGREDO: Criar o objeto que o backend espera
-    const payload = {
-        rodadaId: idDaRodada.rodadaId || idDaRodada 
-    };
+    // 🚀 FORÇANDO A ESTRUTURA CORRETA
+    // Se requestBody for apenas a string "ad7e6396...", o código abaixo corrige:
+    const payload = typeof requestBody === 'string' 
+        ? { rodadaId: requestBody } 
+        : { rodadaId: requestBody.rodadaId || requestBody.id };
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    console.log('ENVIANDO PAYLOAD REAL:', JSON.stringify(payload));
+    // Esse log é vital: ele tem que mostrar {"rodadaId": "..."}
+    console.log('[ApostaService] PAYLOAD FINAL:', JSON.stringify(payload));
 
     return this.http.post<ApiResponse<ApostaRodadaDto>>(
       url, 
-      payload, // Enviamos o objeto, não a string solta
+      payload, 
       { headers }
     ).pipe(
       catchError(this.handleError)
