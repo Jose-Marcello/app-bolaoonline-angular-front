@@ -112,20 +112,24 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
   }
 
 
-  criarNovaApostaAvulsa(requestBody: CriarApostaAvulsaRequestDto): Observable<ApiResponse<ApostaRodadaDto>> {
-    console.log('[ApostaService] Chamando CriarNovaApostaAvulsa com URL:', `${this.apiUrl}/CriarApostaAvulsa`, 'e dados:', requestBody);
+  criarNovaApostaAvulsa(idDaRodada: any): Observable<ApiResponse<ApostaRodadaDto>> {
+    const url = `${this.apiUrl}/CriarApostaAvulsa`;
     
-    // 🚀 Adicionamos o cabeçalho para garantir que o Azure aceite o JSON
+    // 🚀 O SEGREDO: Criar o objeto que o backend espera
+    const payload = {
+        rodadaId: idDaRodada.rodadaId || idDaRodada 
+    };
+
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    console.log('CONTEÚDO DA APOSTA:', JSON.stringify(requestBody));
+    console.log('ENVIANDO PAYLOAD REAL:', JSON.stringify(payload));
 
     return this.http.post<ApiResponse<ApostaRodadaDto>>(
-      `${this.apiUrl}/CriarApostaAvulsa`, 
-      requestBody, 
-      { headers } // Passamos os headers aqui
+      url, 
+      payload, // Enviamos o objeto, não a string solta
+      { headers }
     ).pipe(
       catchError(this.handleError)
     );
