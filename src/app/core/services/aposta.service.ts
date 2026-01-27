@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError,tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -114,12 +114,20 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
 
   criarNovaApostaAvulsa(requestBody: CriarApostaAvulsaRequestDto): Observable<ApiResponse<ApostaRodadaDto>> {
     console.log('[ApostaService] Chamando CriarNovaApostaAvulsa com URL:', `${this.apiUrl}/CriarApostaAvulsa`, 'e dados:', requestBody);
-    return this.http.post<ApiResponse<ApostaRodadaDto>>(`${this.apiUrl}/CriarApostaAvulsa`, requestBody)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
+    
+    // 🚀 Adicionamos o cabeçalho para garantir que o Azure aceite o JSON
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
 
+    return this.http.post<ApiResponse<ApostaRodadaDto>>(
+      `${this.apiUrl}/CriarApostaAvulsa`, 
+      requestBody, 
+      { headers } // Passamos os headers aqui
+    ).pipe(
+      catchError(this.handleError)
+    );
+}
 // Seu novo método vai ser adicionado aqui
   /**
    * Obtém os totais de apostas avulsas (isoladas) de uma rodada específica.

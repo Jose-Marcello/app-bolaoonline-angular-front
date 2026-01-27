@@ -1,7 +1,7 @@
 // Localização: src/app/core/services/campeonato.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http'; // Importar HttpErrorResponse
+import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http'; // Importar HttpErrorResponse
 import { Observable, throwError } from 'rxjs'; // Importar throwError
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -47,14 +47,24 @@ export class CampeonatoService { // <<-- REMOVIDO extends BaseService -->>
    */
   entrarEmCampeonato(request: VincularApostadorCampeonatoDto): Observable<ApiResponse<any>> {
     console.log('[CampeonatoService] entrarEmCampeonato: Chamando API para vincular apostador ao campeonato.');
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/Campeonato/VincularApostador`, request).pipe(
-      map(response => {
-        console.log('[CampeonatoService] Resposta da API entrarEmCampeonato:', response);
-        return response;
-      }),
-      catchError(this.handleError)
+    
+    // Adicionamos o Header explicitamente para matar o erro 415
+    const headers = new HttpHeaders({
+        'Content-Type': 'application/json'
+    });
+
+    return this.http.post<ApiResponse<any>>(
+        `${this.apiUrl}/api/Campeonato/VincularApostador`, 
+        request, // O objeto DTO já deve conter o campeonatoId
+        { headers } // Passamos o header aqui
+    ).pipe(
+        map(response => {
+            console.log('[CampeonatoService] Resposta da API entrarEmCampeonato:', response);
+            return response;
+        }),
+        catchError(this.handleError)
     );
-  }
+}
 
   // Adicione este método ao seu CampeonatoService
 getById(id: string) 
