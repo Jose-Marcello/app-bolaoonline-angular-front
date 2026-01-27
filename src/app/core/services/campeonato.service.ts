@@ -45,21 +45,27 @@ export class CampeonatoService { // <<-- REMOVIDO extends BaseService -->>
    * @param request Dados para vincular apostador ao campeonato.
    * @returns Um Observable da ApiResponse.
    */
-  entrarEmCampeonato(request: VincularApostadorCampeonatoDto): Observable<ApiResponse<any>> {
-    console.log('[CampeonatoService] entrarEmCampeonato: Chamando API para vincular apostador ao campeonato.');
-    
-    // Adicionamos o Header explicitamente para matar o erro 415
+ entrarEmCampeonato(idDoCampeonato: any): Observable<ApiResponse<any>> {
+    console.log('[CampeonatoService] entrarEmCampeonato: Chamando API...');
+
     const headers = new HttpHeaders({
         'Content-Type': 'application/json'
     });
 
+    // 🚀 AQUI ESTÁ O TRUQUE: 
+    // Em vez de passar o 'request' direto, montamos o objeto JSON aqui.
+    // Isso garante que o Payload seja {"campeonatoId": "..."} e não apenas a string.
+    const body = {
+        campeonatoId: idDoCampeonato.campeonatoId || idDoCampeonato 
+    };
+
     return this.http.post<ApiResponse<any>>(
         `${this.apiUrl}/api/Campeonato/VincularApostador`, 
-        request, // O objeto DTO já deve conter o campeonatoId
-        { headers } // Passamos o header aqui
+        body, // Enviamos o objeto estruturado
+        { headers }
     ).pipe(
         map(response => {
-            console.log('[CampeonatoService] Resposta da API entrarEmCampeonato:', response);
+            console.log('[CampeonatoService] Resposta da API:', response);
             return response;
         }),
         catchError(this.handleError)

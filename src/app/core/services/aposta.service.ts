@@ -120,6 +120,8 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
       'Content-Type': 'application/json'
     });
 
+    console.log('CONTEÚDO DA APOSTA:', JSON.stringify(requestBody));
+
     return this.http.post<ApiResponse<ApostaRodadaDto>>(
       `${this.apiUrl}/CriarApostaAvulsa`, 
       requestBody, 
