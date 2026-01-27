@@ -115,18 +115,20 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
  criarNovaApostaAvulsa(requestBody: any): Observable<ApiResponse<ApostaRodadaDto>> {
     const url = `${this.apiUrl}/CriarApostaAvulsa`;
     
-    // 🚀 FORÇANDO A ESTRUTURA CORRETA
-    // Se requestBody for apenas a string "ad7e6396...", o código abaixo corrige:
-    const payload = typeof requestBody === 'string' 
-        ? { rodadaId: requestBody } 
-        : { rodadaId: requestBody.rodadaId || requestBody.id };
+    // 1. Extraímos o ID não importa como ele venha (string ou objeto)
+    const idLimpo = typeof requestBody === 'string' 
+        ? requestBody 
+        : (requestBody.rodadaId || requestBody.id);
+
+    // 2. Montamos o Payload. 
+    // Tente 'rodadaId' (minúsculo). Se falhar, o próximo passo é 'RodadaId'.
+    const payload = { rodadaId: idLimpo };
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    // Esse log é vital: ele tem que mostrar {"rodadaId": "..."}
-    console.log('[ApostaService] PAYLOAD FINAL:', JSON.stringify(payload));
+    console.log('[ApostaService] PAYLOAD ENVIADO:', JSON.stringify(payload));
 
     return this.http.post<ApiResponse<ApostaRodadaDto>>(
       url, 
@@ -136,6 +138,9 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
       catchError(this.handleError)
     );
 }
+
+
+
 // Seu novo método vai ser adicionado aqui
   /**
    * Obtém os totais de apostas avulsas (isoladas) de uma rodada específica.

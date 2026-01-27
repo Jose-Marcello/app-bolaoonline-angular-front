@@ -9,9 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [CommonModule, MatDialogModule, MatButtonModule],
   template: `
     <div class="bg-gray-800 text-white p-6 rounded-lg border border-gray-700">
-      <h2 mat-dialog-title class="text-blue-400 font-black uppercase tracking-tighter">
-        Confirmar Aposta Avulsa
-      </h2>
+     <h3 style="color: #ffffff !important; font-weight: 900 !important; text-transform: uppercase;">
+         Confirmar Aposta Avulsa
+     </h3>
+     <p style="color: #cbd5e1 !important; font-size: 14px !important;">
+         Rodada: <strong style="color: #ffffff !important;">{{ data.rodada.numeroRodada }}</strong>
+     </p>
       <mat-dialog-content class="my-4 text-gray-300">
         <p>Você está prestes a criar uma nova aposta para a <strong>Rodada {{data.rodada}}</strong>.</p>
         <p class="mt-2 text-sm">Custo da operação: <span class="text-green-400 font-bold">R$ {{data.valor | number:'1.2-2'}}</span></p>
