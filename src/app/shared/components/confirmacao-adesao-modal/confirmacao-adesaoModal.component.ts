@@ -64,8 +64,12 @@ import { of } from 'rxjs';
     ::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface { background-color: transparent !important; box-shadow: none !important; }
   `]
 })
+
+
 export class ConfirmacaoAdesaoModalComponent {
   isAderindo = false;
+
+  
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmacaoAdesaoModalComponent>,
@@ -79,32 +83,51 @@ export class ConfirmacaoAdesaoModalComponent {
   }
 
   confirmarAdesao() {
-    // 🛑 1. Verificação de Custo (Segurança de Dados)
-    if (!this.data.campeonato.custoAdesao || this.data.campeonato.custoAdesao <= 0) {
-      this.snackBar.open('⚠️ Erro: Campeonato sem valor de adesão definido.', 'Entendi', { duration: 5000 });
-      return;
-    }
+  // --- 📝 LOGS DE ENTRADA (O que temos no modal?) ---
+  console.log('--- [DEBUG] INÍCIO DA ADESÃO ---');
+  console.log('Dados do Campeonato:', this.data.campeonato);
+  console.log('ID do Campeonato:', this.data.campeonato?.id);
 
-    // 🛑 2. Verificação de Saldo (Prevenção de Erro 400)
-    const saldoAtual = this.data.apostador?.saldo?.valor || 0;
-    if (saldoAtual < this.data.campeonato.custoAdesao) {
-      this.snackBar.open('❌ Saldo insuficiente para esta adesão.', 'OK', { duration: 5000 });
-      return;
-    }
+  // 🛑 1. Verificação de Custo
+  if (!this.data.campeonato.custoAdesao || this.data.campeonato.custoAdesao <= 0) {
+    this.snackBar.open('⚠️ Erro: Campeonato sem valor de adesão definido.', 'Entendi', { duration: 5000 });
+    return;
+  }
 
-    this.isAderindo = true;
+  // 🛑 2. Verificação de Saldo
+  const saldoAtual = this.data.apostador?.saldo?.valor || 0;
+  console.log('Saldo do Apostador:', saldoAtual);
 
-  // 🚀 O SEGREDO: Criar o objeto EXATAMENTE como o backend espera
+  if (saldoAtual < this.data.campeonato.custoAdesao) {
+    this.snackBar.open('❌ Saldo insuficiente para esta adesão.', 'OK', { duration: 5000 });
+    return;
+  }
+
+  this.isAderindo = true;
+
+  // 🚀 MONTAGEM DO PAYLOAD (A chave para matar o 400)
+  const payload = {
+    CampeonatoId: this.data.campeonato.id 
+  };
+
+  /*
   const payload = {
     campeonatoId: this.data.campeonato.id
   };
+  */
 
-  // 🛑 Verifique se você está passando 'payload' e não apenas 'this.data.campeonato.id'
+  console.log('--- [DEBUG] PAYLOAD SENDO ENVIADO PARA O SERVICE ---');
+  console.log('Payload:', JSON.stringify(payload));
+
   this.campeonatoService.entrarEmCampeonato(payload) 
     .pipe(
       finalize(() => this.isAderindo = false),
       catchError(err => {
-        console.error('Erro detalhado:', err);
+        // --- 📝 LOG DE ERRO (O que o Azure respondeu?) ---
+        console.error('--- [DEBUG] ERRO NA RESPOSTA DO AZURE ---');
+        console.error('Status do Erro:', err.status);
+        console.error('Corpo do Erro (Backend):', err.error);
+        
         const msg = err.error?.message || 'Erro ao processar adesão.';
         this.snackBar.open('❌ ' + msg, 'OK', { duration: 5000 });
         return of(null);
@@ -112,6 +135,7 @@ export class ConfirmacaoAdesaoModalComponent {
     )
     .subscribe(res => {
       if (res && res.success) {
+        console.log('--- [DEBUG] SUCESSO TOTAL! ---', res);
         this.snackBar.open('🏆 Adesão realizada com sucesso!', 'Boa sorte!', { duration: 3000 });
         this.dialogRef.close(true);
       }
