@@ -67,9 +67,7 @@ import { of } from 'rxjs';
 
 
 export class ConfirmacaoAdesaoModalComponent {
-  isAderindo = false;
-
-  
+  isAderindo = false;  
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmacaoAdesaoModalComponent>,
@@ -105,40 +103,28 @@ export class ConfirmacaoAdesaoModalComponent {
 
   this.isAderindo = true;
 
-  // 🚀 MONTAGEM DO PAYLOAD (A chave para matar o 400)
+  // 🚀 VARREDURA TOTAL: Mandamos as 3 formas que o C# costuma aceitar
+  const idLimpo = this.data.campeonato.id;
   const payload = {
-    CampeonatoId: this.data.campeonato.id 
+    campeonatoId: idLimpo, // camelCase
+    CampeonatoId: idLimpo, // PascalCase
+    id: idLimpo           // Somente id
   };
 
-  /*
-  const payload = {
-    campeonatoId: this.data.campeonato.id
-  };
-  */
-
-  console.log('--- [DEBUG] PAYLOAD SENDO ENVIADO PARA O SERVICE ---');
-  console.log('Payload:', JSON.stringify(payload));
+  console.log('--- [DEBUG] TENTANDO VARREDURA DE PAYLOAD ---', payload);
 
   this.campeonatoService.entrarEmCampeonato(payload) 
     .pipe(
       finalize(() => this.isAderindo = false),
       catchError(err => {
-        // --- 📝 LOG DE ERRO (O que o Azure respondeu?) ---
-        console.error('--- [DEBUG] ERRO NA RESPOSTA DO AZURE ---');
-        console.error('Status do Erro:', err.status);
-        console.error('Corpo do Erro (Backend):', err.error);
+        // 🔍 AQUI ESTÁ A CHAVE: Vamos abrir o objeto de erros no console!
+        console.error('--- [DETALHE DO ERRO 400] ---');
+        console.table(err.error.errors); // Isso vai mostrar uma tabela linda com o nome do campo errado
         
-        const msg = err.error?.message || 'Erro ao processar adesão.';
+        const msg = err.error?.message || 'Erro de validação no servidor.';
         this.snackBar.open('❌ ' + msg, 'OK', { duration: 5000 });
         return of(null);
       })
     )
-    .subscribe(res => {
-      if (res && res.success) {
-        console.log('--- [DEBUG] SUCESSO TOTAL! ---', res);
-        this.snackBar.open('🏆 Adesão realizada com sucesso!', 'Boa sorte!', { duration: 3000 });
-        this.dialogRef.close(true);
-      }
-    });
   }
 }
