@@ -269,7 +269,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
    // ✅ A LÓGICA CORRETA: O seu objeto 'camp' já possui as rodadas filtradas!
   // Se 'rodadasEmAposta' estiver vazio ou for nulo, significa que não há nada aberto.
-  const temRodadaAberta = camp.rodadasEmAposta && camp.rodadasEmAposta.length > 0;
+  const temRodadaAberta = camp.rodadasEmAposta && 
+                        camp.rodadasEmAposta.length > 0 &&
+                        camp.rodadasEmAposta.some(r => r.status === 'Em Apostas'); 
+                        // 👆 Garante que o status seja exatamente o que o Azure espera
 
   if (!temRodadaAberta) {
     this.snackBar.open(
