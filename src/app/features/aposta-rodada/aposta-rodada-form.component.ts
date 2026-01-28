@@ -306,6 +306,15 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
 
   private executarCriacaoAposta(): void {
     this.loading = true;
+    
+    // --- [DEBUG] CONSTRUÇÃO DO REQUEST ---
+    console.log('--- [DEBUG] EXECUTAR CRIAÇÃO ---');
+    console.log('Dados disponíveis:', {
+      campeonatoId: this.campeonatoId,
+      rodadaId: this.rodadaId,
+      userId: this.userId
+    });
+
     const request: CriarApostaAvulsaRequestDto = {
       campeonatoId: this.campeonatoId || '',
       rodadaId: this.rodadaId!,
@@ -313,21 +322,30 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
       custoAposta: 10
     };
 
+    console.log('Payload Final (Objeto):', request);
+
     this.apostaService.criarNovaApostaAvulsa(request).subscribe({
-      next: () => {
+      next: (res) => {
+        console.log('✅ Aposta Criada:', res);
         this.showSnackBar("Aposta criada com sucesso!", 'Fechar', 'success');
         this.palpites.clear();
         this.jogosDaApostaAtual = [];
         this.loadAllIntegratedData().subscribe();
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
+        // --- [DEBUG] CAPTURA DO ERRO 400 ---
+        console.error('❌ Erro na Criação da Aposta:', err);
+        if (err.error?.errors) {
+          console.table(err.error.errors); // Mostra a tabela de validação do C#
+        }
         this.showSnackBar("Erro ao criar aposta.", 'Fechar', 'error');
       },
       complete: () => this.loading = false
     });
   }
 
+  
   salvarApostas(): void {
   if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar || !this.regraValidada) return;
   

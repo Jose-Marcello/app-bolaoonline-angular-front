@@ -81,50 +81,34 @@ export class ConfirmacaoAdesaoModalComponent {
   }
 
   confirmarAdesao() {
-  // --- 📝 LOGS DE ENTRADA (O que temos no modal?) ---
-  console.log('--- [DEBUG] INÍCIO DA ADESÃO ---');
-  console.log('Dados do Campeonato:', this.data.campeonato);
-  console.log('ID do Campeonato:', this.data.campeonato?.id);
+    this.isAderindo = true;
 
-  // 🛑 1. Verificação de Custo
-  if (!this.data.campeonato.custoAdesao || this.data.campeonato.custoAdesao <= 0) {
-    this.snackBar.open('⚠️ Erro: Campeonato sem valor de adesão definido.', 'Entendi', { duration: 5000 });
-    return;
-  }
+    // Monta o payload conforme sugerido pela IA
+    const payload = {
+      campeonatoId: this.data.campeonato?.id,
+      apostadorId: this.data.apostador?.id,
+      valor: this.data.campeonato?.custoAdesao
+    };
 
-  // 🛑 2. Verificação de Saldo
-  const saldoAtual = this.data.apostador?.saldo?.valor || 0;
-  console.log('Saldo do Apostador:', saldoAtual);
-
-  if (saldoAtual < this.data.campeonato.custoAdesao) {
-    this.snackBar.open('❌ Saldo insuficiente para esta adesão.', 'OK', { duration: 5000 });
-    return;
-  }
-
-  this.isAderindo = true;
-
-  // 🚀 VARREDURA TOTAL: Mandamos as 3 formas que o C# costuma aceitar
-  const idLimpo = this.data.campeonato.id;
-  const payload = {
-    campeonatoId: idLimpo, // camelCase
-    CampeonatoId: idLimpo, // PascalCase
-    id: idLimpo           // Somente id
-  };
-
-  console.log('--- [DEBUG] TENTANDO VARREDURA DE PAYLOAD ---', payload);
-
-  this.campeonatoService.entrarEmCampeonato(payload) 
-    .pipe(
-      finalize(() => this.isAderindo = false),
-      catchError(err => {
-        // 🔍 AQUI ESTÁ A CHAVE: Vamos abrir o objeto de erros no console!
-        console.error('--- [DETALHE DO ERRO 400] ---');
-        console.table(err.error.errors); // Isso vai mostrar uma tabela linda com o nome do campo errado
-        
-        const msg = err.error?.message || 'Erro de validação no servidor.';
-        this.snackBar.open('❌ ' + msg, 'OK', { duration: 5000 });
-        return of(null);
-      })
-    )
+    this.campeonatoService.entrarEmCampeonato(payload as any)
+      .pipe(
+        // O finalize SEMPRE executa, com erro ou sucesso, destravando o botão
+        finalize(() => {
+          this.isAderindo = false;
+          console.log('--- [DEBUG] PROCESSO FINALIZADO NO CLIENTE ---');
+        }),
+        catchError(err => {
+          console.error('--- [ERRO NO AZURE] ---', err.status);
+          const msg = err.error?.message || 'Erro ao processar adesão.';
+          this.snackBar.open('❌ ' + msg, 'OK', { duration: 5000 });
+          return of(null);
+        })
+      )
+      .subscribe(res => {
+        if (res && res.success) {
+          this.snackBar.open('🏆 Adesão realizada com sucesso!', 'Boa sorte!');
+          this.dialogRef.close(true); // Fecha o modal e recarrega o saldo
+        }
+      });
   }
 }

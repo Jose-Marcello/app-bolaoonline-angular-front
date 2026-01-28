@@ -46,18 +46,24 @@ export class CampeonatoService { // <<-- REMOVIDO extends BaseService -->>
    * @returns Um Observable da ApiResponse.
    */
  entrarEmCampeonato(request: any): Observable<ApiResponse<any>> {
-  // Se 'request' for uma string ou um objeto, nós garantimos o formato aqui:
-  const id = typeof request === 'string' ? request : (request.campeonatoId || request.id);
-  const payload = { campeonatoId: id }; // O segredo é este objeto
+  const url = `${this.apiUrl}/api/Campeonato/VincularApostador`;
+  
+  // 🚀 LOG DE SEGURANÇA: Vamos ver o que está chegando no service
+  console.log('[CampeonatoService] Recebido:', request);
 
-  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  // Normalização: garante que temos o ID independente do formato de entrada
+  const idLimpo = typeof request === 'string' 
+    ? request 
+    : (request.campeonatoId || request.id || request.CampeonatoId);
 
-  return this.http.post<ApiResponse<any>>(
-    `${this.apiUrl}/api/Campeonato/VincularApostador`, 
-    payload, // Enviamos o objeto literal
-    { headers }
-  );
+  // O SEGREDO: Montamos o objeto literal que o backend espera
+  const payload = { campeonatoId: idLimpo };
+
+  console.log('[CampeonatoService] Enviando para o Azure:', JSON.stringify(payload));
+
+  return this.http.post<ApiResponse<any>>(url, payload);
 }
+
 
   // Adicione este método ao seu CampeonatoService
 getById(id: string) 
