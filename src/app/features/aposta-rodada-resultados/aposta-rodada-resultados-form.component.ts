@@ -108,60 +108,45 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
 
   // ✅ MÉTODO RESTAURADO E CORRIGIDO PARA MOSTRAR OS PLACARES
   onApostaSelected(apostaId: string): void {
-    this.apostaSelecionadaId = apostaId;
-    this.apostaAtual = this.apostasUsuarioRodada.find((a: any) => a.id === apostaId);
-    
-    if (this.apostaAtual) {
-      this.isLoading = true;
-      this.apostaService.getApostasComResultados(this.rodadaId!, apostaId).subscribe({
-        next: (res) => {
-          const data = res.data as any;
-          const colecao = data?.jogosComResultados || data;
-          const listaRaw = colecao?.$values || (Array.isArray(colecao) ? colecao : []);
-          
-          this.jogosDaApostaAtual = listaRaw.map((j: any) => {
-            const partes = (j.dataHora || j.dataJogo || '').split(' ');
-            
-            return {
-              ...j,
-              // ✅ NOMES DOS TIMES (Conforme sua Consulta1)
-              equipeMandante: j.Mandante || j.equipeCasaNome || j.mandanteNome || j.equipeMandante,
-              equipeVisitante: j.Visitante || j.equipeVisitanteNome || j.visitanteNome || j.equipeVisitante,
-              
-              // ✅ ESCUDOS
-              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante || 'logobolao.png',
-              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante || 'logobolao.png',
-              
-              // ✅ PLACAR REAL (Crucial para mostrar o '0')
-              // Prioriza PlacarCasa (Maiúsculo) da sua consulta SQL
-              placarRealCasa: (j.PlacarCasa !== undefined && j.PlacarCasa !== null) ? j.PlacarCasa : 
-                              (j.placarCasa !== undefined ? j.placarCasa : '-'),
-              
-              placarRealVisita: (j.PlacarVisita !== undefined && j.PlacarVisita !== null) ? j.PlacarVisita : 
-                                (j.placarVisitante !== undefined ? j.placarVisitante : '-'),
-
-              // ✅ SEU PALPITE (DADOS DA CARTELA)
-              placarApostaCasa: j.placarApostaCasa ?? j.golsMandanteAposta ?? 0,
-              placarApostaVisita: j.placarApostaVisita ?? j.golsVisitanteAposta ?? 0,
-              
-              // ✅ DATA E HORA TRATADAS
-              dataJogo: partes[0] || '',
-              horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
-              diaSemana: this.extrairDiaSemana(j.dataHora || j.dataJogo),
-              estadioNome: j.estadioNome || j.estadio || 'ESTÁDIO NÃO INFORMADO'
-            };
-          });
-          this.isLoading = false;
-        },
-        error: () => {
-          this.isLoading = false;
-          this.snackBar.open('Erro ao carregar detalhes da aposta.', 'Fechar', { duration: 3000 });
-        }
-      });
-    }
-  }
-
+  this.apostaSelecionadaId = apostaId;
+  this.apostaAtual = this.apostasUsuarioRodada.find((a: any) => a.id === apostaId);
   
+  if (this.apostaAtual) {
+    this.isLoading = true;
+    this.apostaService.getApostasComResultados(this.rodadaId!, apostaId).subscribe({
+      next: (res) => {
+        // ✅ Acessando a estrutura exata do seu JSON: res.data.jogosComResultados
+        const listaRaw = res.data?.jogosComResultados || [];
+        
+        this.jogosDaApostaAtual = listaRaw.map((j: any) => {
+          return {
+            ...j,
+            // ✅ PLACAR REAL: Usando os nomes confirmados no seu JSON
+            // Verificamos se é diferente de null para o "0" aparecer
+            placarRealCasa: (j.placarRealCasa !== null && j.placarRealCasa !== undefined) ? j.placarRealCasa : '-',
+            placarRealVisita: (j.placarRealVisita !== null && j.placarRealVisita !== undefined) ? j.placarRealVisita : '-',
+
+            // ✅ PALPITES: Também confirmados no JSON
+            placarApostaCasa: j.placarApostaCasa ?? 0,
+            placarApostaVisita: j.placarApostaVisita ?? 0,
+
+            // ✅ STATUS E ESTÁDIO
+            statusJogo: j.statusJogo || 'NaoIniciado',
+            estadioNome: j.estadioNome || 'ESTÁDIO NÃO INFORMADO',
+            
+            // ✅ DATA/HORA: Mantendo o que vem pronto do DTO
+            dataJogo: j.dataJogo,
+            horaJogo: j.horaJogo,
+            diaSemana: this.extrairDiaSemana(j.dataJogo)
+          };
+        });
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false
+    });
+  }
+}
+
   carregarResultadosApenasConsulta(): Observable<any[]> {
     return this.rodadaService.getJogosByRodada(this.rodadaId!).pipe(
       map((res: any) => {
