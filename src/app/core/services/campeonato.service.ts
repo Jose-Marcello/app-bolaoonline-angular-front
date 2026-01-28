@@ -48,20 +48,11 @@ export class CampeonatoService { // <<-- REMOVIDO extends BaseService -->>
  entrarEmCampeonato(request: any): Observable<ApiResponse<any>> {
   const url = `${this.apiUrl}/api/Campeonato/VincularApostador`;
   
-  // 🚀 LOG DE SEGURANÇA: Vamos ver o que está chegando no service
-  console.log('[CampeonatoService] Recebido:', request);
+  // 🚀 FORÇANDO O SERVICE A PARAR DE FILTRAR OS DADOS
+  console.log('[CampeonatoService] AGORA VAI TUDO:', request);
 
-  // Normalização: garante que temos o ID independente do formato de entrada
-  const idLimpo = typeof request === 'string' 
-    ? request 
-    : (request.campeonatoId || request.id || request.CampeonatoId);
-
-  // O SEGREDO: Montamos o objeto literal que o backend espera
-  const payload = { campeonatoId: idLimpo };
-
-  console.log('[CampeonatoService] Enviando para o Azure:', JSON.stringify(payload));
-
-  return this.http.post<ApiResponse<any>>(url, payload);
+  // Enviamos o objeto 'request' DIRETAMENTE, sem remontar.
+  return this.http.post<ApiResponse<any>>(url, request); 
 }
 
 
