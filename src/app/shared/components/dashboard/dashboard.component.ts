@@ -273,7 +273,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                         camp.rodadasEmAposta.length > 0 &&
                         camp.rodadasEmAposta.some(r => r.status === 'Em Apostas'); 
                         // 👆 Garante que o status seja exatamente o que o Azure espera
-
+  /*
   if (!temRodadaAberta) {
     this.snackBar.open(
       "⚠️ Este campeonato está em fase de configuração (Rodada em Construção).", 
@@ -282,7 +282,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
     return; // ⛔ Bloqueia e evita o erro 500/400 no Azure
   }
-     
+    */ 
     if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
   
     const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
