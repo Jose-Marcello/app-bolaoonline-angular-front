@@ -121,22 +121,30 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
           
           this.jogosDaApostaAtual = listaRaw.map((j: any) => {
             const partes = (j.dataHora || j.dataJogo || '').split(' ');
+            
             return {
               ...j,
-              // Mapeamento para o seu HTML
-              equipeMandante: j.equipeCasaNome || j.mandanteNome || j.equipeMandante,
-              equipeVisitante: j.equipeVisitanteNome || j.visitanteNome || j.equipeVisitante,
-              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante,
-              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante,
+              // ✅ NOMES DOS TIMES (Conforme sua Consulta1)
+              equipeMandante: j.Mandante || j.equipeCasaNome || j.mandanteNome || j.equipeMandante,
+              equipeVisitante: j.Visitante || j.equipeVisitanteNome || j.visitanteNome || j.equipeVisitante,
               
-              // ✅ AQUI ESTÁ O SEGREDO DOS PLACARES REAIS
-              placarRealCasa: j.placarCasa !== undefined && j.placarCasa !== null ? j.placarCasa : (j.placarRealCasa ?? '-'),
-              placarRealVisita: j.placarVisitante !== undefined && j.placarVisitante !== null ? j.placarVisitante : (j.placarRealVisita ?? '-'),
+              // ✅ ESCUDOS
+              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante || 'logobolao.png',
+              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante || 'logobolao.png',
+              
+              // ✅ PLACAR REAL (Crucial para mostrar o '0')
+              // Prioriza PlacarCasa (Maiúsculo) da sua consulta SQL
+              placarRealCasa: (j.PlacarCasa !== undefined && j.PlacarCasa !== null) ? j.PlacarCasa : 
+                              (j.placarCasa !== undefined ? j.placarCasa : '-'),
+              
+              placarRealVisita: (j.PlacarVisita !== undefined && j.PlacarVisita !== null) ? j.PlacarVisita : 
+                                (j.placarVisitante !== undefined ? j.placarVisitante : '-'),
 
-              // Palpites da aposta
+              // ✅ SEU PALPITE (DADOS DA CARTELA)
               placarApostaCasa: j.placarApostaCasa ?? j.golsMandanteAposta ?? 0,
               placarApostaVisita: j.placarApostaVisita ?? j.golsVisitanteAposta ?? 0,
               
+              // ✅ DATA E HORA TRATADAS
               dataJogo: partes[0] || '',
               horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
               diaSemana: this.extrairDiaSemana(j.dataHora || j.dataJogo),
@@ -145,11 +153,15 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
           });
           this.isLoading = false;
         },
-        error: () => this.isLoading = false
+        error: () => {
+          this.isLoading = false;
+          this.snackBar.open('Erro ao carregar detalhes da aposta.', 'Fechar', { duration: 3000 });
+        }
       });
     }
   }
 
+  
   carregarResultadosApenasConsulta(): Observable<any[]> {
     return this.rodadaService.getJogosByRodada(this.rodadaId!).pipe(
       map((res: any) => {
