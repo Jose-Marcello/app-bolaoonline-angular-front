@@ -130,4 +130,32 @@
     width: 2.5rem; // Diminui um pouco no celular
     height: 2.5rem;
   }
+
+
+  /* Escudos Circulares para Resultados */
+.img-container-v6 { 
+  width: 42px !important; height: 42px !important; 
+  background: rgba(255,255,255,0.05); 
+  border-radius: 50% !important; 
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  border: 1px solid rgba(255,255,255,0.1); 
+  overflow: hidden;
+  margin: 0 auto 8px; /* Centraliza e dá espaço para o nome embaixo */
+}
+
+.img-container-v6 img { max-width: 28px; max-height: 28px; object-fit: contain; }
+
+/* Data e Hora com destaque */
+.data-hora-resultado {
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  color: #818cf8 !important; /* Roxo vibrante */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  text-align: center;
+  margin-bottom: 12px;
+  
+}
+
 }

@@ -1,5 +1,26 @@
+<style>
+  .img-container-circular {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  .img-container-circular img {
+    max-width: 30px;
+    max-height: 30px;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+  }
+</style>
+
 <div class="min-h-screen bg-[#020617] p-2 sm:p-4">
-  
   <main class="max-w-[500px] mx-auto space-y-5 pb-10">
 
     <div class="flex justify-start px-1">
@@ -11,7 +32,7 @@
 
     <div class="w-full bg-slate-900/80 border border-white/5 py-4 text-center shadow-2xl rounded-3xl">
       <h1 class="text-white font-black uppercase m-0 px-4" style="font-size: 12px !important; letter-spacing: 2px; line-height: 1.4;">
-          {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO BRASILEIRO 2025' }}
+          {{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO' }}
       </h1>
     </div>
 
@@ -19,14 +40,14 @@
       <div class="p-4 border-b border-white/5 bg-slate-800/40">
         <h3 class="text-[11px] font-[900] text-indigo-400 uppercase italic m-0 tracking-[2px]">1. Rodadas em Aposta</h3>
       </div>
-      <div class="p-4 grid grid-cols-3 gap-3">
+      <div class="p-4 flex gap-3 overflow-x-auto scrollbar-hide">
         <div *ngFor="let r of rodadasCorrentes" (click)="onRodadaSelected(r.id!)"
              [ngClass]="rodadaId === r.id ? 'border-indigo-500 bg-indigo-500/30' : 'border-white/5 bg-slate-800/40'"
-             class="flex flex-col items-center p-3 rounded-2xl border-2 cursor-pointer transition-all active:scale-90">
+             class="flex flex-col items-center min-w-[100px] p-3 rounded-2xl border-2 cursor-pointer transition-all active:scale-95">
           <span class="text-[8px] font-black text-slate-400 uppercase">Rodada</span>
           <span class="text-xl font-black text-white italic leading-none my-1">{{ r.numeroRodada }}</span>
           <span class="text-[8px] font-bold text-slate-500">
-            {{ (r.dataInicio || r.dataInic) | date:'dd/MM' }} - {{ r.dataFim | date:'dd/MM' }}
+            {{ r.dataInicio || r.dataInic }}
           </span>
         </div>
       </div>
@@ -48,23 +69,20 @@
              [ngClass]="apostaAtual?.id === a.id ? 'border-indigo-500 bg-indigo-500/30' : 'border-white/5 bg-slate-800/40'"
              class="grid grid-cols-5 items-center p-4 rounded-2xl border-2 cursor-pointer transition-all">
           <div class="flex justify-center">
-            <mat-icon [style.color]="apostaAtual?.id === a.id ? '#818cf8' : '#334155'">check_circle</mat-icon>
+            <mat-icon [style.color]="apostaAtual?.id === a.id ? '#818cf8' : '#334155'">
+              {{ apostaAtual?.id === a.id ? 'check_circle' : 'radio_button_unchecked' }}
+            </mat-icon>
           </div>
           <span class="col-span-2 font-black text-[11px] text-white uppercase truncate">{{ a.identificadorAposta || 'AVULSA' }}</span>
-          <span class="text-center font-black text-emerald-400 text-xs">{{ a.pontuacaoTotalRodada }} PTS</span>
+          <span class="text-center font-black text-emerald-400 text-xs">{{ a.pontuacaoTotalRodada || 0 }} PTS</span>
           <div class="text-right">
             <span [ngClass]="a.ehApostaCampeonato ? 'bg-blue-600' : 'bg-amber-600'" 
-                  class="text-[8px] px-2 py-1 rounded-md font-black text-white shadow-md">{{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}</span>
+                  class="text-[8px] px-2 py-1 rounded-md font-black text-white shadow-md">
+              {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
+            </span>
           </div>
         </div>
       </div>
-    </div>
-
-    <div *ngIf="apostasUsuarioRodada.length === 0" class="bg-slate-900/60 rounded-[32px] border border-white/5 p-6 text-center shadow-xl">
-        <span class="text-[11px] font-black text-indigo-400 uppercase tracking-widest leading-relaxed">
-          Nenhuma aposta realizada nesta rodada. <br>
-          <span class="text-slate-500 font-bold italic lowercase">Exibindo apenas resultados oficiais.</span>
-        </span>
     </div>
 
     <div *ngIf="apostaAtual || rodadaId" class="grid grid-cols-2 gap-4">
@@ -82,12 +100,12 @@
         <div class="flex flex-col text-left">
           <span class="text-[8px] font-black text-indigo-400 uppercase mb-1 tracking-widest">Visualização</span>
           <h2 class="text-sm font-[900] text-white uppercase italic m-0">
-            {{ apostaAtual ? apostaAtual.identificadorAposta : 'CONSULTA GERAL' }}
+            {{ apostaAtual ? apostaAtual.identificadorAposta : 'RESULTADOS OFICIAIS' }}
           </h2>
         </div>
         <div class="bg-black/40 px-4 py-2 rounded-xl border border-white/5">
           <span class="text-[11px] font-black text-emerald-400 uppercase">
-            {{ apostaAtual ? apostaAtual.pontuacaoTotalRodada + ' PONTOS' : 'NÃO JOGOU' }}
+            {{ apostaAtual ? (apostaAtual.pontuacaoTotalRodada || 0) + ' PONTOS' : 'CONSULTA' }}
           </span>
         </div>
       </div>
@@ -96,20 +114,20 @@
         <div *ngFor="let jogo of jogosDaApostaAtual" class="bg-slate-800/40 border border-white/5 rounded-3xl overflow-hidden shadow-inner">
     
           <div class="bg-black/20 text-center py-2 border-b border-white/5">
-             <p class="text-[8px] font-black text-indigo-400 uppercase tracking-[3px] m-0">
+              <p class="text-[8px] font-black text-indigo-400 uppercase tracking-[3px] m-0">
                 {{ jogo.estadioNome || 'ESTÁDIO NÃO INFORMADO' }}
-             </p>
-             <p class="text-[9px] font-bold text-slate-500 m-0 mt-1">
-                {{ jogo.dataJogo }} • {{ jogo.horaJogo }}
-            </p>
+              </p>
+              <p class="text-[10px] font-black text-white m-0 mt-1 uppercase">
+                {{ jogo.diaSemana }} • {{ jogo.dataJogo }} • {{ jogo.horaJogo }}
+              </p>
           </div>
 
           <div class="grid grid-cols-7 items-center p-4 gap-2">
             <div class="col-span-2 flex flex-col items-center text-center">
-              <div class="w-12 h-12 flex items-center justify-center mb-2">
+              <div class="img-container-circular mb-2">
                 <img [src]="baseUrlImagens + (jogo.escudoMandante || 'logobolao.png')" 
-                     onerror="this.src='assets/images/logobolao.png'" 
-                     class="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+                     (error)="$any($event.target).src='assets/images/logobolao.png'"
+                     loading="eager">
               </div>
               <span class="text-[9px] font-black text-white uppercase truncate w-full tracking-tighter">
                   {{ jogo.equipeMandante }}
@@ -123,16 +141,16 @@
                 <span class="text-3xl font-black text-white tabular-nums">{{ jogo.placarRealVisita ?? '-' }}</span>
               </div>
               <span [ngClass]="{'text-emerald-500': jogo.statusJogo === 'Finalizado', 'text-blue-400 animate-pulse': jogo.statusJogo !== 'Finalizado'}"
-                    class="text-[8px] font-black uppercase tracking-[3px] mt-2 px-3 py-0.5 bg-black/30 rounded-full">
-                  {{ jogo.statusJogo }}
+                    class="text-[8px] font-black uppercase tracking-[3px] mt-2 px-3 py-1 bg-black/40 rounded-full border border-white/5">
+                  {{ jogo.statusJogo || 'AGUARDANDO' }}
               </span>
             </div>
       
             <div class="col-span-2 flex flex-col items-center text-center">
-              <div class="w-12 h-12 flex items-center justify-center mb-2">
+              <div class="img-container-circular mb-2">
                 <img [src]="baseUrlImagens + (jogo.escudoVisitante || 'logobolao.png')" 
-                     onerror="this.src='assets/images/logobolao.png'" 
-                     class="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+                     (error)="$any($event.target).src='assets/images/logobolao.png'"
+                     loading="eager">
               </div>
               <span class="text-[9px] font-black text-white uppercase truncate w-full tracking-tighter">
                 {{ jogo.equipeVisitante }}
@@ -149,7 +167,8 @@
              </div>
              <div class="flex items-center gap-3">
                 <span class="text-[8px] text-slate-400 font-black uppercase">Pontos</span>
-                <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                <div [ngClass]="(jogo.pontuacao || 0) > 0 ? 'bg-emerald-600 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-slate-700'"
+                     class="w-10 h-10 rounded-full flex items-center justify-center transition-all">
                    <span class="text-[12px] font-black text-white">{{ jogo.pontuacao ?? 0 }}</span>
                 </div>
              </div>

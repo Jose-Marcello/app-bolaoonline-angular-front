@@ -143,12 +143,40 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
 }
 
   onApostaSelected(apostaId: string): void {
+    this.apostaSelecionadaId = apostaId;
     this.apostaAtual = this.apostasUsuarioRodada.find((a: any) => a.id === apostaId);
+    
     if (this.apostaAtual) {
-      this.apostaService.getApostasComResultados(this.rodadaId!, apostaId).subscribe(res => {
-        const data = res.data as any;
-        const colecao = data?.jogosComResultados || data;
-        this.jogosDaApostaAtual = colecao?.$values || (Array.isArray(colecao) ? colecao : []);
+      this.isLoading = true;
+      this.apostaService.getApostasComResultados(this.rodadaId!, apostaId).subscribe({
+        next: (res) => {
+          const data = res.data as any;
+          const colecao = data?.jogosComResultados || data;
+          const listaRaw = colecao?.$values || (Array.isArray(colecao) ? colecao : []);
+          
+          // ✅ MAPEAMENTO PRECISO PARA O SEU HTML
+          this.jogosDaApostaAtual = listaRaw.map((j: any) => {
+            const partes = (j.dataHora || '').split(' ');
+            return {
+              ...j,
+              // Campos que seu HTML pede:
+              equipeMandante: j.equipeCasaNome || j.mandanteNome || j.equipeMandante,
+              equipeVisitante: j.equipeVisitanteNome || j.visitanteNome || j.equipeVisitante,
+              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante,
+              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante,
+              placarRealCasa: j.placarCasa !== undefined ? j.placarCasa : j.golsMandante,
+              placarRealVisita: j.placarVisitante !== undefined ? j.placarVisitante : j.golsVisitante,
+              placarApostaCasa: j.placarApostaCasa ?? j.golsMandanteAposta,
+              placarApostaVisita: j.placarApostaVisita ?? j.golsVisitanteAposta,
+              // Data tratada para o seu {{ jogo.dataJogo | date }} ou string
+              dataJogo: partes[0] || '',
+              horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
+              estadioNome: j.estadioNome || j.estadio
+            };
+          });
+          this.isLoading = false;
+        },
+        error: () => this.isLoading = false
       });
     }
   }
@@ -157,21 +185,40 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     return this.rodadaService.getJogosByRodada(this.rodadaId!).pipe(
       map((res: any) => {
         const data = res.data?.$values || res.data || [];
-        return data.map((j: any) => ({
-          equipeMandante: j.equipeCasaNome || j.equipeMandante,
-          escudoMandante: j.equipeCasaEscudoUrl || j.escudoMandante,
-          equipeVisitante: j.equipeVisitanteNome || j.equipeVisitante,
-          escudoVisitante: j.equipeVisitanteEscudoUrl || j.escudoVisitante,
-          placarRealCasa: j.placarCasa,
-          placarRealVisita: j.placarVisitante,
-          statusJogo: j.status || 'Agendado',
-          estadioNome: j.estadioNome || j.estadio,
-          dataJogo: j.dataHora || j.dataJogo,
-          horaJogo: j.horaJogo || '--:--',
-          pontuacao: 0
-        }));
+        return data.map((j: any) => {
+          const partes = (j.dataHora || '').split(' ');
+          return {
+            equipeMandante: j.equipeCasaNome || j.equipeMandante,
+            escudoMandante: j.equipeCasaEscudoUrl || j.escudoMandante,
+            equipeVisitante: j.equipeVisitanteNome || j.equipeVisitante,
+            escudoVisitante: j.equipeVisitanteEscudoUrl || j.escudoVisitante,
+            placarRealCasa: j.placarCasa,
+            placarRealVisita: j.placarVisitante,
+            statusJogo: j.status || 'Agendado',
+            estadioNome: j.estadioNome || j.estadio,
+            dataJogo: partes[0] || '',
+            horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
+            pontuacao: 0
+          };
+        });
       })
     );
+  }
+
+  // ✅ EXTRAIR DIA SEMANA MELHORADO
+  extrairDiaSemana(data: string): string {
+    if (!data) return '';
+    try {
+      let dateObj;
+      if (data.includes('/')) {
+        const [dia, mes, ano] = data.split(' ')[0].split('/');
+        dateObj = new Date(Number(ano), Number(mes) - 1, Number(dia));
+      } else {
+        dateObj = new Date(data);
+      }
+      const dias = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
+      return dias[dateObj.getDay()] || '';
+    } catch { return ''; }
   }
 
   // Métodos de Navegação (Recuperados)
@@ -190,12 +237,7 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
   navegarParaRankingCampeonato(): void {
     this.router.navigate(['/dashboard/ranking/campeonato', this.campeonatoId]);
   }
-
-  extrairDiaSemana(data: string): string {
-    if (!data) return '';
-    const dias = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
-    return dias[new Date(data).getDay()];
-  }
+  
 
 // Método chamado pelo botão (click)="onDownloadPlanilhaConferencia()"
   onDownloadPlanilhaConferencia(): void {

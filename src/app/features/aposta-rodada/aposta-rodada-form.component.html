@@ -3,7 +3,7 @@
   .tela-apostas-v6 { 
     background-color: #020617 !important; 
     min-height: 100vh !important; 
-    color: #f8fafc; /* Fonte levemente off-white para não cansar a vista */
+    color: #f8fafc; 
     font-family: 'Roboto', sans-serif; 
     padding: 0 !important;
   }
@@ -15,7 +15,7 @@
     width: 100%;
   }
   
-  /* 2. HEADER E SALDO (CONTRASTE TURBINADO) */
+  /* 2. HEADER E SALDO */
   .linha-superior { display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 20px !important; }
   
   .btn-voltar-v6 { 
@@ -28,7 +28,7 @@
   
   .valor-v6 { font-size: 16px !important; color: #10b981 !important; font-weight: 900 !important; letter-spacing: -0.5px; }
 
-  /* 3. SEÇÕES E TITULOS (MAIS CLAREZA) */
+  /* 3. SEÇÕES E TITULOS */
   .secao-v6 { background: #0f172a !important; border-radius: 16px !important; border: 1px solid rgba(255,255,255,0.05) !important; margin-top: 24px !important; overflow: hidden !important; }
   
   .titulo-secao-v6 { 
@@ -38,12 +38,15 @@
   }
   .titulo-secao-v6 h3 { font-size: 11px !important; color: #f1f5f9 !important; font-weight: 900 !important; text-transform: uppercase !important; margin: 0 !important; letter-spacing: 1px; }
 
-  /* 4. RODADAS (ESTILO PWA) */
-  .item-rodada-v6 { min-width: 85px !important; padding: 12px !important; border-radius: 12px !important; background: #1e293b !important; border: 2px solid #334155 !important; text-align: center !important; }
+  /* 4. RODADAS (SCROLL) */
+  .scroll-horizontal-v6 { display: flex; gap: 12px; padding: 16px; overflow-x: auto; scrollbar-width: none; }
+  .scroll-horizontal-v6::-webkit-scrollbar { display: none; }
+  
+  .item-rodada-v6 { min-width: 85px !important; padding: 12px !important; border-radius: 12px !important; background: #1e293b !important; border: 2px solid #334155 !important; text-align: center !important; cursor: pointer; }
   .item-rodada-v6.ativa { background: #4f46e5 !important; border-color: #818cf8 !important; box-shadow: 0 0 20px rgba(79, 70, 229, 0.4) !important; }
   .item-rodada-v6 span.num-rodada { font-size: 22px !important; font-weight: 900 !important; color: white !important; display: block; line-height: 1; margin: 4px 0; }
 
-  /* 5. CONFRONTO E PLACAR (CONTRASTE MÁXIMO NO INPUT) */
+  /* 5. CONFRONTO E PLACAR */
   .card-confronto-v6 { 
     background: #1e293b !important; 
     border-radius: 16px !important; padding: 16px !important; 
@@ -51,31 +54,59 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   }
   
+  .info-jogo-v6 { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; /* ✅ Evita corte em telas pequenas */
+    gap: 8px;
+    margin-bottom: 16px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    padding-bottom: 8px; 
+  }
+
+  .grid-confronto-v6 { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  
+  .time-v6 { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .time-v6 span { font-size: 11px !important; font-weight: 900 !important; color: #f1f5f9; text-transform: uppercase; margin-top: 8px; }
+
+  .img-container-v6 { 
+    width: 48px; height: 48px; background: rgba(255,255,255,0.05); 
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.1); overflow: hidden;
+  }
+  .img-container-v6 img { max-width: 32px; max-height: 32px; object-fit: contain; }
+
+  .placar-v6 { display: flex; align-items: center; gap: 5px; }
   .placar-v6 input { 
-    width: 48px !important; height: 48px !important; 
+    width: 50px !important; height: 50px !important; 
     background: #ffffff !important; color: #000000 !important; 
     border-radius: 10px !important; text-align: center !important; 
-    font-size: 24px !important; font-weight: 900 !important; border: 3px solid #4f46e5 !important; 
+    font-size: 24px !important; font-weight: 900 !important; 
+    border: 3px solid #4f46e5 !important; 
   }
 
-  /* 6. STATUS DE VALIDAÇÃO (MAIS VIBRANTE) */
-  .status-sucesso {
-    background: rgba(16, 185, 129, 0.2) !important;
-    border: 2px solid #10b981 !important;
-    color: #4ade80 !important; /* Verde mais claro para brilhar no dark */
-  }
-  .status-erro {
-    background: rgba(239, 68, 68, 0.2) !important;
-    border: 2px solid #ef4444 !important;
-    color: #fca5a5 !important;
-  }
+  /* 6. STATUS E BOTÕES */
+  .badge-validacao-v6 { margin-top: 20px; padding: 15px; border-radius: 12px; text-align: center; font-weight: 900; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .status-sucesso { background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #4ade80; }
+  .status-erro { background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; color: #fca5a5; }
 
-  /* 7. BOTÃO SALVAR */
   .btn-salvar-v6 { 
     width: 100% !important; height: 60px !important; 
     font-weight: 900 !important; border-radius: 16px !important; 
-    text-transform: uppercase !important; font-size: 14px !important; 
-    letter-spacing: 1px; transition: all 0.3s ease;
+    text-transform: uppercase !important; transition: all 0.3s ease; cursor: pointer; border: none;
+  }
+
+  .card-cartela-v6 {
+    display: flex; align-items: center; padding: 12px; background: #1e293b; 
+    border-radius: 12px; margin-bottom: 8px; border: 1px solid #334155; cursor: pointer;
+  }
+  .card-cartela-v6.selecionada { border-color: #818cf8; background: rgba(129, 140, 248, 0.1); }
+
+  .btn-novo-amber-v6 {
+    width: 100%; padding: 12px; background: #d97706; color: white; border: none;
+    border-radius: 12px; font-weight: 900; display: flex; align-items: center;
+    justify-content: center; gap: 8px; text-transform: uppercase; font-size: 12px; margin-top: 10px;
   }
 </style>
 
@@ -94,7 +125,7 @@
         </div>
       </div>
       <div class="faixa-campeonato-v6">
-        <h1 style="color: #f8fafc; font-size: 11px; letter-spacing: 1px;">{{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO' }}</h1>
+        <h1 style="color: #f8fafc; font-size: 11px; letter-spacing: 1px; text-align: center;">{{ rodadaSelecionada?.campeonato?.nome || 'CAMPEONATO' }}</h1>
       </div>
     </header>
 
@@ -106,8 +137,8 @@
       <div class="scroll-horizontal-v6">
         <div *ngFor="let r of rodadasDisponiveis" (click)="selecionarRodada(r.id)" class="item-rodada-v6" [class.ativa]="rodadaSelecionadaId === r.id">
           <span style="font-size: 8px; color: #94a3b8; font-weight: 900;">RODADA</span>
-          <span class="num-rodada">{{ r.numeroRodada }}</span>
-          <span style="font-size: 9px; color: #cbd5e1; font-weight: 700;">{{ (r.dataInicio || r.dataInic) | date:'dd/MM' }}</span>
+          <span class="num-rodada">{{ r.numeroRodada }}</span>          
+          <span style="font-size: 9px; color: #cbd5e1; font-weight: 700;">{{ r.dataInicio || r.dataInic }}</span>
         </div>
       </div>
     </section>
@@ -123,12 +154,11 @@
             {{ apostaSelecionadaId === a.id ? 'check_circle' : 'radio_button_unchecked' }}
           </mat-icon>
           <span style="font-size: 12px; font-weight: 900; color: #f1f5f9;">{{ a.identificadorAposta || 'Aposta Avulsa' }}</span>
-          <span style="margin-left:auto; font-size:9px; font-weight:900; padding:4px 10px; border-radius:6px; color:white; letter-spacing: 0.5px;" 
+          <span style="margin-left:auto; font-size:9px; font-weight:900; padding:4px 10px; border-radius:6px; color:white;" 
                 [style.background]="a.ehApostaCampeonato ? '#4f46e5' : '#d97706'">
             {{ a.ehApostaCampeonato ? 'CAMP' : 'AVUL' }}
           </span>
         </div>
-        
         <button class="btn-novo-amber-v6" (click)="criarNovaAposta()">
           <mat-icon style="font-size: 18px;">add_shopping_cart</mat-icon>
           <span>Nova Aposta Avulsa</span>
@@ -136,74 +166,79 @@
       </div>
     </section>
 
+
+<div class="bg-slate-800/60 p-5 border-b border-white/5 flex justify-between items-center shadow-lg">
+  <div class="flex flex-col text-left">
+    <span class="text-[8px] font-black text-indigo-400 uppercase mb-1 tracking-widest">Visualização</span>
+    <h2 class="text-sm font-[900] text-white uppercase italic m-0">
+      {{ apostaAtual?.identificadorAposta || (rodadaId ? 'CONSULTA GERAL' : 'SELECIONE UMA CARTELA') }}
+    </h2>
+  </div>
+  <div class="bg-black/40 px-4 py-2 rounded-xl border border-white/5">
+    <span class="text-[11px] font-black text-emerald-400 uppercase">
+      {{ apostaAtual ? (apostaAtual.pontuacaoTotalRodada || 0) + ' PONTOS' : '---' }}
+    </span>
+  </div>
+</div>
+
+
     <div *ngIf="jogosDaApostaAtual.length > 0" formArrayName="palpites">
-      <div class="titulo-confrontos" style="margin: 24px 0 12px 4px; display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 4px; height: 20px; background: #4f46e5; border-radius: 2px;"></div>
-          <h2 style="font-size: 14px; font-weight: 900; color: white; margin: 0; text-transform: uppercase;">{{ apostaAtual?.identificadorAposta || 'Confrontos' }}</h2>
-        </div>
-        <span style="font-size: 10px; font-weight: 900; color: #10b981; padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 4px;">
-          {{ apostaAtual?.podeEditar ? 'MODO EDIÇÃO' : 'APENAS LEITURA' }}
-        </span>
+      <div *ngFor="let j of jogosDaApostaAtual; let i = index" [formGroupName]="i" class="card-confronto-v6">
+        
+       <div class="info-jogo-v6">
+          <span style="color: #818cf8; font-size: 10px; font-weight: 900; text-transform: uppercase;">
+             {{ j.dataJogo }} | {{ j.horaJogo }}
+          </span>
+          <span style="color: #64748b; font-size: 9px; font-weight: 700;">
+             {{ j.estadioNome || 'ESTÁDIO N/I' }}
+          </span>
       </div>
 
-      <div *ngFor="let j of jogosDaApostaAtual; let i = index" [formGroupName]="i" class="card-confronto-v6">
-        <div class="info-jogo-v6" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-          <span class="data-hora-v6" style="color: #818cf8; font-size: 10px; font-weight: 900;">{{ j.diaSemana }} | {{ j.dataHora | date:'dd/MM' }} - {{ j.horaJogo }}</span>
-          <span class="estadio-v6" style="color: #64748b; font-size: 9px; font-weight: 700;">{{ j.estadioNome }}</span>
-        </div>
-        
         <div class="grid-confronto-v6">
           <div class="time-v6">
             <div class="img-container-v6">
-              <img [src]="baseUrlImagens + j.equipeCasaEscudoUrl" onerror="this.src='assets/images/logobolao.png'">
+              <img [src]="baseUrlImagens + j.equipeCasaEscudoUrl" 
+                   loading="eager"
+                   (error)="$any($event.target).src='assets/images/logobolao.png'">
             </div>
-            <span style="color: #f1f5f9;">{{ j.equipeCasaNome }}</span>
+            <span>{{ j.equipeCasaNome }}</span>
           </div>
 
           <div class="placar-v6">
-            <input type="number" formControlName="placarApostaCasa" inputmode="numeric">
-            <span style="font-weight: 900; color: #4f46e5; font-size: 18px; margin: 0 4px;">×</span>
-            <input type="number" formControlName="placarApostaVisita" inputmode="numeric">
+            <input type="number" formControlName="placarApostaCasa" inputmode="numeric" min="0" oninput="this.value=Math.abs(this.value)" (keydown)="bloquearTeclasInvalidas($event)">
+            <span style="font-weight: 900; color: #4f46e5; font-size: 18px;">×</span>
+            <input type="number" formControlName="placarApostaVisita" inputmode="numeric" min="0" oninput="this.value=Math.abs(this.value)" (keydown)="bloquearTeclasInvalidas($event)">
           </div>
 
           <div class="time-v6">
             <div class="img-container-v6">
-              <img [src]="baseUrlImagens + j.equipeVisitanteEscudoUrl" onerror="this.src='assets/images/logobolao.png'">
+              <img [src]="baseUrlImagens + j.equipeVisitanteEscudoUrl" 
+                   loading="eager"
+                   (error)="$any($event.target).src='assets/images/logobolao.png'">
             </div>
-            <span style="color: #f1f5f9;">{{ j.equipeVisitanteNome }}</span>
+            <span>{{ j.equipeVisitanteNome }}</span>
           </div>
         </div>
       </div>
 
-      <div class="badge-validacao-v6" 
-           [ngClass]="regraValidada ? 'status-sucesso' : 'status-erro'"
-           *ngIf="apostaAtual?.podeEditar">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <mat-icon>{{ regraValidada ? 'verified' : 'gpp_maybe' }}</mat-icon>
-          <span>{{ regraValidada ? 'APOSTA VÁLIDA - PRONTA PARA SALVAR' : 'INVÁLIDA: MÍNIMO 3 (EMPATES OU VISITANTES)' }}</span>
-        </div>
+      <div class="badge-validacao-v6" [ngClass]="regraValidada ? 'status-sucesso' : 'status-erro'" *ngIf="apostaAtual?.podeEditar">
+        <mat-icon>{{ regraValidada ? 'verified' : 'gpp_maybe' }}</mat-icon>
+        <span>{{ regraValidada ? 'APOSTA VÁLIDA - PRONTA PARA SALVAR' : 'INVÁLIDA: MÍNIMO 3 (EMPATES OU VISITANTES)' }}</span>
       </div>
       
-      <footer class="footer-v6" style="padding-bottom: 60px; margin-top: 20px;">
-          <button type="button" 
-                  class="btn-salvar-v6" 
-                  (click)="salvarApostas()" 
-                  [disabled]="!regraValidada || !apostaAtual?.podeEditar || isSaving"
+      <footer style="padding-bottom: 60px; margin-top: 20px;">
+          <button type="button" class="btn-salvar-v6" (click)="salvarApostas()" [disabled]="!regraValidada || !apostaAtual?.podeEditar || isSaving"
                   [style.background]="regraValidada ? 'linear-gradient(90deg, #4f46e5, #818cf8)' : '#334155'"
-                  [style.color]="regraValidada ? '#ffffff' : '#94a3b8'"
-                  [style.boxShadow]="regraValidada ? '0 10px 25px rgba(79, 70, 229, 0.4)' : 'none'">
-              <span *ngIf="!isSaving">
-                  {{ regraValidada ? 'SALVAR MEUS PALPITES' : 'REGRA NÃO ATENDIDA' }}
-              </span>
+                  [style.color]="regraValidada ? '#ffffff' : '#94a3b8'">
+              <span *ngIf="!isSaving">{{ regraValidada ? 'SALVAR MEUS PALPITES' : 'REGRA NÃO ATENDIDA' }}</span>
               <mat-spinner *ngIf="isSaving" diameter="24" style="margin: 0 auto;"></mat-spinner>
           </button>
       </footer>
     </div>
 
-    <div *ngIf="isLoading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:100px 0;">
-      <mat-spinner diameter="40" color="primary"></mat-spinner>
-      <span style="color: #818cf8; font-size: 11px; font-weight: 900; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;">Carregando Dados...</span>
+    <div *ngIf="isLoading" style="text-align:center; padding:100px 0;">
+      <mat-spinner diameter="40" style="margin:0 auto;"></mat-spinner>
+      <span style="color:#818cf8; font-size:11px; font-weight:900; display:block; margin-top:15px;">CARREGANDO...</span>
     </div>
 
   </div> 
