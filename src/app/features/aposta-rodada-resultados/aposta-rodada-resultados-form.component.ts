@@ -1,22 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-
-// Importe também o modelo se ele existir, ou use 'any'
-import { ConferenciaPalpiteDto } from '../../features/relatorios/models/conferencia-palpite-dto.model';
-
-// Angular Material
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-
 import { Subscription, combineLatest, of, Observable, forkJoin } from 'rxjs';
 import { switchMap, finalize, catchError, filter, tap, map } from 'rxjs/operators';
 import { utils, writeFile } from 'xlsx';
-
-// Services & Models
 import { RodadaService } from '../../core/services/rodada.service';
 import { ApostaService } from '../../core/services/aposta.service';
 import { ApostadorService } from '../../core/services/apostador.service';
@@ -76,8 +68,6 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
 
   loadAllIntegratedData(): Observable<any> {
     this.isLoading = true;
-    
-    // Reset inicial para evitar resquícios visuais de rodadas anteriores
     this.apostasUsuarioRodada = [];
     this.jogosDaApostaAtual = [];
     this.apostaSelecionadaId = null;
@@ -92,55 +82,29 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
         catchError(() => of(null))
       ),
       apostas: this.apostaService.obterApostasPorRodada(this.rodadaId!, this.apostadorCampeonatoId).pipe(
-  map(res => {
-    // 1. Extrai os dados tratando o formato do JSON (com ou sem $values)
-    const dados = (res.data as any)?.$values || res.data || [];
-    
-    // 2. Filtro radical: Só aceita apostas com ID válido e que não seja o GUID vazio
-    return dados.filter((a: any) => 
-      a.id && a.id !== '00000000-0000-0000-0000-000000000000'
-    );
-  }),
-  catchError(() => of([])) // catchError fica fora do map, tratando o pipe
-)
+        map(res => {
+          const dados = (res.data as any)?.$values || res.data || [];
+          return dados.filter((a: any) => a.id && a.id !== '00000000-0000-0000-0000-000000000000');
+        }),
+        catchError(() => of([]))
+      )
     }).pipe(
       tap(({ rodadas, apostador, apostas }) => {
         this.rodadasCorrentes = rodadas;
         this.rodadaSelecionada = this.rodadasCorrentes.find(r => r.id === this.rodadaId) || this.rodadasCorrentes[0];
-        
-        if (apostador) {
-          this.userId = apostador.id;
-        }
-
+        if (apostador) this.userId = apostador.id;
         this.apostasUsuarioRodada = apostas;
 
-        // LÓGICA DE TRATAMENTO PARA RODADAS SEM APOSTA (Ex: Jeff na Rodada 1)
-        if (this.apostasUsuarioRodada && this.apostasUsuarioRodada.length > 0) {
-          // CASO 1: EXISTEM APOSTAS
-          // Prioriza a aposta do campeonato, senão pega a primeira da lista
+        if (this.apostasUsuarioRodada.length > 0) {
           const inicial = this.apostasUsuarioRodada.find((a: any) => a.ehApostaCampeonato) || this.apostasUsuarioRodada[0];
           this.onApostaSelected(inicial.id);
         } else {
-          // CASO 2: NÃO EXISTEM APOSTAS (Modo Consulta Pura)
-          this.apostaAtual = null;
-          this.apostaSelecionadaId = null; // Garante que nenhuma cartela fantasma seja marcada
-          
-          // Carrega apenas os jogos e resultados oficiais para o grid
-          this.carregarResultadosApenasConsulta().subscribe({
-            next: (jogos) => {
-              this.jogosDaApostaAtual = jogos;
-              this.isLoading = false;
-            },
-            error: () => {
-              this.isLoading = false;
-            }
-          });
+          this.carregarResultadosApenasConsulta().subscribe(jogos => this.jogosDaApostaAtual = jogos);
         }
       }),
-      // Finaliza o loading caso o fluxo principal termine (com ou sem erro)
       finalize(() => this.isLoading = false)
     );
-}
+  }
 
   onApostaSelected(apostaId: string): void {
     this.apostaSelecionadaId = apostaId;
@@ -154,24 +118,22 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
           const colecao = data?.jogosComResultados || data;
           const listaRaw = colecao?.$values || (Array.isArray(colecao) ? colecao : []);
           
-          // ✅ MAPEAMENTO PRECISO PARA O SEU HTML
           this.jogosDaApostaAtual = listaRaw.map((j: any) => {
-            const partes = (j.dataHora || '').split(' ');
+            const partes = (j.dataHora || j.dataJogo || '').split(' ');
             return {
               ...j,
-              // Campos que seu HTML pede:
               equipeMandante: j.equipeCasaNome || j.mandanteNome || j.equipeMandante,
               equipeVisitante: j.equipeVisitanteNome || j.visitanteNome || j.equipeVisitante,
-              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante,
-              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante,
-              placarRealCasa: j.placarCasa !== undefined ? j.placarCasa : j.golsMandante,
-              placarRealVisita: j.placarVisitante !== undefined ? j.placarVisitante : j.golsVisitante,
-              placarApostaCasa: j.placarApostaCasa ?? j.golsMandanteAposta,
-              placarApostaVisita: j.placarApostaVisita ?? j.golsVisitanteAposta,
-              // Data tratada para o seu {{ jogo.dataJogo | date }} ou string
+              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante || 'logobolao.png',
+              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante || 'logobolao.png',
+              placarRealCasa: j.placarCasa ?? j.placarRealCasa ?? '-',
+              placarRealVisita: j.placarVisitante ?? j.placarRealVisita ?? '-',
+              placarApostaCasa: j.placarApostaCasa ?? j.golsMandanteAposta ?? 0,
+              placarApostaVisita: j.placarApostaVisita ?? j.golsVisitanteAposta ?? 0,
               dataJogo: partes[0] || '',
               horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
-              estadioNome: j.estadioNome || j.estadio
+              diaSemana: this.extrairDiaSemana(j.dataHora || j.dataJogo),
+              estadioNome: j.estadioNome || j.estadio || 'ESTÁDIO NÃO INFORMADO'
             };
           });
           this.isLoading = false;
@@ -192,12 +154,13 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
             escudoMandante: j.equipeCasaEscudoUrl || j.escudoMandante,
             equipeVisitante: j.equipeVisitanteNome || j.equipeVisitante,
             escudoVisitante: j.equipeVisitanteEscudoUrl || j.escudoVisitante,
-            placarRealCasa: j.placarCasa,
-            placarRealVisita: j.placarVisitante,
+            placarRealCasa: j.placarCasa ?? '-',
+            placarRealVisita: j.placarVisitante ?? '-',
             statusJogo: j.status || 'Agendado',
             estadioNome: j.estadioNome || j.estadio,
             dataJogo: partes[0] || '',
             horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
+            diaSemana: this.extrairDiaSemana(j.dataHora),
             pontuacao: 0
           };
         });
@@ -205,9 +168,8 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     );
   }
 
-  // ✅ EXTRAIR DIA SEMANA MELHORADO
   extrairDiaSemana(data: string): string {
-    if (!data) return '';
+    if (!data) return 'DATA N/I';
     try {
       let dateObj;
       if (data.includes('/')) {
@@ -216,12 +178,11 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
       } else {
         dateObj = new Date(data);
       }
-      const dias = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
+      const dias = ['DOMINGO', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
       return dias[dateObj.getDay()] || '';
     } catch { return ''; }
   }
 
-  // Métodos de Navegação (Recuperados)
   onRodadaSelected(id: string): void {
     this.router.navigate(['/aposta-rodada-resultados', this.campeonatoId, id], {
       queryParams: { apostadorCampeonatoId: this.apostadorCampeonatoId }
@@ -229,52 +190,32 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
   }
 
   goBackToDashboard(): void { this.router.navigate(['/dashboard']); }
+  navegarParaRankingRodada(): void { this.router.navigate(['/dashboard/ranking/rodada', this.campeonatoId, this.rodadaId]); }
+  navegarParaRankingCampeonato(): void { this.router.navigate(['/dashboard/ranking/campeonato', this.campeonatoId]); }
 
-  navegarParaRankingRodada(): void {
-    this.router.navigate(['/dashboard/ranking/rodada', this.campeonatoId, this.rodadaId]);
-  }
-
-  navegarParaRankingCampeonato(): void {
-    this.router.navigate(['/dashboard/ranking/campeonato', this.campeonatoId]);
-  }
-  
-
-// Método chamado pelo botão (click)="onDownloadPlanilhaConferencia()"
   onDownloadPlanilhaConferencia(): void {
     if (!this.rodadaId) return;
-
     this.rodadaService.obterDadosPlanilhaConferencia(this.rodadaId).subscribe({
       next: (res) => {
-        // Trata o retorno com $values (comum em APIs .NET com PreserveReferences)
         const dados = (res as any)?.$values || res;
-        
-        if (dados && dados.length > 0) {
-          this.gerarExcel(dados);
-        } else {
-          this.snackBar.open('Nenhum dado encontrado para esta planilha.', 'Fechar', { duration: 3000 });
-        }
+        if (dados && dados.length > 0) this.gerarExcel(dados);
+        else this.snackBar.open('Nenhum dado encontrado.', 'Fechar', { duration: 3000 });
       },
       error: () => this.snackBar.open('Erro ao gerar planilha.', 'Fechar', { duration: 3000 })
     });
   }
 
   private gerarExcel(dados: any[]): void {
-    // Mapeia os dados para colunas amigáveis no Excel
     const worksheetData = dados.map(item => ({
       'Apostador': item.apelidoApostador || item.apelido,
       'Identificação': item.identificadorAposta || 'AVULSA',
       'Jogo': `${item.nomeEquipeCasa || item.equipeMandante} x ${item.nomeEquipeVisita || item.equipeVisitante}`,
       'Palpite': `${item.placarPalpiteCasa ?? item.placarApostaCasa} x ${item.placarPalpiteVisita ?? item.placarApostaVisita}`,
-      'Data do Jogo': item.dataJogo ? new Date(item.dataJogo).toLocaleDateString() : ''
+      'Data do Jogo': item.dataJogo || ''
     }));
-
     const ws = utils.json_to_sheet(worksheetData);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Conferência de Palpites');
-
-    // Gera o download do arquivo
-    const nomeArquivo = `Conferencia_Rodada_${this.rodadaSelecionada?.numeroRodada || this.rodadaId}.xlsx`;
-    writeFile(wb, nomeArquivo);
+    utils.book_append_sheet(wb, ws, 'Conferência');
+    writeFile(wb, `Conferencia_Rodada_${this.rodadaSelecionada?.numeroRodada || this.rodadaId}.xlsx`);
   }
-
 }
