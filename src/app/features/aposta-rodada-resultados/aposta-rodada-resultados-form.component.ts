@@ -115,34 +115,61 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.apostaService.getApostasComResultados(this.rodadaId!, apostaId).subscribe({
       next: (res) => {
-        // ✅ Acessando a estrutura exata do seu JSON: res.data.jogosComResultados
+        // Acessa a lista de jogos conforme seu JSON (res.data.jogosComResultados)
         const listaRaw = res.data?.jogosComResultados || [];
-        
+        let totalPontosCartela = 0;
+
         this.jogosDaApostaAtual = listaRaw.map((j: any) => {
+          // ✅ 1. TRATAMENTO DOS PLACARES (Garante que o '0' apareça e o 'null' vire '-')
+          const realCasa = (j.placarRealCasa !== null && j.placarRealCasa !== undefined) ? j.placarRealCasa : null;
+          const realVisita = (j.placarRealVisita !== null && j.placarRealVisita !== undefined) ? j.placarRealVisita : null;
+          
+          const apostCasa = j.placarApostaCasa ?? 0;
+          const apostVisita = j.placarApostaVisita ?? 0;
+
+          // ✅ 2. LÓGICA DE PONTUAÇÃO ONLINE (Cálculo em tempo real no Front-end)
+          let pontosCalculados = 0;
+
+          // Só calcula se houver placar real disponível (jogo iniciado ou em andamento)
+          if (realCasa !== null && realVisita !== null) {
+            // Caso 1: Acerto em cheio (Ex: 1x1 e apostou 1x1) -> 10 PTS
+            if (realCasa === apostCasa && realVisita === apostVisita) {
+              pontosCalculados = 10;
+            } 
+            // Caso 2: Acerto de tendência (Vencedor ou Empate) -> 5 PTS
+            else {
+              const tendenciaReal = realCasa > realVisita ? 'M' : (realCasa < realVisita ? 'V' : 'E');
+              const tendenciaApost = apostCasa > apostVisita ? 'M' : (apostCasa < apostVisita ? 'V' : 'E');
+              
+              if (tendenciaReal === tendenciaApost) {
+                pontosCalculados = 5;
+              }
+            }
+          }
+
+          totalPontosCartela += pontosCalculados;
+
+          // ✅ 3. RETORNO DO OBJETO MAPEADO PARA O HTML
           return {
             ...j,
-            // ✅ PLACAR REAL: Usando os nomes confirmados no seu JSON
-            // Verificamos se é diferente de null para o "0" aparecer
-            placarRealCasa: (j.placarRealCasa !== null && j.placarRealCasa !== undefined) ? j.placarRealCasa : '-',
-            placarRealVisita: (j.placarRealVisita !== null && j.placarRealVisita !== undefined) ? j.placarRealVisita : '-',
-
-            // ✅ PALPITES: Também confirmados no JSON
-            placarApostaCasa: j.placarApostaCasa ?? 0,
-            placarApostaVisita: j.placarApostaVisita ?? 0,
-
-            // ✅ STATUS E ESTÁDIO
-            statusJogo: j.statusJogo || 'NaoIniciado',
-            estadioNome: j.estadioNome || 'ESTÁDIO NÃO INFORMADO',
-            
-            // ✅ DATA/HORA: Mantendo o que vem pronto do DTO
-            dataJogo: j.dataJogo,
-            horaJogo: j.horaJogo,
-            diaSemana: this.extrairDiaSemana(j.dataJogo)
+            placarRealCasa: realCasa, // O HTML vai receber o número ou null
+            placarRealVisita: realVisita,
+            pontuacao: pontosCalculados, // Atribui a pontuação "viva"
+            statusJogo: j.statusJogo === 'EmAndamento' ? 'AO VIVO' : j.statusJogo
           };
         });
+
+        // Atualiza o total da cartela no cabeçalho para refletir os gols em tempo real
+        if (this.apostaAtual) {
+          this.apostaAtual.pontuacaoTotalRodada = totalPontosCartela;
+        }
+
         this.isLoading = false;
       },
-      error: () => this.isLoading = false
+      error: () => {
+        this.isLoading = false;
+        this.snackBar.open('Erro ao carregar dados da rodada.', 'Fechar', { duration: 3000 });
+      }
     });
   }
 }
