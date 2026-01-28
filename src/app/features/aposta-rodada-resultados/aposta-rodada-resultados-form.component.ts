@@ -106,6 +106,7 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     );
   }
 
+  // ✅ MÉTODO RESTAURADO E CORRIGIDO PARA MOSTRAR OS PLACARES
   onApostaSelected(apostaId: string): void {
     this.apostaSelecionadaId = apostaId;
     this.apostaAtual = this.apostasUsuarioRodada.find((a: any) => a.id === apostaId);
@@ -122,14 +123,20 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
             const partes = (j.dataHora || j.dataJogo || '').split(' ');
             return {
               ...j,
+              // Mapeamento para o seu HTML
               equipeMandante: j.equipeCasaNome || j.mandanteNome || j.equipeMandante,
               equipeVisitante: j.equipeVisitanteNome || j.visitanteNome || j.equipeVisitante,
-              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante || 'logobolao.png',
-              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante || 'logobolao.png',
-              placarRealCasa: j.placarCasa ?? j.placarRealCasa ?? '-',
-              placarRealVisita: j.placarVisitante ?? j.placarRealVisita ?? '-',
+              escudoMandante: j.equipeCasaEscudoUrl || j.mandanteUrl || j.escudoMandante,
+              escudoVisitante: j.equipeVisitanteEscudoUrl || j.visitanteUrl || j.escudoVisitante,
+              
+              // ✅ AQUI ESTÁ O SEGREDO DOS PLACARES REAIS
+              placarRealCasa: j.placarCasa !== undefined && j.placarCasa !== null ? j.placarCasa : (j.placarRealCasa ?? '-'),
+              placarRealVisita: j.placarVisitante !== undefined && j.placarVisitante !== null ? j.placarVisitante : (j.placarRealVisita ?? '-'),
+
+              // Palpites da aposta
               placarApostaCasa: j.placarApostaCasa ?? j.golsMandanteAposta ?? 0,
               placarApostaVisita: j.placarApostaVisita ?? j.golsVisitanteAposta ?? 0,
+              
               dataJogo: partes[0] || '',
               horaJogo: partes[1] ? partes[1].substring(0, 5) : '',
               diaSemana: this.extrairDiaSemana(j.dataHora || j.dataJogo),
@@ -169,7 +176,7 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
   }
 
   extrairDiaSemana(data: string): string {
-    if (!data) return 'DATA N/I';
+    if (!data) return '';
     try {
       let dateObj;
       if (data.includes('/')) {
