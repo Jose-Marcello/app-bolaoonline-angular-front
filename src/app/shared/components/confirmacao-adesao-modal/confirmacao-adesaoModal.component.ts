@@ -85,10 +85,11 @@ export class ConfirmacaoAdesaoModalComponent {
 
     // Monta o payload conforme sugerido pela IA
     const payload = {
-      campeonatoId: this.data.campeonato?.id,
-      apostadorId: this.data.apostador?.id,
-      valor: this.data.campeonato?.custoAdesao
-    };
+  CampeonatoId: this.data.campeonato?.id,
+  ApostadorId: this.data.apostador?.id, // âncora principal
+  ApostadorCampeonatoId: this.data.apostador?.apostadorCampeonatoId || null, // Vínculo se existir
+  Valor: this.data.campeonato?.custoAdesao
+};
 
     this.campeonatoService.entrarEmCampeonato(payload as any)
       .pipe(

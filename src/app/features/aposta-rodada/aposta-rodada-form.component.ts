@@ -307,26 +307,22 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
   private executarCriacaoAposta(): void {
     this.loading = true;
     
-    // --- [DEBUG] CONSTRUÇÃO DO REQUEST ---
-    console.log('--- [DEBUG] EXECUTAR CRIAÇÃO ---');
-    console.log('Dados disponíveis:', {
-      campeonatoId: this.campeonatoId,
-      rodadaId: this.rodadaId,
-      userId: this.userId
-    });
+    console.log('--- [DEBUG] EXECUTAR CRIAÇÃO AVULSA ---');
 
-    const request: CriarApostaAvulsaRequestDto = {
-      campeonatoId: this.campeonatoId || '',
-      rodadaId: this.rodadaId!,
-      apostadorId: this.userId!,
-      custoAposta: 10
+    // 🚀 AJUSTE DE 15K: Chaves em PascalCase para o .NET não dar Erro 400
+    const request = {
+      CampeonatoId: this.campeonatoId || null,
+      RodadaId: this.rodadaId!,
+      ApostadorId: this.userId!, // O campo que estava faltando!
+      CustoAposta: 10
     };
 
-    console.log('Payload Final (Objeto):', request);
+    console.log('Payload Final (PascalCase):', request);
 
-    this.apostaService.criarNovaApostaAvulsa(request).subscribe({
+    // Usamos 'as any' para o Service aceitar as chaves maiúsculas sem reclamar
+    this.apostaService.criarNovaApostaAvulsa(request as any).subscribe({
       next: (res) => {
-        console.log('✅ Aposta Criada:', res);
+        console.log('✅ Aposta Criada com Sucesso:', res);
         this.showSnackBar("Aposta criada com sucesso!", 'Fechar', 'success');
         this.palpites.clear();
         this.jogosDaApostaAtual = [];
@@ -334,17 +330,19 @@ export class ApostaRodadaFormComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.loading = false;
-        // --- [DEBUG] CAPTURA DO ERRO 400 ---
         console.error('❌ Erro na Criação da Aposta:', err);
+        
+        // Se der 400, aqui veremos exatamente qual campo o Azure rejeitou
         if (err.error?.errors) {
-          console.table(err.error.errors); // Mostra a tabela de validação do C#
+          console.table(err.error.errors); 
         }
-        this.showSnackBar("Erro ao criar aposta.", 'Fechar', 'error');
+        
+        const msg = err.error?.message || "Erro ao criar aposta.";
+        this.showSnackBar(msg, 'Fechar', 'error');
       },
       complete: () => this.loading = false
     });
   }
-
   
   salvarApostas(): void {
   if (this.apostaForm.invalid || !this.apostaAtual?.podeEditar || !this.regraValidada) return;
