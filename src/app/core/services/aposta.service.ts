@@ -115,30 +115,31 @@ obterApostasPorRodada(rodadaId: string, apostadorCampeonatoId?: string): Observa
  criarNovaApostaAvulsa(requestBody: any): Observable<ApiResponse<ApostaRodadaDto>> {
     const url = `${this.apiUrl}/CriarApostaAvulsa`;
     
-    // 1. Extraímos o ID não importa como ele venha (string ou objeto)
-    const idLimpo = typeof requestBody === 'string' 
+    // 1. Mantemos sua extração inteligente para o RodadaId
+    const rodadaIdFinal = typeof requestBody === 'string' 
         ? requestBody 
-        : (requestBody.rodadaId || requestBody.id);
+        : (requestBody.rodadaId || requestBody.RodadaId || requestBody.id);
 
-    // 2. Montamos o Payload. 
-    // Tente 'rodadaId' (minúsculo). Se falhar, o próximo passo é 'RodadaId'.
-    const payload = { rodadaId: idLimpo };
+    // 2. 🚀 A NOVIDADE: Extraímos também o ApostadorId que você passou a exigir
+    const apostadorIdFinal = requestBody.apostadorId || requestBody.ApostadorId || requestBody.userId;
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+    // 3. Montamos o Payload com os nomes que o C# (Azure) exige (PascalCase)
+    const payload = { 
+        RodadaId: rodadaIdFinal,
+        ApostadorId: apostadorIdFinal, // <--- Aqui está o segredo do sucesso
+        CustoAposta: requestBody.custoAposta || 10,
+        CampeonatoId: requestBody.campeonatoId || null
+    };
 
-    console.log('[ApostaService] PAYLOAD ENVIADO:', JSON.stringify(payload));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post<ApiResponse<ApostaRodadaDto>>(
-      url, 
-      payload, 
-      { headers }
-    ).pipe(
+    // Esse log vai mostrar se o ApostadorId está indo ou não!
+    console.log('[ApostaService] PAYLOAD FINAL PARA AZURE:', JSON.stringify(payload));
+
+    return this.http.post<ApiResponse<ApostaRodadaDto>>(url, payload, { headers }).pipe(
       catchError(this.handleError)
     );
 }
-
 
 
 // Seu novo método vai ser adicionado aqui
