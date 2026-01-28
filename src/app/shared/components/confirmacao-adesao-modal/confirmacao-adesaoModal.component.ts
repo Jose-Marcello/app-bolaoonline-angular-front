@@ -67,6 +67,7 @@ import { of } from 'rxjs';
 
 
 export class ConfirmacaoAdesaoModalComponent {
+   
   isAderindo = false;  
 
   constructor(

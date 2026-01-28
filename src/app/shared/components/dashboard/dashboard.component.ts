@@ -234,6 +234,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }, 300); // Aguarda o Angular renderizar os cards na tela
 }
 
+
+
   iniciarCarrossel() {
     this.intervaloGaleria = setInterval(() => {
       this.indiceAtual = (this.indiceAtual + 1) % this.fotos.length;
@@ -264,24 +266,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
   informarEmDesenvolvimento() { this.snackBar.open('Em desenvolvimento!', 'OK', { duration: 3000 }); }
 
   abrirModalAdesao(camp: any) {
-  if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
-  
-  const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
-    width: '400px',
-    data: { campeonato: camp, apostador: this.apostador }
-  });
 
-  dialogRef.afterClosed().pipe(
-    catchError(err => {
-      console.error("Erro ao processar adesão:", err);
-      this.snackBar.open('Ops! Ocorreu um erro na adesão, mas você continua logado.', 'OK');
-      return of(null);
-    })
-  ).subscribe(result => { 
-    if (result) {
-      // Recarrega os dados sem perder o campeonato selecionado
-      this.loadDashboardData(); 
-    }
-  });
-}
+   // ✅ A LÓGICA CORRETA: O seu objeto 'camp' já possui as rodadas filtradas!
+  // Se 'rodadasEmAposta' estiver vazio ou for nulo, significa que não há nada aberto.
+  const temRodadaAberta = camp.rodadasEmAposta && camp.rodadasEmAposta.length > 0;
+
+  if (!temRodadaAberta) {
+    this.snackBar.open(
+      "⚠️ Este campeonato está em fase de configuração (Rodada em Construção).", 
+      "OK", 
+      { duration: 5000 }
+    );
+    return; // ⛔ Bloqueia e evita o erro 500/400 no Azure
+  }
+     
+    if (!this.usuarioLogado) { this.router.navigate(['/auth/login']); return; }
+  
+    const dialogRef = this.dialog.open(ConfirmacaoAdesaoModalComponent, {
+      width: '400px',
+      data: { campeonato: camp, apostador: this.apostador }
+    });
+
+    dialogRef.afterClosed().pipe(
+      catchError(err => {
+        console.error("Erro ao processar adesão:", err);
+        this.snackBar.open('Ops! Ocorreu um erro na adesão, mas você continua logado.', 'OK');
+        return of(null);
+      })
+    ).subscribe(result => { 
+      if (result) {
+        // Recarrega os dados sem perder o campeonato selecionado
+        this.loadDashboardData(); 
+      }
+    });
+  }
 }
