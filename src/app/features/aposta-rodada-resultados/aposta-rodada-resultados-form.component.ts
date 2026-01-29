@@ -115,61 +115,49 @@ export class ApostaRodadaResultadosFormComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.apostaService.getApostasComResultados(this.rodadaId!, apostaId).subscribe({
       next: (res) => {
-        // Acessa a lista de jogos conforme seu JSON (res.data.jogosComResultados)
-        const listaRaw = res.data?.jogosComResultados || [];
+        let listaRaw = res.data?.jogosComResultados || [];
         let totalPontosCartela = 0;
 
+        // ✅ 1. ORDENAÇÃO CRONOLÓGICA (Data + Hora)
+        listaRaw.sort((a: any, b: any) => {
+          const dataA = (a.dataJogo || '').split('/').reverse().join('-') + ' ' + (a.horaJogo || '00:00');
+          const dataB = (b.dataJogo || '').split('/').reverse().join('-') + ' ' + (b.horaJogo || '00:00');
+          return dataA.localeCompare(dataB);
+        });
+
         this.jogosDaApostaAtual = listaRaw.map((j: any) => {
-          // ✅ 1. TRATAMENTO DOS PLACARES (Garante que o '0' apareça e o 'null' vire '-')
           const realCasa = (j.placarRealCasa !== null && j.placarRealCasa !== undefined) ? j.placarRealCasa : null;
           const realVisita = (j.placarRealVisita !== null && j.placarRealVisita !== undefined) ? j.placarRealVisita : null;
-          
-          const apostCasa = j.placarApostaCasa ?? 0;
-          const apostVisita = j.placarApostaVisita ?? 0;
+          const apCasa = j.placarApostaCasa ?? 0;
+          const apVisita = j.placarApostaVisita ?? 0;
 
-          // ✅ 2. LÓGICA DE PONTUAÇÃO ONLINE (Cálculo em tempo real no Front-end)
-          let pontosCalculados = 0;
-
-          // Só calcula se houver placar real disponível (jogo iniciado ou em andamento)
+          // ✅ 2. REGRA DE PONTUAÇÃO OFICIAL (7-4-3) ESPELHADA DO BACKEND
+          let pts = 0;
           if (realCasa !== null && realVisita !== null) {
-            // Caso 1: Acerto em cheio (Ex: 1x1 e apostou 1x1) -> 10 PTS
-            if (realCasa === apostCasa && realVisita === apostVisita) {
-              pontosCalculados = 10;
-            } 
-            // Caso 2: Acerto de tendência (Vencedor ou Empate) -> 5 PTS
-            else {
-              const tendenciaReal = realCasa > realVisita ? 'M' : (realCasa < realVisita ? 'V' : 'E');
-              const tendenciaApost = apostCasa > apostVisita ? 'M' : (apostCasa < apostVisita ? 'V' : 'E');
-              
-              if (tendenciaReal === tendenciaApost) {
-                pontosCalculados = 5;
-              }
+            if (realCasa === apCasa && realVisita === apVisita) {
+              pts = 7; // Placar Exato
+            } else if (realCasa === realVisita && apCasa === apVisita) {
+              pts = 4; // Empate Correto (Placar Diferente)
+            } else if ((realCasa > realVisita && apCasa > apVisita) || (realCasa < realVisita && apCasa < apVisita)) {
+              pts = (realCasa === apCasa || realVisita === apVisita) ? 4 : 3; // Vencedor + 1 Placar ou Só Vencedor
             }
           }
 
-          totalPontosCartela += pontosCalculados;
+          totalPontosCartela += pts;
 
-          // ✅ 3. RETORNO DO OBJETO MAPEADO PARA O HTML
           return {
             ...j,
-            placarRealCasa: realCasa, // O HTML vai receber o número ou null
+            placarRealCasa: realCasa,
             placarRealVisita: realVisita,
-            pontuacao: pontosCalculados, // Atribui a pontuação "viva"
+            pontuacao: pts,
             statusJogo: j.statusJogo === 'EmAndamento' ? 'AO VIVO' : j.statusJogo
           };
         });
 
-        // Atualiza o total da cartela no cabeçalho para refletir os gols em tempo real
-        if (this.apostaAtual) {
-          this.apostaAtual.pontuacaoTotalRodada = totalPontosCartela;
-        }
-
+        if (this.apostaAtual) this.apostaAtual.pontuacaoTotalRodada = totalPontosCartela;
         this.isLoading = false;
       },
-      error: () => {
-        this.isLoading = false;
-        this.snackBar.open('Erro ao carregar dados da rodada.', 'Fechar', { duration: 3000 });
-      }
+      error: () => this.isLoading = false
     });
   }
 }
